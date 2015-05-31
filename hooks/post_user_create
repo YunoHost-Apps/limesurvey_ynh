@@ -2,4 +2,4 @@
 
 db_pwd=$(sudo cat /etc/yunohost/mysql)
 user=$1
-mysql -u root -p$db_pwd limesurvey -e "INSERT INTO prefix_users (users_name) VALUES ('$user');INSERT INTO prefix_permissions (entity,entity_id,uid,permission,create_p,read_p,update_p,delete_p,import_p,export_p) SELECT 'global',0,uid,'surveys',1,1,1,1,0,1 FROM prefix_users WHERE users_name='$user'"
+mysql -u root -p$db_pwd limesurvey -e "INSERT IGNORE INTO prefix_users (users_name) VALUES ('$user');INSERT IGNORE INTO prefix_permissions (entity,entity_id,uid,permission,create_p,read_p,update_p,delete_p,import_p,export_p) SELECT 'global',0,uid,'surveys',1,1,1,1,0,1 FROM prefix_users WHERE users_name='$user'"
