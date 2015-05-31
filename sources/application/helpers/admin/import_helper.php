@@ -194,14 +194,14 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
     $countgroups=0;
     if (isset($questionarray))
     {
-        $questionfieldnames=convertCSVRowToArray($questionarray[0],',','"');
+        $questionfieldnames=str_getcsv($questionarray[0],',','"');
         unset($questionarray[0]);
         $countquestions = 0;
     }
 
     if (isset($answerarray))
     {
-        $answerfieldnames=convertCSVRowToArray($answerarray[0],',','"');
+        $answerfieldnames=str_getcsv($answerarray[0],',','"');
         unset($answerarray[0]);
         $countanswers = count($answerarray);
     }
@@ -220,7 +220,7 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
     $langcode = Survey::model()->findByPk($iNewSID)->language;
     if (isset($grouparray))
     {
-        $groupfieldnames = convertCSVRowToArray($grouparray[0],',','"');
+        $groupfieldnames = str_getcsv($grouparray[0],',','"');
         $langfieldnum = array_search("language", $groupfieldnames);
         $gidfieldnum = array_search("gid", $groupfieldnames);
         $groupssupportbaselang = doesImportArraySupportLanguage($grouparray,Array($gidfieldnum),$langfieldnum,$sBaseLanguage,true);
@@ -261,7 +261,7 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
 
     if (count($labelsetsarray) > 1)
     {
-        $labelsetfieldname = convertCSVRowToArray($labelsetsarray[0],',','"');
+        $labelsetfieldname = str_getcsv($labelsetsarray[0],',','"');
         $langfieldnum = array_search("languages", $labelsetfieldname);
         $lidfilednum =  array_search("lid", $labelsetfieldname);
         $labelsetssupportbaselang = doesImportArraySupportLanguage($labelsetsarray,Array($lidfilednum),$langfieldnum,$sBaseLanguage,true);
@@ -288,8 +288,8 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
         $csarray=buildLabelSetCheckSumArray();   // build checksums over all existing labelsets
         $count=0;
         foreach ($labelsetsarray as $lsa) {
-            $fieldorders  =convertCSVRowToArray($labelsetsarray[0],',','"');
-            $fieldcontents=convertCSVRowToArray($lsa,',','"');
+            $fieldorders  =str_getcsv($labelsetsarray[0],',','"');
+            $fieldcontents=str_getcsv($lsa,',','"');
             if ($count==0) {$count++; continue;}
 
             $labelsetrowdata=array_combine($fieldorders,$fieldcontents);
@@ -308,8 +308,8 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
             if ($labelsarray) {
                 $count=0;
                 foreach ($labelsarray as $la) {
-                    $lfieldorders  =convertCSVRowToArray($labelsarray[0],',','"');
-                    $lfieldcontents=convertCSVRowToArray($la,',','"');
+                    $lfieldorders  =str_getcsv($labelsarray[0],',','"');
+                    $lfieldcontents=str_getcsv($la,',','"');
                     if ($count==0) {$count++; continue;}
 
                     // Combine into one array with keys and values since its easier to handle
@@ -385,14 +385,14 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
     if (isset($grouparray) && $grouparray)
     {
         // do GROUPS
-        $gafieldorders=convertCSVRowToArray($grouparray[0],',','"');
+        $gafieldorders=str_getcsv($grouparray[0],',','"');
         unset($grouparray[0]);
         $newgid = 0;
         $group_order = 0;   // just to initialize this variable
 
         foreach ($grouparray as $ga)
         {
-            $gacfieldcontents=convertCSVRowToArray($ga,',','"');
+            $gacfieldcontents=str_getcsv($ga,',','"');
             $grouprowdata=array_combine($gafieldorders,$gacfieldcontents);
 
             // Skip not supported languages
@@ -447,7 +447,7 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
 
             foreach ($questionarray as $qa)
             {
-                $qacfieldcontents=convertCSVRowToArray($qa,',','"');
+                $qacfieldcontents=str_getcsv($qa,',','"');
                 $questionrowdata=array_combine($questionfieldnames,$qacfieldcontents);
                 $questionrowdata=array_map('convertCSVReturnToReturn', $questionrowdata);
                 $questionrowdata["type"]=strtoupper($questionrowdata["type"]);
@@ -582,7 +582,7 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
         {
             foreach ($answerarray as $aa)
             {
-                $answerfieldcontents=convertCSVRowToArray($aa,',','"');
+                $answerfieldcontents=str_getcsv($aa,',','"');
                 $answerrowdata=array_combine($answerfieldnames,$answerfieldcontents);
                 if ($answerrowdata===false)
                 {
@@ -682,11 +682,11 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
     // Finally the question attributes - it is called just once and only if there was a question
     if (isset($question_attributesarray) && $question_attributesarray)
     {//ONLY DO THIS IF THERE ARE QUESTION_ATTRIBUES
-        $fieldorders=convertCSVRowToArray($question_attributesarray[0],',','"');
+        $fieldorders=str_getcsv($question_attributesarray[0],',','"');
         unset($question_attributesarray[0]);
 
         foreach ($question_attributesarray as $qar) {
-            $fieldcontents=convertCSVRowToArray($qar,',','"');
+            $fieldcontents=str_getcsv($qar,',','"');
             $qarowdata=array_combine($fieldorders,$fieldcontents);
 
             // replace the qid for the new one (if there is no new qid in the $aQIDReplacements array it mean that this attribute is orphan -> error, skip this record)
@@ -710,10 +710,10 @@ function CSVImportGroup($sFullFilePath, $iNewSID)
     $results['conditions']=0;
     if (isset($conditionsarray) && $conditionsarray)
     {
-        $fieldorders=convertCSVRowToArray($conditionsarray[0],',','"');
+        $fieldorders=str_getcsv($conditionsarray[0],',','"');
         unset($conditionsarray[0]);
         foreach ($conditionsarray as $car) {
-            $fieldcontents=convertCSVRowToArray($car,',','"');
+            $fieldcontents=str_getcsv($car,',','"');
             $conditionrowdata=array_combine($fieldorders,$fieldcontents);
 
             $oldqid = $conditionrowdata["qid"];
@@ -850,7 +850,7 @@ function XMLImportGroup($sFullFilePath, $iNewSID)
             $insertdata['gid']=$aGIDReplacements[$oldgid];
         }
         if (isset($insertdata['gid'])) switchMSSQLIdentityInsert('groups',true);
-        
+
         $result = Yii::app()->db->createCommand()->insert('{{groups}}', $insertdata);
 
         if (isset($insertdata['gid'])) switchMSSQLIdentityInsert('groups',false);
@@ -896,7 +896,7 @@ function XMLImportGroup($sFullFilePath, $iNewSID)
                 $insertdata['qid']=$aQIDReplacements[$oldqid];
             }
             if (isset($insertdata['qid'])) switchMSSQLIdentityInsert('questions',true);
-            
+
             $result = Yii::app()->db->createCommand()->insert('{{questions}}', $insertdata);
             if (isset($insertdata['qid'])) switchMSSQLIdentityInsert('questions',false);
             if (!isset($aQIDReplacements[$oldqid]))
@@ -938,7 +938,7 @@ function XMLImportGroup($sFullFilePath, $iNewSID)
             $result = Yii::app()->db->createCommand()->insert('{{questions}}', $insertdata);
             $newsqid=getLastInsertID('{{questions}}');
             if (isset($insertdata['qid'])) switchMSSQLIdentityInsert('questions',true);
-            
+
             if (!isset($insertdata['qid']))
             {
                 $aQIDReplacements[$oldsqid]=$newsqid; // add old and new qid to the mapping array
@@ -1020,10 +1020,10 @@ function XMLImportGroup($sFullFilePath, $iNewSID)
                 $insertdata[(string)$key]=(string)$value;
             }
             $insertdata['qid']=$aQIDReplacements[(int)$insertdata['qid']]; // remap the qid
-            if ($insertdata['sqid']>0) 
+            if ($insertdata['sqid']>0)
             {
                 if (!isset($aQIDReplacements[(int)$insertdata['sqid']])) continue;  // If SQID is invalid skip the default value
-                $insertdata['sqid']=$aQIDReplacements[(int)$insertdata['sqid']]; // remap the subquestion id    
+                $insertdata['sqid']=$aQIDReplacements[(int)$insertdata['sqid']]; // remap the subquestion id
             }
 
             // now translate any links
@@ -1238,7 +1238,7 @@ function CSVImportQuestion($sFullFilePath, $iNewSID, $newgid)
 
     if (isset($questionarray))
     {
-        $questionfieldnames=convertCSVRowToArray($questionarray[0],',','"');
+        $questionfieldnames=str_getcsv($questionarray[0],',','"');
         unset($questionarray[0]);
         $countquestions = count($questionarray)-1;
     }
@@ -1246,7 +1246,7 @@ function CSVImportQuestion($sFullFilePath, $iNewSID, $newgid)
 
     if (isset($answerarray))
     {
-        $answerfieldnames=convertCSVRowToArray($answerarray[0],',','"');
+        $answerfieldnames=str_getcsv($answerarray[0],',','"');
         unset($answerarray[0]);
         while (trim(reset($answerarray))=='')
         {
@@ -1298,7 +1298,7 @@ function CSVImportQuestion($sFullFilePath, $iNewSID, $newgid)
 
     if ($countlabelsets > 0)
     {
-        $labelsetfieldname = convertCSVRowToArray($labelsetsarray[0],',','"');
+        $labelsetfieldname = str_getcsv($labelsetsarray[0],',','"');
         $langfieldnum = array_search("languages", $labelsetfieldname);
         $lidfilednum =  array_search("lid", $labelsetfieldname);
         $labelsetssupportbaselang = doesImportArraySupportLanguage($labelsetsarray,Array($lidfilednum),$langfieldnum,$sBaseLanguage,true);
@@ -1316,8 +1316,8 @@ function CSVImportQuestion($sFullFilePath, $iNewSID, $newgid)
         $csarray=buildLabelSetCheckSumArray();   // build checksums over all existing labelsets
         $count=0;
         foreach ($labelsetsarray as $lsa) {
-            $fieldorders  =convertCSVRowToArray($labelsetsarray[0],',','"');
-            $fieldcontents=convertCSVRowToArray($lsa,',','"');
+            $fieldorders  =str_getcsv($labelsetsarray[0],',','"');
+            $fieldcontents=str_getcsv($lsa,',','"');
             if ($count==0) {$count++; continue;}
 
             $results['labelsets']++;
@@ -1338,8 +1338,8 @@ function CSVImportQuestion($sFullFilePath, $iNewSID, $newgid)
             if ($labelsarray) {
                 $count=0;
                 foreach ($labelsarray as $la) {
-                    $lfieldorders  =convertCSVRowToArray($labelsarray[0],',','"');
-                    $lfieldcontents=convertCSVRowToArray($la,',','"');
+                    $lfieldorders  =str_getcsv($labelsarray[0],',','"');
+                    $lfieldcontents=str_getcsv($la,',','"');
                     if ($count==0) {$count++; continue;}
 
                     // Combine into one array with keys and values since its easier to handle
@@ -1432,7 +1432,7 @@ function CSVImportQuestion($sFullFilePath, $iNewSID, $newgid)
 
         foreach ($questionarray as $qa)
         {
-            $qacfieldcontents=convertCSVRowToArray($qa,',','"');
+            $qacfieldcontents=str_getcsv($qa,',','"');
             $questionrowdata=array_combine($questionfieldnames,$qacfieldcontents);
 
             // Skip not supported languages
@@ -1567,7 +1567,7 @@ function CSVImportQuestion($sFullFilePath, $iNewSID, $newgid)
         {
             foreach ($answerarray as $aa)
             {
-                $answerfieldcontents=convertCSVRowToArray($aa,',','"');
+                $answerfieldcontents=str_getcsv($aa,',','"');
                 $answerrowdata=array_combine($answerfieldnames,$answerfieldcontents);
                 if ($answerrowdata===false)
                 {
@@ -1660,10 +1660,10 @@ function CSVImportQuestion($sFullFilePath, $iNewSID, $newgid)
         // Finally the question attributes - it is called just once and only if there was a question
         if (isset($question_attributesarray) && $question_attributesarray)
         {//ONLY DO THIS IF THERE ARE QUESTION_ATTRIBUES
-            $fieldorders  =convertCSVRowToArray($question_attributesarray[0],',','"');
+            $fieldorders  =str_getcsv($question_attributesarray[0],',','"');
             unset($question_attributesarray[0]);
             foreach ($question_attributesarray as $qar) {
-                $fieldcontents=convertCSVRowToArray($qar,',','"');
+                $fieldcontents=str_getcsv($qar,',','"');
                 $qarowdata=array_combine($fieldorders,$fieldcontents);
                 $qarowdata["qid"]=$newqid;
                 unset($qarowdata["qaid"]);
@@ -2019,8 +2019,8 @@ function CSVImportLabelset($sFullFilePath, $options)
     if (isset($labelsetsarray) && $labelsetsarray) {
         $count=0;
         foreach ($labelsetsarray as $lsa) {
-            $fieldorders  =convertCSVRowToArray($labelsetsarray[0],',','"');
-            $fieldcontents=convertCSVRowToArray($lsa,',','"');
+            $fieldorders  =str_getcsv($labelsetsarray[0],',','"');
+            $fieldcontents=str_getcsv($lsa,',','"');
             if ($count==0) {$count++; continue;}
 
             $labelsetrowdata=array_combine($fieldorders,$fieldcontents);
@@ -2040,11 +2040,11 @@ function CSVImportLabelset($sFullFilePath, $options)
 
             if ($labelsarray) {
                 $count=0;
-                $lfieldorders=convertCSVRowToArray($labelsarray[0],',','"');
+                $lfieldorders=str_getcsv($labelsarray[0],',','"');
                 unset($labelsarray[0]);
                 foreach ($labelsarray as $la) {
 
-                    $lfieldcontents=convertCSVRowToArray($la,',','"');
+                    $lfieldcontents=str_getcsv($la,',','"');
                     // Combine into one array with keys and values since its easier to handle
                     $labelrowdata=array_combine($lfieldorders,$lfieldcontents);
                     $labellid=$labelrowdata['lid'];
@@ -2259,7 +2259,6 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     $substitutions=array();
     $aQuestionCodeReplacements=array();
     $aQuotaReplacements=array();
-    $importresults['error']=false;
     $importresults['importwarnings']=array();
     $importresults['question_attributes']=0;
 
@@ -2597,8 +2596,8 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     if ($importresults['conditions']>0){$importresults['conditions']--;};
     if ($importresults['labelsets']>0){$importresults['labelsets']--;};
     if ($importresults['quota']>0){$importresults['quota']--;};
-    $sfieldorders  =convertCSVRowToArray($surveyarray[0],',','"');
-    $sfieldcontents=convertCSVRowToArray($surveyarray[1],',','"');
+    $sfieldorders  =str_getcsv($surveyarray[0],',','"');
+    $sfieldcontents=str_getcsv($surveyarray[1],',','"');
     $surveyrowdata=array_combine($sfieldorders,$sfieldcontents);
     $iOldSID=$surveyrowdata["sid"];
 
@@ -2631,8 +2630,8 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
 
 
     $insert=$surveyarray[0];
-    $sfieldorders  =convertCSVRowToArray($surveyarray[0],',','"');
-    $sfieldcontents=convertCSVRowToArray($surveyarray[1],',','"');
+    $sfieldorders  =str_getcsv($surveyarray[0],',','"');
+    $sfieldcontents=str_getcsv($surveyarray[1],',','"');
     $surveyrowdata=array_combine($sfieldorders,$sfieldcontents);
     // Set new owner ID
     $surveyrowdata['owner_id']=Yii::app()->session['loginID'];
@@ -2662,10 +2661,10 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     $iNewSID = Survey::model()->insertNewSurvey($surveyrowdata) or safeDie ("<br />".$clang->gT("Import of this survey file failed")."<br />{$surveyarray[0]}<br /><br />\n" );
 
     // Now import the survey language settings
-    $fieldorders=convertCSVRowToArray($surveylsarray[0],',','"');
+    $fieldorders=str_getcsv($surveylsarray[0],',','"');
     unset($surveylsarray[0]);
     foreach ($surveylsarray as $slsrow) {
-        $fieldcontents=convertCSVRowToArray($slsrow,',','"');
+        $fieldcontents=str_getcsv($slsrow,',','"');
         $surveylsrowdata=array_combine($fieldorders,$fieldcontents);
         // convert back the '\'.'n' char from the CSV file to true return char "\n"
         $surveylsrowdata=array_map('convertCSVReturnToReturn', $surveylsrowdata);
@@ -2699,8 +2698,7 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     $aLanguagesSupported=array_merge($aLanguagesSupported,Survey::model()->findByPk($iNewSID)->additionalLanguages);
 
 
-    // DO SURVEY_RIGHTS
-
+    // Create survey permissions
     Permission::model()->giveAllSurveyPermissions(Yii::app()->session['loginID'],$iNewSID);
 
     $importresults['deniedcountls'] =0;
@@ -2718,8 +2716,8 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
         $csarray=buildLabelSetCheckSumArray();   // build checksums over all existing labelsets
         $count=0;
         foreach ($labelsetsarray as $lsa) {
-            $fieldorders  =convertCSVRowToArray($labelsetsarray[0],',','"');
-            $fieldcontents=convertCSVRowToArray($lsa,',','"');
+            $fieldorders  =str_getcsv($labelsetsarray[0],',','"');
+            $fieldcontents=str_getcsv($lsa,',','"');
             if ($count==0) {$count++; continue;}
 
             $labelsetrowdata=array_combine($fieldorders,$fieldcontents);
@@ -2737,8 +2735,8 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
             if ($labelsarray) {
                 $count=0;
                 foreach ($labelsarray as $la) {
-                    $lfieldorders  =convertCSVRowToArray($labelsarray[0],',','"');
-                    $lfieldcontents=convertCSVRowToArray($la,',','"');
+                    $lfieldorders  =str_getcsv($labelsarray[0],',','"');
+                    $lfieldcontents=str_getcsv($la,',','"');
                     if ($count==0) {$count++; continue;}
 
                     // Combine into one array with keys and values since its easier to handle
@@ -2815,11 +2813,11 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     if (isset($grouparray) && $grouparray)
     {
         // do GROUPS
-        $gafieldorders=convertCSVRowToArray($grouparray[0],',','"');
+        $gafieldorders=str_getcsv($grouparray[0],',','"');
         unset($grouparray[0]);
         foreach ($grouparray as $ga)
         {
-            $gacfieldcontents=convertCSVRowToArray($ga,',','"');
+            $gacfieldcontents=str_getcsv($ga,',','"');
             $grouprowdata=array_combine($gafieldorders,$gacfieldcontents);
 
             //Now an additional integrity check if there are any groups not belonging into this survey
@@ -2867,11 +2865,11 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     // Import questions
     if (isset($questionarray) && $questionarray)
     {
-        $qafieldorders=convertCSVRowToArray($questionarray[0],',','"');
+        $qafieldorders=str_getcsv($questionarray[0],',','"');
         unset($questionarray[0]);
         foreach ($questionarray as $qa)
         {
-            $qacfieldcontents=convertCSVRowToArray($qa,',','"');
+            $qacfieldcontents=str_getcsv($qa,',','"');
             $questionrowdata=array_combine($qafieldorders,$qacfieldcontents);
             $questionrowdata=array_map('convertCSVReturnToReturn', $questionrowdata);
             $questionrowdata["type"]=strtoupper($questionrowdata["type"]);
@@ -2961,7 +2959,7 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
             }
             if (!$oQuestion->save())
             {
-                // safeDie($clang->gT("Error while saving: "). print_r($oQuestion->errors, true));  
+                // safeDie($clang->gT("Error while saving: "). print_r($oQuestion->errors, true));
                 //
                 // In PHP 5.2.10 a bug is triggered that resets the foreach loop when inserting a record
                 // Problem is that it is the default PHP version on Ubuntu 12.04 LTS (which is currently very common in use)
@@ -3044,12 +3042,12 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     //Do answers
     if (isset($answerarray) && $answerarray)
     {
-        $answerfieldnames = convertCSVRowToArray($answerarray[0],',','"');
+        $answerfieldnames = str_getcsv($answerarray[0],',','"');
         unset($answerarray[0]);
 
         foreach ($answerarray as $aa)
         {
-            $answerfieldcontents = convertCSVRowToArray($aa,',','"');
+            $answerfieldcontents = str_getcsv($aa,',','"');
             $answerrowdata = array_combine($answerfieldnames,$answerfieldcontents);
             if (in_array($answerrowdata['qid'],$aIgnoredAnswers))
             {
@@ -3153,9 +3151,9 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
                 }
                 if (!$question->save())
                 {
-                    // safeDie($clang->gT("Error while saving: "). print_r($question->errors, true));  
+                    // safeDie($clang->gT("Error while saving: "). print_r($question->errors, true));
                     //
-                    // In PHP 5.2.10 a bug is triggered that resets the foreach loop when inserting a record
+                    // In PHP 5.2.10 and some later versions a bug is triggered that resets the foreach loop when inserting a record
                     // Problem is that it is the default PHP version on Ubuntu 12.04 LTS (which is currently very common in use)
                     // For this reason we ignore insertion errors (because it is most likely a duplicate)
                     // and continue with the next one
@@ -3217,10 +3215,10 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     //We've built two arrays along the way - one containing the old SID, GID and QIDs - and their NEW equivalents
     //and one containing the old 'extended fieldname' and its new equivalent.  These are needed to import conditions and question_attributes.
     if (isset($question_attributesarray) && $question_attributesarray) {//ONLY DO THIS IF THERE ARE QUESTION_ATTRIBUES
-        $fieldorders  =convertCSVRowToArray($question_attributesarray[0],',','"');
+        $fieldorders  =str_getcsv($question_attributesarray[0],',','"');
         unset($question_attributesarray[0]);
         foreach ($question_attributesarray as $qar) {
-            $fieldcontents=convertCSVRowToArray($qar,',','"');
+            $fieldcontents=str_getcsv($qar,',','"');
             $qarowdata=array_combine($fieldorders,$fieldcontents);
             $newqid="";
             $qarowdata["qid"]=$aQIDReplacements[$qarowdata["qid"]];
@@ -3231,11 +3229,11 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     }
 
     if (isset($assessmentsarray) && $assessmentsarray) {//ONLY DO THIS IF THERE ARE QUESTION_ATTRIBUTES
-        $fieldorders=convertCSVRowToArray($assessmentsarray[0],',','"');
+        $fieldorders=str_getcsv($assessmentsarray[0],',','"');
         unset($assessmentsarray[0]);
         foreach ($assessmentsarray as $qar)
         {
-            $fieldcontents=convertCSVRowToArray($qar,',','"');
+            $fieldcontents=str_getcsv($qar,',','"');
             $asrowdata=array_combine($fieldorders,$fieldcontents);
             if (isset($asrowdata['link']))
             {
@@ -3257,19 +3255,12 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
     }
 
     if (isset($quotaarray) && $quotaarray) {//ONLY DO THIS IF THERE ARE QUOTAS
-        $fieldorders=convertCSVRowToArray($quotaarray[0],',','"');
+        $fieldorders=str_getcsv($quotaarray[0],',','"');
         unset($quotaarray[0]);
         foreach ($quotaarray as $qar)
         {
-            $fieldcontents=convertCSVRowToArray($qar,',','"');
-
+            $fieldcontents=str_getcsv($qar,',','"');
             $asrowdata=array_combine($fieldorders,$fieldcontents);
-
-            $iOldSID=$asrowdata["sid"];
-            foreach ($substitutions as $subs) {
-                if ($iOldSID==$subs[0]) {$iNewSID=$subs[3];}
-            }
-
             $asrowdata["sid"]=$iNewSID;
             $oldid = $asrowdata["id"];
             unset($asrowdata["id"]);
@@ -3283,27 +3274,20 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
         $count=0;
         foreach ($quotamembersarray as $qar) {
 
-            $fieldorders  =convertCSVRowToArray($quotamembersarray[0],',','"');
-            $fieldcontents=convertCSVRowToArray($qar,',','"');
+            $fieldorders  =str_getcsv($quotamembersarray[0],',','"');
+            $fieldcontents=str_getcsv($qar,',','"');
             if ($count==0) {$count++; continue;}
 
             $asrowdata=array_combine($fieldorders,$fieldcontents);
 
             $iOldSID=$asrowdata["sid"];
-            $newqid="";
-            $newquotaid="";
             $oldqid=$asrowdata['qid'];
             $oldquotaid=$asrowdata['quota_id'];
-
-            foreach ($substitutions as $subs) {
-                if ($iOldSID==$subs[0]) {$iNewSID=$subs[3];}
-                if ($oldqid==$subs[2]) {$newqid=$subs[5];}
-            }
 
             $newquotaid=$aQuotaReplacements[$oldquotaid];
 
             $asrowdata["sid"]=$iNewSID;
-            $asrowdata["qid"]=$newqid;
+            $asrowdata["qid"]=$aQIDReplacements[$oldqid];
             $asrowdata["quota_id"]=$newquotaid;
             unset($asrowdata["id"]);
 
@@ -3316,8 +3300,8 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
         $count=0;
         foreach ($quotalsarray as $qar) {
 
-            $fieldorders  =convertCSVRowToArray($quotalsarray[0],',','"');
-            $fieldcontents=convertCSVRowToArray($qar,',','"');
+            $fieldorders  =str_getcsv($quotalsarray[0],',','"');
+            $fieldcontents=str_getcsv($qar,',','"');
             if ($count==0) {$count++; continue;}
 
             $asrowdata=array_combine($fieldorders,$fieldcontents);
@@ -3354,12 +3338,12 @@ function CSVImportSurvey($sFullFilePath,$iDesiredSurveyId=NULL,$bTranslateLinks=
 
     // Do conditions
     if (isset($conditionsarray) && $conditionsarray) {//ONLY DO THIS IF THERE ARE CONDITIONS!
-        $fieldorders  =convertCSVRowToArray($conditionsarray[0],',','"');
+        $fieldorders  =str_getcsv($conditionsarray[0],',','"');
         unset($conditionsarray[0]);
         // Exception for conditions based on attributes
         $aQIDReplacements[0]=0;
         foreach ($conditionsarray as $car) {
-            $fieldcontents=convertCSVRowToArray($car,',','"');
+            $fieldcontents=str_getcsv($car,',','"');
             $conditionrowdata=array_combine($fieldorders,$fieldcontents);
 
             unset($conditionrowdata["cid"]);
@@ -3510,7 +3494,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
     if ($sXMLdata == NULL)
     {
         $sXMLdata = file_get_contents($sFullFilePath);
-    } 
+    }
     $xml = @simplexml_load_string($sXMLdata,'SimpleXMLElement',LIBXML_NONET);
 
     if (!$xml || $xml->LimeSurveyDocType!='Survey')
@@ -3598,9 +3582,9 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
             $insertdata['googleanalyticsapikey']=$insertdata['googleAnalyticsAPIKey'];
             unset($insertdata['googleAnalyticsAPIKey']);
         }
-        if (isset($insertdata['allowjumps'])) 
+        if (isset($insertdata['allowjumps']))
         {
-            $insertdata['questionindex']= ($insertdata['allowjumps']=="Y")?1:0; 
+            $insertdata['questionindex']= ($insertdata['allowjumps']=="Y")?1:0;
             unset($insertdata['allowjumps']);
         }
         /* Remove unknow column */
@@ -3613,7 +3597,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
         {
             $results['importwarnings'][]=sprintf($clang->gT("This survey setting has not been imported: %s => %s"),$key,$value);
         }
-        
+
         $iNewSID = $results['newsid'] = Survey::model()->insertNewSurvey($insertdata) or safeDie($clang->gT("Error").": Failed to insert data [1]<br />");
 
         $results['surveys']++;
@@ -3655,7 +3639,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
         {
             unset($insertdata['surveyls_attributecaptions']);
         }
-        
+
 
 
         $result = SurveyLanguageSetting::model()->insertNewSurvey($insertdata) or safeDie($clang->gT("Error").": Failed to insert data [2]<br />");
@@ -3741,7 +3725,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
             if ($insertdata)
                 XSSFilterArray($insertdata);
 
-            if (!$bConvertInvalidQuestionCodes)   
+            if (!$bConvertInvalidQuestionCodes)
             {
                 $sScenario='archiveimport';
             }
@@ -3787,7 +3771,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
             }
             if (!$oQuestion->save())
             {
-                // safeDie($clang->gT("Error while saving: "). print_r($oQuestion->errors, true));  
+                // safeDie($clang->gT("Error while saving: "). print_r($oQuestion->errors, true));
                 //
                 // In PHP 5.2.10 a bug is triggered that resets the foreach loop when inserting a record
                 // Problem is that it is the default PHP version on Ubuntu 12.04 LTS (which is currently very common in use)
@@ -3851,7 +3835,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
                 XSSFilterArray($insertdata);
 
 
-            if (!$bConvertInvalidQuestionCodes)   
+            if (!$bConvertInvalidQuestionCodes)
             {
                 $sScenario='archiveimport';
             }
@@ -3895,7 +3879,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
             }
             if (!$question->save())
             {
-                // safeDie($clang->gT("Error while saving: "). print_r($question->errors, true));  
+                // safeDie($clang->gT("Error while saving: "). print_r($question->errors, true));
                 //
                 // In PHP 5.2.10 a bug is triggered that resets the foreach loop when inserting a record
                 // Problem is that it is the default PHP version on Ubuntu 12.04 LTS (which is currently very common in use)
@@ -3946,7 +3930,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
             }
             if ($insertdata)
                 XSSFilterArray($insertdata);
-                
+
             if (Answer::model()->insertRecords($insertdata))
             {
                 $results['answers']++;
@@ -3965,17 +3949,17 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
             {
                 $insertdata[(string)$key]=(string)$value;
             }
-            
+
             // take care of renaming of date min/max adv. attributes fields
             if ($iDBVersion < 170)
             {
                 if (isset($insertdata['attribute']))
                 {
-                    if ($insertdata['attribute']=='dropdown_dates_year_max') 
+                    if ($insertdata['attribute']=='dropdown_dates_year_max')
                     {
-                        $insertdata['attribute']='date_max'; 
+                        $insertdata['attribute']='date_max';
                     }
-                    if ($insertdata['attribute']=='dropdown_dates_year_min') 
+                    if ($insertdata['attribute']=='dropdown_dates_year_min')
                     {
                         $insertdata['attribute']='date_min';
                     }
@@ -4203,7 +4187,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
             $insertdata['sid']=$iNewSID; // remap the survey id
             if (isset($insertdata['targetsqid']) && $insertdata['targetsqid']!='')
             {
-                $insertdata['targetsqid'] =$aSQIDReplacements[(int)$insertdata['targetsqid']]; // remap the qid
+                $insertdata['targetsqid'] =$aQIDReplacements[(int)$insertdata['targetsqid']]; // remap the qid
             }
             if (isset($insertdata['targetqid']) && $insertdata['targetqid']!='')
             {
@@ -4215,7 +4199,7 @@ function XMLImportSurvey($sFullFilePath,$sXMLdata=NULL,$sNewSurveyName=NULL,$iDe
         }
     }
 
-    // Set survey rights
+    // Set survey permissions
     Permission::model()->giveAllSurveyPermissions(Yii::app()->session['loginID'],$iNewSID);
     $aOldNewFieldmap=reverseTranslateFieldNames($iOldSID,$iNewSID,$aGIDReplacements,$aQIDReplacements);
     $results['FieldReMap']=$aOldNewFieldmap;
@@ -4282,7 +4266,7 @@ function XMLImportTokens($sFullFilePath,$iSurveyID,$sCreateMissingAttributeField
         $results['tokens']=0;
         return $results;
     }
-    
+
     $results['tokens']=0;
     $results['tokenfieldscreated']=0;
 
@@ -4322,13 +4306,16 @@ function XMLImportTokens($sFullFilePath,$iSurveyID,$sCreateMissingAttributeField
 		$token = Token::create($iSurveyID);
 		$token->setAttributes($insertdata, false);
         if (!$token->save())
-        {                   
+        {
             $results['warnings'][]=$clang->gT("Skipped tokens entry:").' '. implode('. ',$token->errors['token']);
         };
         $results['tokens']++;
     }
     switchMSSQLIdentityInsert('tokens_'.$iSurveyID,false);
-
+    if (Yii::app()->db->getDriverName() == 'pgsql')
+    {
+        try {Yii::app()->db->createCommand("SELECT pg_catalog.setval(pg_get_serial_sequence('{{tokens_".$iSurveyID."}}', 'tid'), (SELECT MAX(tid) FROM {{tokens_".$iSurveyID."}}))")->execute();} catch(Exception $oException){};
+    }
     return $results;
 }
 
@@ -4379,7 +4366,7 @@ function XMLImportResponses($sFullFilePath,$iSurveyID,$aFieldReMap=array())
                                 $aInsertData[$sFieldname]='';
                         }
                     }
-                    
+
                     $result = SurveyDynamic::model($iSurveyID)->insertRecords($aInsertData) or safeDie($clang->gT("Error").": Failed to insert data[16]<br />");
                     $results['responses']++;
                 }
@@ -4389,7 +4376,10 @@ function XMLImportResponses($sFullFilePath,$iSurveyID,$aFieldReMap=array())
     }
 
     switchMSSQLIdentityInsert('survey_'.$iSurveyID,false);
-
+    if (Yii::app()->db->getDriverName() == 'pgsql')
+    {
+        try {Yii::app()->db->createCommand("SELECT pg_catalog.setval(pg_get_serial_sequence('{{survey_".$iSurveyID."}}', 'id'), (SELECT MAX(id) FROM {{survey_".$iSurveyID."}}))")->execute();} catch(Exception $oException){};
+    }
     return $results;
 }
 
@@ -4510,6 +4500,7 @@ function CSVImportResponses($sFullFilePath,$iSurveyId,$aOptions=array())
     $aResponsesError=array();
     $aExistingsId=array();
 
+    $iMaxId=0; // If we set the id, keep the max
     // Some specific header (with options)
     $iIdKey=array_search('id', $aCsvHeader); // the id is allways needed and used a lot
     if(is_int($iIdKey)){unset($aKeyForFieldNames['id']);}
@@ -4565,6 +4556,7 @@ function CSVImportResponses($sFullFilePath,$iSurveyId,$aOptions=array())
                 if(!$bExistingsId) // If not exist : allways import it
                 {
                     $oSurvey->id=$aResponses[$iIdKey];
+                    $iMaxId=($aResponses[$iIdKey]>$iMaxId)?$aResponses[$iIdKey]:$iMaxId;
                 }
                 elseif($aOptions['sExistingId']=='replace' || $aOptions['sExistingId']=='replaceanswers')// Set it depending with some options
                 {
@@ -4578,7 +4570,7 @@ function CSVImportResponses($sFullFilePath,$iSurveyId,$aOptions=array())
             elseif(is_int($iSubmitdateKey))
             {
                 if( $aResponses[$iSubmitdateKey]=='{question_not_shown}' || trim($aResponses[$iSubmitdateKey]=='')){
-                    $oSurvey->submitdate = new CDbExpression('NULL'); 
+                    $oSurvey->submitdate = new CDbExpression('NULL');
                 }else{
                     // Maybe control valid date : see http://php.net/manual/en/function.checkdate.php#78362 for example
                     $oSurvey->submitdate=$aResponses[$iSubmitdateKey];
@@ -4587,7 +4579,7 @@ function CSVImportResponses($sFullFilePath,$iSurveyId,$aOptions=array())
             foreach($aKeyForFieldNames as $sFieldName=>$iFieldKey)
             {
                 if( $aResponses[$iFieldKey]=='{question_not_shown}'){
-                    $oSurvey->$sFieldName = new CDbExpression('NULL'); 
+                    $oSurvey->$sFieldName = new CDbExpression('NULL');
                 }else{
                     $sResponse=str_replace(array("{quote}","{tab}","{cr}","{newline}","{lbrace}"),array("\"","\t","\r","\n","{"),$aResponses[$iFieldKey]);
                     $oSurvey->$sFieldName = $sResponse;
@@ -4597,6 +4589,11 @@ function CSVImportResponses($sFullFilePath,$iSurveyId,$aOptions=array())
             $oTransaction = Yii::app()->db->beginTransaction();
             try
             {
+                if (isset($oSurvey->id) && !is_null($oSurvey->id))
+                {
+                    switchMSSQLIdentityInsert('survey_'.$iSurveyId, true);
+                    $bSwitched=true;
+                }
                 if($oSurvey->save())
                 {
                     $oTransaction->commit();
@@ -4614,6 +4611,10 @@ function CSVImportResponses($sFullFilePath,$iSurveyId,$aOptions=array())
                     $oTransaction->rollBack();
                     $aResponsesError[]=$aResponses[$iIdReponsesKey];
                 }
+                if (isset($bSwitched) && $bSwitched==true){
+                    switchMSSQLIdentityInsert('survey_'.$iSurveyId, false);
+                    $bSwitched=false;
+                }
             }
             catch(Exception $oException)
             {
@@ -4624,6 +4625,19 @@ function CSVImportResponses($sFullFilePath,$iSurveyId,$aOptions=array())
                 // tracevar($oException->getMessage());// Show it in console (if debug is set)
             }
 
+        }
+    }
+    // Fix max next id (for pgsql)
+    // mysql dot need fix, but what for mssql ?
+    // Do a model function for this can be a good idea (see activate_helper/activateSurvey)
+    if (Yii::app()->db->driverName=='pgsql')
+    {
+        $sSequenceName= Yii::app()->db->getSchema()->getTable("{{survey_{$iSurveyId}}}")->sequenceName;
+        $iActualSerial=Yii::app()->db->createCommand("SELECT last_value FROM  {$sSequenceName}")->queryScalar();
+        if($iActualSerial<$iMaxId)
+        {
+            $sQuery = "SELECT setval(pg_get_serial_sequence('{{survey_{$iSurveyId}}}', 'id'),{$iMaxId},false);";
+            $result = @Yii::app()->db->createCommand($sQuery)->execute();
         }
     }
 
@@ -4674,9 +4688,9 @@ function XMLImportTimings($sFullFilePath,$iSurveyID,$aFieldReMap=array())
     }
     $results['languages']=count($aLanguagesSupported);
      // Return if there are no timing records to import
-    if (!isset($xml->timings->rows)) 
+    if (!isset($xml->timings->rows))
     {
-        return $results;   
+        return $results;
     }
     switchMSSQLIdentityInsert('survey_'.$iSurveyID.'_timings',true);
     foreach ($xml->timings->rows->row as $row)
@@ -4850,7 +4864,7 @@ function TSVImportSurvey($sFullFilePath)
     $surveyinfo['active']='N';
    // unset($surveyinfo['datecreated']);
     $iNewSID = Survey::model()->insertNewSurvey($surveyinfo) ; //or safeDie($clang->gT("Error").": Failed to insert survey<br />");
-    if ($iNewSID==false)
+    if (!$iNewSID)
     {
         $results['error'] = Survey::model()->getErrors();
         $results['bFailed'] = true;
@@ -4915,7 +4929,7 @@ function TSVImportSurvey($sFullFilePath)
                 $glang = (!empty($row['language']) ? $row['language'] : $baselang);
                 // when a multi-lang tsv-file without information on the group id/number (old style) is imported,
                 // we make up this information by giving a number 0..[numberofgroups-1] per language.
-                // the number and order of groups per language should be the same, so we can also import these files 
+                // the number and order of groups per language should be the same, so we can also import these files
                 if ($lastglang!=$glang)    //reset counter on language change
                 {
                     $iGroupcounter=0;
@@ -4936,7 +4950,7 @@ function TSVImportSurvey($sFullFilePath)
                     $insertdata['group_order'] = $ginfo[$sGroupseq]['group_order'];
                 }
                 else
-                { 
+                {
                     $insertdata['group_order'] = $gseq;
                 }
                 $newgid = QuestionGroup::model()->insertRecords($insertdata);
@@ -4969,7 +4983,7 @@ function TSVImportSurvey($sFullFilePath)
                 $insertdata['help'] = (isset($row['help']) ? $row['help'] : '');
                 $insertdata['language'] = (isset($row['language']) ? $row['language'] : $baselang);
                 $insertdata['mandatory'] = (isset($row['mandatory']) ? $row['mandatory'] : '');
-                $insertdata['other'] = (isset($row['other']) ? $row['other'] : 'N');
+                $lastother = $insertdata['other'] = (isset($row['other']) ? $row['other'] : 'N'); // Keep trace of other settings for sub question
                 $insertdata['same_default'] = (isset($row['same_default']) ? $row['same_default'] : 0);
                 $insertdata['parent_qid'] = 0;
 
@@ -5030,7 +5044,7 @@ function TSVImportSurvey($sFullFilePath)
                                 {
                                     $insertdata['language'] = (isset($row['language']) ? $row['language'] : $baselang);
                                 }
-                                else 
+                                else
                                 {
                                     $insertdata['language'] = NULL;
                                 }
@@ -5062,17 +5076,17 @@ function TSVImportSurvey($sFullFilePath)
                     $results['defaultvalues']++;
                 }
                 break;
-
             case 'SQ':
                 $sqname = (isset($row['name']) ? $row['name'] : 'SQ' . $sqseq);
                 if ($qtype == 'O' || $qtype == '|')
                 {
                     ;   // these are fake rows to show naming of comment and filecount fields
                 }
-                elseif ($sqname == 'other' && ($qtype == '!' || $qtype == 'L'))
+                elseif ($sqname == 'other' && $lastother=="Y") // If last question have other to Y : it's not a real SQ row
+                {
+                    if($qtype=="!" || $qtype=="L")
                     {
-                        // only want to set default value for 'other' in these cases - not a real SQ row
-                        // TODO - this isn't working
+                        // only used to set default value for 'other' in these cases
                         if (isset($row['default']))
                         {
                             $insertdata=array();
@@ -5081,12 +5095,14 @@ function TSVImportSurvey($sFullFilePath)
                             $insertdata['language'] = (isset($row['language']) ? $row['language'] : $baselang);
                             $insertdata['defaultvalue'] = $row['default'];
                             $result = DefaultValue::model()->insertRecords($insertdata);
-                            if(!$result){
+                            if(!$result)
+                            {
                                 $results['importwarnings'][] = $clang->gT("Warning")." : ".$clang->gT("Failed to insert default value").". ".$clang->gT("Text file row number ").$rownumber;
                                 break;
                             }
                             $results['defaultvalues']++;
                         }
+                    }
                 }
                 else
                 {
@@ -5179,6 +5195,6 @@ function TSVImportSurvey($sFullFilePath)
         LimeExpressionManager::RevertUpgradeConditionsToRelevance($iNewSID);
         LimeExpressionManager::UpgradeConditionsToRelevance($iNewSID);
     }
-    
+
     return $results;
 }

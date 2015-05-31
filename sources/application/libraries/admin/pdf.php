@@ -19,144 +19,144 @@ if(!defined('K_TCPDF_EXTERNAL_CONFIG')) {
 # include TCPDF
 require(APPPATH.'config/tcpdf'.EXT);
 
-require_once($tcpdf['base_directory'].'/tcpdf.php');
-
-
 /**
  * page format
  */
-(!defined ('PDF_PAGE_FORMAT')) ? (define ('PDF_PAGE_FORMAT', 'A4')):'';
+(!defined ('PDF_PAGE_FORMAT')) ? (define ('PDF_PAGE_FORMAT', isset($tcpdf['page_format']) ? $tcpdf['page_format'] : 'A4')):'';
 
 /**
  * page orientation (P=portrait, L=landscape)
  */
-(!defined ('PDF_PAGE_ORIENTATION')) ? (define('PDF_PAGE_ORIENTATION', 'P')):'';
+(!defined ('PDF_PAGE_ORIENTATION')) ? (define('PDF_PAGE_ORIENTATION', isset($tcpdf['page_orientation']) ? $tcpdf['page_orientation'] :'P')):'';
 
 /**
  * document creator
  */
-(!defined ('PDF_CREATOR'))?(define ('PDF_CREATOR', 'TCPDF')):'';
+(!defined ('PDF_CREATOR'))?(define ('PDF_CREATOR', isset($tcpdf['creator']) ? $tcpdf['creator'] : 'TCPDF')):'';
 
 /**
  * document author
  */
-(!defined ('PDF_AUTHOR'))? (define ('PDF_AUTHOR', 'TCPDF')):'';
+(!defined ('PDF_AUTHOR'))? (define ('PDF_AUTHOR', isset($tcpdf['author']) ? $tcpdf['author'] : 'TCPDF')):'';
 
 /**
  * header title
  */
-(!defined ('PDF_HEADER_TITLE'))? (define ('PDF_HEADER_TITLE', 'TCPDF Example')):'';
+(!defined ('PDF_HEADER_TITLE'))? (define ('PDF_HEADER_TITLE', isset($tcpdf['header_title']) ? $tcpdf['header_title'] : 'TCPDF Example')):'';
 
 /**
  * header description string
  */
-(!defined ('PDF_HEADER_STRING'))? (define ('PDF_HEADER_STRING', "by Nicola Asuni - Tecnick.com\nwww.tcpdf.org")):'';
+(!defined ('PDF_HEADER_STRING'))? (define ('PDF_HEADER_STRING', isset($tcpdf['header_string']) ? $tcpdf['header_string'] : "by Nicola Asuni - Tecnick.com\nwww.tcpdf.org")):'';
 
 /**
  * image logo
  */
-(!defined ('PDF_HEADER_LOGO'))? (define ('PDF_HEADER_LOGO', 'tcpdf_logo.jpg')):'';
+(!defined ('PDF_HEADER_LOGO'))? (define ('PDF_HEADER_LOGO', isset($tcpdf['header_logo']) ? $tcpdf['header_logo'] : 'tcpdf_logo.jpg')):'';
 
 /**
  * header logo image width [mm]
  */
-(!defined ('PDF_HEADER_LOGO_WIDTH'))? (define ('PDF_HEADER_LOGO_WIDTH', 30)):'';
+(!defined ('PDF_HEADER_LOGO_WIDTH'))? (define ('PDF_HEADER_LOGO_WIDTH', isset($tcpdf['header_logo_width']) ? $tcpdf['header_logo_width'] : 30)):'';
 
 /**
  *  document unit of measure [pt=point, mm=millimeter, cm=centimeter, in=inch]
  */
-(!defined ('PDF_UNIT'))? (define ('PDF_UNIT', 'mm')):'';
+(!defined ('PDF_UNIT'))? (define ('PDF_UNIT', isset($tcpdf['page_unit']) ? $tcpdf['page_unit'] : 'mm')):'';
 
 /**
  * header margin
  */
-(!defined ('PDF_MARGIN_HEADER'))? (define ('PDF_MARGIN_HEADER', 5)):'';
+(!defined ('PDF_MARGIN_HEADER'))? (define ('PDF_MARGIN_HEADER', isset($tcpdf['header_margin']) ? $tcpdf['header_margin'] : 5)):'';
 
 /**
  * footer margin
  */
-(!defined ('PDF_MARGIN_FOOTER'))? (define ('PDF_MARGIN_FOOTER', 10)):'';
+(!defined ('PDF_MARGIN_FOOTER'))? (define ('PDF_MARGIN_FOOTER', isset($tcpdf['footer_margin']) ? $tcpdf['footer_margin'] : 10)):'';
 
 /**
  * top margin
  */
-(!defined ('PDF_MARGIN_TOP'))? (define ('PDF_MARGIN_TOP', 27)):'';
+(!defined ('PDF_MARGIN_TOP'))? (define ('PDF_MARGIN_TOP', isset($tcpdf['margin_top']) ? $tcpdf['margin_top'] : 27)):'';
 
 /**
  * bottom margin
  */
-(!defined ('PDF_MARGIN_BOTTOM'))? (define ('PDF_MARGIN_BOTTOM', 25)):'';
+(!defined ('PDF_MARGIN_BOTTOM'))? (define ('PDF_MARGIN_BOTTOM', isset($tcpdf['margin_bottom']) ? $tcpdf['margin_bottom'] : 25)):'';
 
 /**
  * left margin
  */
-(!defined ('PDF_MARGIN_LEFT'))? (define ('PDF_MARGIN_LEFT', 15)):'';
+(!defined ('PDF_MARGIN_LEFT'))? (define ('PDF_MARGIN_LEFT', isset($tcpdf['margin_left']) ? $tcpdf['margin_left'] : 15)):'';
 
 /**
  * right margin
  */
-(!defined ('PDF_MARGIN_RIGHT'))? (define ('PDF_MARGIN_RIGHT', 15)):'';
+(!defined ('PDF_MARGIN_RIGHT'))? (define ('PDF_MARGIN_RIGHT', isset($tcpdf['margin_right']) ? $tcpdf['margin_right'] : 15)):'';
 
 /**
  * default main font name
  */
-(!defined ('PDF_FONT_NAME_MAIN'))? (define ('PDF_FONT_NAME_MAIN', 'helvetica')):'';
+(!defined ('PDF_FONT_NAME_MAIN'))? (define ('PDF_FONT_NAME_MAIN', isset($tcpdf['page_font']) ? $tcpdf['page_font'] : 'helvetica')):'';
 
 /**
  * default main font size
  */
-(!defined ('PDF_FONT_SIZE_MAIN'))? (define ('PDF_FONT_SIZE_MAIN', 10)):'';
+(!defined ('PDF_FONT_SIZE_MAIN'))? (define ('PDF_FONT_SIZE_MAIN', isset($tcpdf['page_font_size']) ? $tcpdf['page_font_size'] : 10)):'';
 
 /**
  * default data font name
  */
-(!defined ('PDF_FONT_NAME_DATA'))? (define ('PDF_FONT_NAME_DATA', 'helvetica')):'';
+(!defined ('PDF_FONT_NAME_DATA'))? (define ('PDF_FONT_NAME_DATA', isset($tcpdf['data_font']) ? $tcpdf['data_font'] : 'helvetica')):'';
 
 /**
  * default data font size
  */
-(!defined ('PDF_FONT_SIZE_DATA'))? (define ('PDF_FONT_SIZE_DATA', 8)):'';
+(!defined ('PDF_FONT_SIZE_DATA'))? (define ('PDF_FONT_SIZE_DATA', isset($tcpdf['data_font_size']) ? $tcpdf['data_font_size'] : 8)):'';
 
 /**
  * default monospaced font name
  */
-(!defined ('PDF_FONT_MONOSPACED'))? (define ('PDF_FONT_MONOSPACED', 'courier')):'';
+(!defined ('PDF_FONT_MONOSPACED'))? (define ('PDF_FONT_MONOSPACED', isset($tcpdf['mono_font']) ? $tcpdf['mono_font'] : 'courier')):'';
 
 /**
  * ratio used to adjust the conversion of pixels to user units
  */
-(!defined ('PDF_IMAGE_SCALE_RATIO'))? (define ('PDF_IMAGE_SCALE_RATIO', 1.25)):'';
+(!defined ('PDF_IMAGE_SCALE_RATIO'))? (define ('PDF_IMAGE_SCALE_RATIO', isset($tcpdf['image_scale']) ? $tcpdf['image_scale'] : 1.25)):'';
 
 /**
  * magnification factor for titles
  */
-(!defined('HEAD_MAGNIFICATION'))? (define('HEAD_MAGNIFICATION', 1.1)):'';
+(!defined('HEAD_MAGNIFICATION'))? (define('HEAD_MAGNIFICATION', 1.1)):''; // never used in TCPDF 6.
 
 /**
  * height of cell repect font height
  */
-(!defined('K_CELL_HEIGHT_RATIO'))? (define('K_CELL_HEIGHT_RATIO', 1.25)):'';
+(!defined('K_CELL_HEIGHT_RATIO'))? (define('K_CELL_HEIGHT_RATIO', isset($tcpdf['cell_height_ratio']) ? $tcpdf['cell_height_ratio'] : 1.25)):'';
 
 /**
  * title magnification respect main font size
  */
-(!defined('K_TITLE_MAGNIFICATION'))? (define('K_TITLE_MAGNIFICATION', 1.3)):'';
+(!defined('K_TITLE_MAGNIFICATION'))? (define('K_TITLE_MAGNIFICATION', 1.3)):''; // never used in TCPDF 6.
 
 /**
  * reduction factor for small font
  */
-(!defined('K_SMALL_RATIO'))? (define('K_SMALL_RATIO', 2/3)):'';
+(!defined('K_SMALL_RATIO'))? (define('K_SMALL_RATIO', isset ($tcpdf['small_font_ratio']) ? $tcpdf['small_font_ratio'] : 2/3)):'';
 
 /**
- * set to true to enable the special procedure used to avoid the overlappind of symbols on Thai language
+ * set to true to enable the special procedure used to avoid the overlapping of symbols on Thai language
  */
-(!defined('K_THAI_TOPCHARS'))? (define('K_THAI_TOPCHARS', true)):'';
+(!defined('K_THAI_TOPCHARS'))? (define('K_THAI_TOPCHARS', isset($tcpdf['thai_top_chars']) ? $tcpdf['thai_top_chars'] : true)):'';
 
 /**
  * if true allows to call TCPDF methods using HTML syntax
  * IMPORTANT: For security reason, disable this feature if you are printing user HTML content.
  */
-(!defined('K_TCPDF_CALLS_IN_HTML'))? (define('K_TCPDF_CALLS_IN_HTML', true)):'';
+(!defined('K_TCPDF_CALLS_IN_HTML'))? (define('K_TCPDF_CALLS_IN_HTML', isset($tcpdf['tcpdf_in_html']) ? $tcpdf['tcpdf_in_html'] : true)):'';
+
+require_once($tcpdf['base_directory'].'/tcpdf.php');
+
 
 /************************************************************
  * TCPDF - CodeIgniter Integration
@@ -193,6 +193,30 @@ class pdf extends TCPDF {
    * @access private
    */
   private $_config = array();
+
+  /**
+   * Base font size for answer PDF export
+   *
+   * @var int
+   * @access private
+   */
+  private $_ibaseAnswerFontSize = 12;
+
+  /**
+   * Cell height for answer PDF export
+   *
+   * @var int
+   * @access private
+   */
+  private $_iCellHeight = 6;
+
+  /**
+   * Survey Information (preventing from passing to methods every time)
+   *
+   * @var array
+   * @access private
+   */
+  private $_aSurveyInfo = array();
 
   /**
    * Set _config for pdf
@@ -236,13 +260,6 @@ class pdf extends TCPDF {
       $this->_config['enable_disk_cache']
     );
 
-
-    # language settings
-    if(is_file($this->_config['language_file'])) {
-      include($this->_config['language_file']);
-      $this->setLanguageArray($l);
-      unset($l);
-    }
 
     # margin settings
     $this->SetMargins($this->_config['margin_left'], $this->_config['margin_top'], $this->_config['margin_right']);
@@ -608,5 +625,163 @@ class pdf extends TCPDF {
     $text = html_entity_decode($text,null,'UTF-8');
     $text = str_replace("\t",' ',$text);
     return strip_tags($text);
+  }
+  /**
+   *
+   * Create Answer PDF document, set metadata and set title
+   * @param $aSurveyInfo - Survey Information (preventing from passing to methods every time)
+   * @param $aPdfLanguageSettings - Pdf language settings
+   * @param $sSiteName - LimeSurvey site name (header and metadata)
+   * @param $sSurveyName - Survey name (header, metadata and title),
+   * @param $sDefaultHeaderString - TCPDF header string
+   * @return unknown_type
+   */
+  function initAnswerPDF($aSurveyInfo, $aPdfLanguageSettings, $sSiteName, $sSurveyName, $sDefaultHeaderString = '')
+  {
+    if (empty($sDefaultHeaderString))
+      $sDefaultHeaderString = $sSurveyName;
+
+    $this->_aSurveyInfo = $aSurveyInfo;
+    $this->SetAuthor($sSiteName);
+    $this->SetTitle($sSurveyName);
+    $this->SetSubject($sSurveyName);
+    $this->SetKeywords($sSurveyName);
+
+    $this->SetFont($aPdfLanguageSettings['pdffont']);
+    $this->_ibaseAnswerFontSize = $aPdfLanguageSettings['pdffontsize'];
+    $this->_iCellHeight = ceil($this->_ibaseAnswerFontSize / 2);
+    $this->setLanguageArray($aPdfLanguageSettings['lg']);
+
+    $this->addHeader($aPdfLanguageSettings, $sSiteName, $sDefaultHeaderString);
+    $this->AddPage();
+    $this->SetFillColor(220, 220, 220);
+
+    $this->addTitle($sSurveyName);
+  }
+
+  /**
+   *
+   * Add title to pdf
+   * @param $sTitle - Title
+   * @param $sSubtitle - Subtitle
+   * @return unknown_type
+   */
+  function addTitle($sTitle, $sSubtitle="")
+  {
+    if(!empty($sTitle))
+    {
+      $this->ln(1);
+      $this->SetFontSize($this->_ibaseAnswerFontSize + 6);
+      $oPurifier = new CHtmlPurifier();
+      $sTitleHTML = html_entity_decode(stripJavaScript($oPurifier->purify($sTitle)),ENT_COMPAT);
+      $this->WriteHTMLCell(0, $this->_iCellHeight, $this->getX(), $this->getY(), $sTitleHTML, 0, 1, false, true, 'C');
+      if (!empty($sSubtitle))
+      {
+        $this->ln(1);
+        $this->SetFontSize($this->_ibaseAnswerFontSize + 2);
+        $sSubtitleHTML = html_entity_decode(stripJavaScript($oPurifier->purify($sSubtitle)),ENT_COMPAT);
+        $this->WriteHTMLCell(0, $this->_iCellHeight, $this->getX(), $this->getY(), $sSubtitleHTML, 0, 1, false, true, 'C');
+      }
+      $this->ln(6);
+      $this->SetFontSize($this->_ibaseAnswerFontSize);
+    }
+  }
+
+  /**
+   *
+   * Add header to pdf
+   * @param $aPdfLanguageSettings - Pdf language settings
+   * @param $sSiteName - LimeSurvey site name (header and metadata)
+   * @param $sDefaultHeaderString - TCPDF header string
+   * @return unknown_type
+   */
+  function addHeader($aPdfLanguageSettings, $sSiteName, $sDefaultHeaderString)
+  {
+    $sLogoFileName = Yii::app()->getConfig('pdflogofile');
+    if (Yii::app()->getConfig('pdfshowheader')=='Y' && file_exists(K_PATH_IMAGES.$sLogoFileName))
+    {
+      $sHeaderTitle = Yii::app()->getConfig('pdfheadertitle');
+      if ($sHeaderTitle == '') $sHeaderTitle = $sSiteName;
+      $sHeaderString = Yii::app()->getConfig('pdfheaderstring');
+      if ($sHeaderString == '') $sHeaderString = $sDefaultHeaderString;
+
+      $this->SetHeaderData($sLogoFileName, Yii::app()->getConfig('pdflogowidth'), $sHeaderTitle, $sHeaderString);
+      $this->SetHeaderFont(Array($aPdfLanguageSettings['pdffont'], '', $this->_ibaseAnswerFontSize - 2));
+      $this->SetFooterFont(Array($aPdfLanguageSettings['pdffont'], '', $this->_ibaseAnswerFontSize - 2));
+    }
+  }
+
+  /**
+   *
+   * Add GID text to PDF
+   * @param $sFname - Answer field text
+   * @param $bAllowBreakPage - Allow break cell in two pages
+   * @return unknown_type
+   */
+  function addGidAnswer($sFname, $bAllowBreakPage=false)
+  {
+    $oPurifier = new CHtmlPurifier();
+    $sAnswerHTML = html_entity_decode(stripJavaScript($oPurifier->purify($sFname)),ENT_COMPAT);
+    $sData['thissurvey']=$this->_aSurveyInfo;
+    $sAnswerHTML = templatereplace($sAnswerHTML, array() , $sData, '', $this->_aSurveyInfo['anonymized']=="Y",NULL, array(), true);
+
+    $startPage = $this->getPage();
+    $this->startTransaction();
+    $this->ln(6);
+    $this->SetFontSize($this->_ibaseAnswerFontSize + 2);
+    $this->WriteHTMLCell(0, $this->_iCellHeight, $this->getX(), $this->getY(), $sAnswerHTML, 0, 1, false, true, 'L');
+    $this->ln(2);
+    if ($this->getPage() != $startPage && !$bAllowBreakPage)
+    {
+      $this->rollbackTransaction(true);
+      $this->AddPage();
+      $this->addGidAnswer($sFname,true); // Second param = true avoid an endless loop if a cell is longer than a page
+    }
+    else
+    {
+      $this->commitTransaction();
+    }
+  }
+
+  /**
+   *
+   * Add answer to PDF
+   *
+   * @param $sQuestion - Question field text array
+   * @param $sResponse - Answer field text array
+   * @param $bReplaceExpressions - Try to replace LimeSurvey Expressions. This is false when exporting answers PDF from admin GUI
+   *                               because we can not interpret expressions so just purify.
+   *                               TODO: Find a universal valid method to interpret expressions
+   * @param $bAllowBreakPage - Allow break cell in two pages
+   * @return unknown_type
+   */
+  function addAnswer($sQuestion, $sResponse, $bReplaceExpressions=true, $bAllowBreakPage=false)
+  {
+    $oPurifier = new CHtmlPurifier();
+    $sQuestionHTML = str_replace('-oth-','',$sQuestion); // Copied from Writer::stripTagsFull. Really necessary?
+    $sQuestionHTML = html_entity_decode(stripJavaScript($oPurifier->purify($sQuestionHTML)),ENT_COMPAT);
+    if ($bReplaceExpressions)
+    {
+        $sData['thissurvey']=$this->_aSurveyInfo;
+        $sQuestionHTML = templatereplace($sQuestionHTML, array() , $sData, '', $this->_aSurveyInfo['anonymized']=="Y",NULL, array(), true);
+    }
+    $sResponse = flattenText($sResponse, false, true, 'UTF-8', false);
+
+    $startPage = $this->getPage();
+    $this->startTransaction();
+    $this->SetFontSize($this->_ibaseAnswerFontSize);
+    $this->WriteHTMLCell(0, $this->_iCellHeight, $this->getX(), $this->getY(), $sQuestionHTML, 1, 1, true, true, 'L');
+    $this->MultiCell(0, $this->_iCellHeight, $sResponse, 1, 'L', 0, 1, '', '', true);
+    $this->ln(2);
+    if ($this->getPage() != $startPage && !$bAllowBreakPage)
+    {
+      $this->rollbackTransaction(true);
+      $this->AddPage();
+      $this->addAnswer($sQuestion,$sResponse,$bReplaceExpressions,true); // "Last param = true" prevents an endless loop if a cell is longer than a page
+    }
+    else
+    {
+      $this->commitTransaction();
+    }
   }
 }

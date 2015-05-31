@@ -147,7 +147,7 @@
         */
         public static function updateSortOrder($gid, $surveyid)
         {
-            $questions = self::model()->findAllByAttributes(array('gid' => $gid, 'sid' => $surveyid, 'language' => Survey::model()->findByPk($surveyid)->language));
+            $questions = self::model()->findAllByAttributes(array('gid' => $gid, 'sid' => $surveyid, 'language' => Survey::model()->findByPk($surveyid)->language), array('order'=>'question_order') );
             $p = 0;
             foreach ($questions as $question)
             {
@@ -168,7 +168,7 @@
         function updateQuestionOrder($gid,$language,$position=0)
         {
             $data=Yii::app()->db->createCommand()->select('qid')
-            ->where(array('and','gid=:gid','language=:language'))
+            ->where(array('and','gid=:gid','language=:language', 'parent_qid=0'))
             ->order('question_order, title ASC')
             ->from('{{questions}}')
             ->bindParam(':gid', $gid, PDO::PARAM_INT)
@@ -590,7 +590,7 @@
                     'description' => gT("Yes/No"),
                     'group' => gT("Mask questions"),
                     'subquestions' => 0,
-                    'hasdefaultvalues' => 0,
+                    'hasdefaultvalues' => 1,
                     'assessable' => 0,
                     'answerscales' => 0),
                 "!" => array(

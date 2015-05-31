@@ -53,7 +53,7 @@
 			// Check if we have custom attributes.
 			if ($this->hasAttribute('attribute_1'))
 			{
-				foreach (unserialize($this->survey->attributedescriptions) as $key => $info)
+				foreach (decodeTokenAttributes($this->survey->attributedescriptions) as $key => $info)
 				{
 					$labels[$key] = $info['description'];
 				}
@@ -79,14 +79,14 @@
 				'token' => $token
 			));
 		}
-		
+
 		public function generateToken()
 		{
 			$length = $this->survey->tokenlength;
 
 			$this->token = randomChars($length);
 			$counter = 0;
-			while (!$this->validate('token'))
+			while (!$this->validate(array('token')))
 			{
 				$this->token = randomChars($length);
 				$counter++;
@@ -108,7 +108,7 @@
 		}
 
 		/**
-		 * 
+		 *
 		 * @param int $surveyId
 		 * @param string $scenario
 		 * @return Token Description
@@ -129,14 +129,15 @@
 		public function rules()
 		{
 			return array(
-				array('token', 'unique', 'allowEmpty' => true),
+				array('token', 'unique', 'allowEmpty' => true),// 'caseSensitive'=>false only for mySql
 				array(implode(',', $this->tableSchema->columnNames), 'safe'),
-                array('remindercount','numerical', 'integerOnly'=>true,'allowEmpty'=>true), 
-                array('email','filter','filter'=>'trim'),        
-                array('email','LSYii_EmailIDNAValidator', 'allowEmpty'=>true, 'allowMultiple'=>true), 
+                array('remindercount','numerical', 'integerOnly'=>true,'allowEmpty'=>true),
+                array('email','filter','filter'=>'trim'),
+                array('email','LSYii_EmailIDNAValidator', 'allowEmpty'=>true, 'allowMultiple'=>true),
                 array('usesleft','numerical', 'integerOnly'=>true,'allowEmpty'=>true),
-                array('mpid','numerical', 'integerOnly'=>true,'allowEmpty'=>true),     
-                array('blacklisted', 'in','range'=>array('Y','N'), 'allowEmpty'=>true), 
+                array('mpid','numerical', 'integerOnly'=>true,'allowEmpty'=>true),
+                array('blacklisted', 'in','range'=>array('Y','N'), 'allowEmpty'=>true),
+                array('emailstatus', 'default', 'value' => 'OK'),
 			);
 		}
 
@@ -163,7 +164,8 @@
 				"COUNT(CASE WHEN (token IS NULL OR token='') THEN 1 ELSE NULL END) as invalid",
 				"COUNT(CASE WHEN (sent!='N' AND sent<>'') THEN 1 ELSE NULL END) as sent",
 				"COUNT(CASE WHEN (emailstatus LIKE 'OptOut%') THEN 1 ELSE NULL END) as optout",
-				"COUNT(CASE WHEN (completed!='N' and completed<>'') THEN 1 ELSE NULL END) as completed"
+				"COUNT(CASE WHEN (completed!='N' and completed<>'' and completed !='Q') THEN 1 ELSE NULL END) as completed",
+                "COUNT(CASE WHEN (completed='Q') THEN 1 ELSE NULL END) as screenout",
 			);
 			$command = $this->getCommandBuilder()->createFindCommand($this->getTableSchema(),$criteria);
 			return $command->queryRow();
@@ -172,7 +174,7 @@
 		public function tableName()
 		{
 			return '{{tokens_' . $this->dynamicId . '}}';
-		}           
+		}
 	}
 
 ?>

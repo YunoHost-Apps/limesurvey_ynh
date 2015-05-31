@@ -41,9 +41,6 @@
                     $sql_file = 'mysql';
                     break;
                 case 'pgsql':
-                    if (version_compare($this->connection->getServerVersion(),'9','>=')) {
-                        $this->connection->createCommand("ALTER DATABASE ". $this->connection->quoteTableName($this->getDBConnectionStringProperty('dbname')) ." SET bytea_output='escape';")->execute();
-                    }
                     $sql_file = 'pgsql';
                     break;
                 case 'dblib': 
@@ -52,7 +49,7 @@
                     $sql_file = 'mssql';
                     break;
                 default:
-                    throw new Exception(sprintf('Unkown database type "%s".', $this->connection->driverName));
+                    throw new Exception(sprintf('Unknown database type "%s".', $this->connection->driverName));
             }
             $this->_executeSQLFile(dirname(Yii::app()->basePath).'/installer/sql/create-'.$sql_file.'.sql');
             $this->connection->createCommand()->insert($this->connection->tablePrefix.'users', array(
@@ -130,10 +127,12 @@
 
         protected function createDatabase()
         {
+            App()->configure(array('components'=>array('db'=>array('autoConnect'=>false)))) ;
+            $this->connection=App()->db;
+            App()->configure(array('components'=>array('db'=>array('autoConnect'=>true)))) ;
             $connectionString = $this->connection->connectionString;
             $this->connection->connectionString = preg_replace('/dbname=([^;]*)/', '', $connectionString);
-            try
-            {
+            try {
                 $this->connection->active=true;
             }
             catch(Exception $e){

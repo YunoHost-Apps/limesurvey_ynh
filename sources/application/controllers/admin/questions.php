@@ -1020,10 +1020,48 @@ class questions extends Survey_Common_Action
             $language=null;
         }
         $resultdata=getlabelsets($language);
+        // Label set title really don't need HTML
+        foreach($resultdata as &$aResult)
+        {
+            $aResult = array_map('flattenText', $aResult);
+        }
         header('Content-type: application/json');
         echo ls_json_encode($resultdata);
     }
 
+    public function ajaxchecklabel()
+    {
+        $iLabelID = (int) Yii::app()->request->getParam('lid');
+        $aNewLanguages = Yii::app()->request->getParam('languages');
+        $bCheckAssessments = Yii::app()->request->getParam('bCheckAssessments',0);
+        $arLabelSet=LabelSet::model()->find('lid=:lid',array(':lid' => $iLabelID)); 
+        $iLabelsWithAssessmentValues=Label::model()->count('lid=:lid AND assessment_value<>0',array(':lid' => $iLabelID));
+        $aLabelSetLanguages=explode(' ',$arLabelSet->languages);
+        $aErrorMessages=array();
+        if ($bCheckAssessments && $iLabelsWithAssessmentValues)
+        {
+            $aErrorMessages[]=gT('The existing label set has some assessment values assigned.').'<strong>'.gT('If you replace the label set the existing asssessment values will be lost.').'</strong>';
+        }
+        if (count(array_diff($aLabelSetLanguages,$aNewLanguages)))
+        {
+            $aErrorMessages[]=gT('The existing label has different/more languages.').'<strong>'.gT('If you replace the label set these translations will be lost.').'</strong>';
+        }
+        if (count($aErrorMessages)){
+            foreach ($aErrorMessages as $sErrorMessage)
+            {
+                echo  $sErrorMessage.'<br>';
+            }
+            eT('Do you really want to continue?');
+        }
+        else
+        {
+            eT('You are about to replace a given label set with the current answer options');
+            echo '<br>';
+            eT('Continue?');
+        }
+    }
+
+    
     /**
     * Load preview of a question screen.
     *
@@ -1072,8 +1110,6 @@ class questions extends Survey_Common_Action
         $thissurvey = getSurveyInfo($surveyid);
 
         setNoAnswerMode($thissurvey);
-
-        Yii::app()->session['dateformats'] = getDateFormatData($thissurvey['surveyls_dateformat']);
 
         $qrows = Question::model()->findByAttributes(array('sid' => $surveyid, 'qid' => $qid, 'language' => $language))->getAttributes();
 

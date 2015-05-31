@@ -515,6 +515,7 @@ class conditionsaction extends Survey_Common_Action {
 
         //BEGIN: GATHER INFORMATION
         // 1: Get information for this question
+        // @todo : use viewHelper::getFieldText and getFieldCode for 2.06 for string show to user
         if (!isset($qid)) { $qid = returnGlobal('qid'); }
         if (!isset($iSurveyID)) { $iSurveyID = returnGlobal('sid'); }
         $thissurvey = getSurveyInfo($iSurveyID);
@@ -814,8 +815,10 @@ class conditionsaction extends Survey_Common_Action {
                     foreach ($aresult as $arows)
                     {
                         $attr = getQuestionAttributeValues($rows['qid']);
-                        $label1 = isset($attr['dualscale_headerA']) ? $attr['dualscale_headerA'] : 'Label1';
-                        $label2 = isset($attr['dualscale_headerB']) ? $attr['dualscale_headerB'] : 'Label2';
+                        $sLanguage=Survey::model()->findByPk($iSurveyID)->language;
+                        // dualscale_header are allways set, but can be empty
+                        $label1 = empty($attr['dualscale_headerA'][$sLanguage]) ? gt('Scale 1') : $attr['dualscale_headerA'][$sLanguage];
+                        $label2 = empty($attr['dualscale_headerB'][$sLanguage]) ? gt('Scale 2') : $attr['dualscale_headerB'][$sLanguage];
                         $shortanswer = "{$arows['title']}: [" . strip_tags($arows['question']) . "][$label1]";
                         $shortquestion = $rows['title'].":$shortanswer ".strip_tags($rows['question']);
                         $cquestions[] = array($shortquestion, $rows['qid'], $rows['type'], $rows['sid'].$X.$rows['gid'].$X.$rows['qid'].$arows['title']."#0");
@@ -1280,7 +1283,7 @@ class conditionsaction extends Survey_Common_Action {
                     ->bindValue(":lang1", $sLanguage, PDO::PARAM_STR)
                     ->bindValue(":lang2", $sLanguage, PDO::PARAM_STR)
                     ->query() or safeDie ("Couldn't get other conditions for question $qid<br />$query<br />");
-                    
+
                     $querytoken = "SELECT count(*) as recordcount "
                     ."FROM {{conditions}} "
                     ."WHERE "
@@ -1310,7 +1313,7 @@ class conditionsaction extends Survey_Common_Action {
                     ->bindValue(":scenario", $scenarionr['scenario'], PDO::PARAM_INT)
                     ->bindValue(":qid", $qid, PDO::PARAM_INT)
                     ->query() or safeDie ("Couldn't get other conditions for question $qid<br />$query<br />");
-                    
+
                     $conditionscount=$conditionscount+$conditionscounttoken;
 
                     if ($conditionscount > 0)
@@ -1341,19 +1344,17 @@ class conditionsaction extends Survey_Common_Action {
                                 $markcidstyle="editedrow";
                             }
 
-                            if (isset($currentfield) && $currentfield != $rows['cfieldname'])
+                            if (isset($currentfield) && $currentfield != $rows['cfieldname'] )
                             {
                                 $aViewUrls['output'] .= "<tr class='evenrow'>\n"
-                                ."\t<td colspan='2'>\n"
-                                ."<span><strong>"
-                                .$clang->gT("and")."</strong></span></td></tr>";
+                                ."\t<td colspan='2' class='operator'>\n"
+                                .$clang->gT("and")."</td></tr>";
                             }
                             elseif (isset($currentfield))
                             {
                                 $aViewUrls['output'] .= "<tr class='evenrow'>\n"
-                                ."\t<td colspan='2'>\n"
-                                ."<span><strong>"
-                                .$clang->gT("or")."</strong></span></td></tr>";
+                                ."\t<td colspan='2' class='operator'>\n"
+                                .$clang->gT("or")."</td></tr>";
                             }
 
                             $aViewUrls['output'] .= "\t<tr class='{$markcidstyle}'>\n"
@@ -1378,14 +1379,23 @@ class conditionsaction extends Survey_Common_Action {
                             {
                                 $leftOperandType = 'tokenattr';
                                 $aTokenAttrNames=getTokenFieldsAndNames($iSurveyID);
-                                if (count($aTokenAttrNames) != 0)
+                                if(isset($aTokenAttrNames[strtolower($extractedTokenAttr[1])]))
                                 {
-                                    $thisAttrName=HTMLEscape($aTokenAttrNames[strtolower($extractedTokenAttr[1])]['description'])." [".$clang->gT("From token table")."]";
+                                    $thisAttrName=HTMLEscape($aTokenAttrNames[strtolower($extractedTokenAttr[1])]['description']);
                                 }
                                 else
                                 {
-                                    $thisAttrName=HTMLEscape($extractedTokenAttr[1])." [".$clang->gT("Inexistant token table")."]";
+                                    $thisAttrName=HTMLEscape($extractedTokenAttr[1]);
                                 }
+                                if(tableExists("{{tokens_$iSurveyID}}"))
+                                {
+                                    $thisAttrName.= " [".$clang->gT("From token table")."]";
+                                }
+                                else
+                                {
+                                    $thisAttrName.= " [".$clang->gT("Inexistant token table")."]";
+                                }
+
                                 $aViewUrls['output'] .= "\t$thisAttrName\n";
                                 // TIBO not sure this is used anymore !!
                                 $conditionsList[]=array("cid"=>$rows['cid'],
@@ -1473,7 +1483,7 @@ class conditionsaction extends Survey_Common_Action {
                                     }
                                 }
                             }
-                            // if $rightOperandType is still unkown then it is a simple constant
+                            // if $rightOperandType is still unknown then it is a simple constant
                             if ($rightOperandType == 'unknown')
                             {
                                 $rightOperandType = 'constantVal';
@@ -1524,7 +1534,7 @@ class conditionsaction extends Survey_Common_Action {
 
                                 // now set the corresponding hidden input field
                                 // depending on the rightOperandType
-                                // This is used when Editting a condition
+                                // This is used when editing a condition
                                 if ($rightOperandType == 'predefinedAnsw')
                                 {
                                     $aViewUrls['output'] .= CHtml::hiddenField('EDITcanswers[]', HTMLEscape($rows['value']), array(

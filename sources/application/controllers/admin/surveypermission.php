@@ -10,7 +10,7 @@
  * other free or open source software licenses.
  * See COPYRIGHT.php for copyright notices and details.
  */
- 
+
 /**
 * surveypermission
 *
@@ -31,7 +31,7 @@ class surveypermission extends Survey_Common_Action {
         $aViewUrls = array();
         $clang = Yii::app()->lang;
         $imageurl = Yii::app()->getConfig('adminimageurl');
-            
+
         if(Permission::model()->hasSurveyPermission($surveyid,'surveysecurity','read'))
         {
             $aBaseSurveyPermissions=Permission::model()->getSurveyBasePermissions();
@@ -83,7 +83,7 @@ class surveypermission extends Survey_Common_Action {
                         {
                             $group_ids_query = implode(",", $group_ids);
                             unset($group_ids);
-                            $result4 = UserGroup::model()->findAll("ugid IN ($group_ids_query)");                        
+                            $result4 = UserGroup::model()->findAll("ugid IN ($group_ids_query)");
 
                             foreach ($result4 as $resul4row)
                             {
@@ -96,7 +96,7 @@ class surveypermission extends Survey_Common_Action {
                         $surveysecurity .= "<tr>\n";
 
                         $surveysecurity .= "<td>\n";
-                        
+
                         if(Permission::model()->hasSurveyPermission($surveyid,'surveysecurity','update'))
                         {
                             if($PermissionRow['uid']!=Yii::app()->user->getId() || Permission::model()->hasGlobalPermission('superadmin','read')) // Can not update own security
@@ -171,7 +171,7 @@ class surveypermission extends Survey_Common_Action {
             }
             else
             {
-            
+
             }
             if(Permission::model()->hasSurveyPermission($surveyid,'surveysecurity','create'))
             {
@@ -182,7 +182,7 @@ class surveypermission extends Survey_Common_Action {
                 . "<input style='width: 15em;' type='submit' value='".$clang->gT("Add user")."'  onclick=\"if (document.getElementById('uidselect').value == -1) { alert('".$clang->gT("Please select a user first","js")."'); return false;}\"/>"
                 . "<input type='hidden' name='action' value='addsurveysecurity' />"
                 . "</li></ul></form>\n";
-                
+
                 $surveysecurity .=  CHtml::form(array("admin/surveypermission/sa/addusergroup/surveyid/{$surveyid}"), 'post', array('class'=>"form44"))."<ul><li>\n"
                 . "<label for='ugidselect'>".$clang->gT("User group").": </label><select id='ugidselect' name='ugid'>\n"
                 . getSurveyUserGroupList('htmloptions',$surveyid)
@@ -227,7 +227,7 @@ class surveypermission extends Survey_Common_Action {
             $addsummary .= "<div class=\"messagebox ui-corner-all\" >\n";
 
             $result = Survey::model()->findAll('sid = :surveyid AND owner_id = :owner_id',array(':surveyid' => $surveyid, ':owner_id' => Yii::app()->session['loginID']));
-            if( Permission::model()->hasSurveyPermission($surveyid, 'surveysecurity', 'create') 
+            if( Permission::model()->hasSurveyPermission($surveyid, 'surveysecurity', 'create')
                 && in_array($postusergroupid,getSurveyUserGroupList('simpleugidarray',$surveyid))
                 )
             {
@@ -311,7 +311,7 @@ class surveypermission extends Survey_Common_Action {
             $addsummary .= "<div class=\"messagebox ui-corner-all\">\n";
 
             $result = Survey::model()->findAll('sid = :sid AND owner_id = :owner_id AND owner_id != :postuserid',array(':sid' => $surveyid, ':owner_id' => Yii::app()->session['loginID'], ':postuserid' => $postuserid));
-            if( Permission::model()->hasSurveyPermission($surveyid, 'surveysecurity', 'create') 
+            if( Permission::model()->hasSurveyPermission($surveyid, 'surveysecurity', 'create')
                 &&  in_array($postuserid,getUserList('onlyuidarray'))
                 )
             {
@@ -387,7 +387,7 @@ class surveypermission extends Survey_Common_Action {
         }
         elseif( $action == "setusergroupsurveysecurity" )
         {
-            if ( !Permission::model()->hasGlobalPermission('superadmin','read') && !in_array($postusergroupid,getUserList('onlyuidarray')) ) // User can not change own security (except for superadmin ?)
+            if ( !Permission::model()->hasGlobalPermission('superadmin','read') && !in_array($postusergroupid,getUserGroupList(null, 'simplegidarray')) ) // User can not change own security (except for superadmin ?)
             {
                 $this->getController()->error('Access denied');
             }
@@ -431,14 +431,14 @@ class surveypermission extends Survey_Common_Action {
             . "</tr></thead>\n";
 
             //content
-            
+
             $aBasePermissions=Permission::model()->getSurveyBasePermissions();
 
             $oddcolumn=false;
             foreach($aBasePermissions as $sPermissionKey=>$aCRUDPermissions)
             {
                 $oddcolumn=!$oddcolumn;
-                $usersummary .= "<tr><td><img src='{$imageurl}{$aCRUDPermissions['img']}_30.png' alt='{$aCRUDPermissions['description']}'/></td>";
+                $usersummary .= "<tr><td><img src='{$imageurl}{$aCRUDPermissions['img']}_30.png' alt='' title='{$aCRUDPermissions['description']}'/></td>";
                 $usersummary .= "<td>{$aCRUDPermissions['title']}</td>";
                 $usersummary .= "<td ><input type=\"checkbox\"  class=\"markrow\" name='all_{$sPermissionKey}' /></td>";
                 foreach ($aCRUDPermissions as $sCRUDKey=>$CRUDValue)
@@ -451,8 +451,17 @@ class surveypermission extends Survey_Common_Action {
                         if (!($sPermissionKey=='survey' && $sCRUDKey=='read'))
                         {
                             $usersummary .= "<input type=\"checkbox\"  class=\"checkboxbtn\" name='perm_{$sPermissionKey}_{$sCRUDKey}' ";
-                            if($action=='setsurveysecurity' && Permission::model()->hasSurveyPermission( $surveyid,$sPermissionKey,$sCRUDKey,$postuserid)) {
-                                $usersummary .= ' checked="checked" ';
+                            if($action=='setsurveysecurity')
+                            {
+                                if(Permission::model()->hasPermission($surveyid,'survey',$sPermissionKey,$sCRUDKey,$postuserid))
+                                {
+                                    $usersummary .= ' checked="checked" ';// User have this permission set for this survey
+
+                                }
+                                elseif(Permission::model()->hasSurveyPermission( $surveyid,$sPermissionKey,$sCRUDKey,$postuserid))
+                                {
+                                    $usersummary .= ' data-indeterminate=true ';// User have this permission for this survey by another system (global or owner)
+                                }
                             }
                             $usersummary .=" />";
                         }
@@ -478,6 +487,7 @@ class surveypermission extends Survey_Common_Action {
             $usersummary .= "</form>\n";
 
             $aViewUrls['output'] = $usersummary;
+            App()->getClientScript()->registerScript("data-indeterminate","$(':checkbox[data-indeterminate]').prop('indeterminate', true);",CClientScript::POS_READY);
         }
         else
         {
@@ -524,7 +534,7 @@ class surveypermission extends Survey_Common_Action {
             {
                 if (isset($postuserid))
                 {
-                    $dbresult = Permission::model()->deleteAll('uid = :uid AND entity_id = :sid AND entity = :entity',array(':uid' => $postuserid, ':sid' => $surveyid, ':entity' => 'survey'));
+                    $dbresult = Permission::model()->deleteAll("uid = :uid AND entity_id = :sid AND entity = 'survey'",array(':uid' => $postuserid, ':sid' => $surveyid));
                     $addsummary .= "<br />".$clang->gT("Username").": ".sanitize_xss_string($_POST['user'])."<br /><br />\n";
                     $addsummary .= "<div class=\"successheader\">".$clang->gT("Success!")."</div>\n";
                 }

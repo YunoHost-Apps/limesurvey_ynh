@@ -146,6 +146,21 @@
                             case 'U':*
                             */
                         ?>
+                            <?php
+                            /**
+                             * Call default value widget for yes/no question type
+                             * This is fast insert rewrite of this view follows
+                             */
+                            $widgetOptions = array(
+                                'language' =>$language ,
+                                'questionrow' => $questionrow,
+                                'qtproperties' => $qtproperties,
+                                'langopts' => $langopts,
+                                'clang' => $clang
+                             );
+                            $this->widget('application.views.admin.survey.Question.yesNo_defaultvalue_widget', array('widgetOptions'=>$widgetOptions));
+                            ?>
+                            <?php if ($questionrow['type'] != 'Y'): //temporary solution - until everything is move to widgets?>
                         <li>
                             <label for='defaultanswerscale_<?php echo "0_{$language}_0" ?>'>
                                 <?php $clang->eT("Default value:")?>
@@ -155,18 +170,18 @@
                                 id='defaultanswerscale_<?php echo "0_{$language}_0" ?>'><?php
                                 echo htmlspecialchars($langopts[$language][$questionrow['type']][0]); ?></textarea>
                         </li>
+                        <?php endif;  //temporary solution?>
                         <?php
                         }
 
                         if ($language == $baselang && count($questlangs) > 1)
                         {
+                        echo '<li>';
+                        echo CHtml::label($clang->gT('Use same default value across languages:'), 'samedefault'); // use gT - eT is not working, causes a wrong replacement in label
+                        echo CHtml::checkBox('samedefault', $questionrow['same_default']);
+                        echo '</li>';
                         ?>
-                        <li>
-                            <label for='samedefault'>
-                                <?php $clang->eT('Use same default value across languages:') ?>
-                            </label>
-                            <input type='checkbox' name='samedefault' id='samedefault'<?php $questionrow['same_default'] ? ' checked="checked"' : '' ?> />
-                        </li>
+
                         <?php
                         }
                     ?>

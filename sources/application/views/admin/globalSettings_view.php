@@ -361,7 +361,7 @@
 
                 <?php $thisforce_ssl = getGlobalSetting('force_ssl');
                     $opt_force_ssl_on = $opt_force_ssl_off = $opt_force_ssl_neither = '';
-                    $warning_force_ssl = sprintf($clang->gT('Warning: Before turning on HTTPS,%s check if this link works.%s'),'<a href="https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'" title="'. $clang->gT('Test if your server has SSL enabled by clicking on this link.').'">','</a>')
+                    $warning_force_ssl = sprintf($clang->gT('Warning: Before turning on HTTPS,%s check if this link works.%s'),'<a href="https://'.$_SERVER['HTTP_HOST'].$this->createUrl("admin/globalsettings/sa").'" title="'. $clang->gT('Test if your server has SSL enabled by clicking on this link.').'">','</a>')
                     .'<br/> '
                     . $clang->gT("If the link does not work and you turn on HTTPS, LimeSurvey will break and you won't be able to access it.");
                     switch($thisforce_ssl)
@@ -455,6 +455,34 @@
                     </select></li><?php
                     unset($set_qnc,$sel_qnc);
                 ?>
+                <li><label for='pdffontsize'><?php $clang->eT("Font size of PDFs"); ?></label>
+                    <input type='text' size='5' id='pdffontsize' name='pdffontsize' value="<?php echo htmlspecialchars(getGlobalSetting('pdffontsize')); ?>" />
+                </li>
+                <li><label for='pdfshowheader'><?php $clang->eT("Show header in answers export PDFs?") ; ?></label>
+                    <select id='pdfshowheader' name='pdfshowheader'>
+                        <option value='Y'
+                            <?php if (getGlobalSetting('pdfshowheader') == "Y") { ?>
+                                selected='selected'
+                                <?php } ?>
+                            ><?php $clang->eT("Yes") ; ?>
+                        </option>
+                        <option value='N'
+                            <?php if (getGlobalSetting('pdfshowheader') != "Y") { ?>
+                                selected='selected'
+                                <?php } ?>
+                            ><?php $clang->eT("No") ; ?>
+                        </option>
+                    </select>
+                </li>
+                <li><label for='pdflogowidth'><?php $clang->eT("Width of PDF header logo"); ?></label>
+                    <input type='text' size='5' id='pdflogowidth' name='pdflogowidth' value="<?php echo htmlspecialchars(getGlobalSetting('pdflogowidth')); ?>" />
+                </li>
+                <li><label for='pdfheadertitle'><?php $clang->eT("PDF header title (if empty, site name will be used)"); ?></label>
+                    <input type='text' id='pdfheadertitle' size='50' maxlength='256' name='pdfheadertitle' value="<?php echo htmlspecialchars(getGlobalSetting('pdfheadertitle')); ?>" />
+                </li>
+                <li><label for='pdfheaderstring'><?php $clang->eT("PDF header string (if empty, survey name will be used)"); ?></label>
+                    <input type='text' id='pdfheaderstring' size='50' maxlength='256' name='pdfheaderstring' value="<?php echo htmlspecialchars(getGlobalSetting('pdfheaderstring')); ?>" />
+                </li>
             </ul>
 
         </div>

@@ -13,8 +13,9 @@
  * @author Thomas M. White (TMSWhite)
  * @author Denis Chenu (Shnoulle)
  *
- * Portion from php.js is copyright 2012 Kevin van Zonneveld.
- * php.js is dual licensed under the MIT licenses.
+ * Portion from php.js licensed under the MIT licenses.
+ * Copyright (c) 2013 Kevin van Zonneveld (http://kvz.io) 
+ * and Contributors (http://phpjs.org/authors)
  */
 
 function LEMcount()
@@ -189,6 +190,53 @@ function LEMis_numeric(mixed_var)
 function LEMis_string(a)
 {
     return isNaN(a);
+}
+
+/**
+ * Find the closest matching numerical input values in a list an replace it by the
+ * corresponding value within another list 
+ *
+ * @author Johannes Weberhofer, 2013
+ *
+ * @param numeric fValueToReplace
+ * @param numeric iStrict - 1 for exact matches only otherwise interpolation the 
+ * 		  closest value should be returned
+ * @param string sTranslateFromList - comma seperated list of values to translate from
+ * @param string sTranslateToList - comma seperated list of values to translate to
+ * @return numeric
+ */
+function LEMconvert_value( fValueToReplace, iStrict, sTranslateFromList, sTranslateToList) 
+{
+	if ( isNaN(fValueToReplace) || (iStrict==null) || (sTranslateFromList==null) || (sTranslateToList==null) ) 
+	{
+		return null;
+	}
+	aFromValues = sTranslateFromList.split(",");
+	aToValues = sTranslateToList.split(",");
+	if ( (aFromValues.length > 0)  && (aFromValues.length == aToValues.length) ) 
+	{
+		fMinimumDiff = null;
+		iNearestIndex = 0;
+		for ( i = 0; i < aFromValues.length; i++) {
+			if ( isNaN(aFromValues[i]) ) {
+				// break processing when non-numeric variables are about to be processed
+				return null;
+			}
+			fCurrentDiff = Math.abs(aFromValues[i] - fValueToReplace);
+			if (fCurrentDiff === 0) {
+				return aToValues[i];
+			} else if (i === 0) {
+				fMinimumDiff = fCurrentDiff;
+			} else if ( fMinimumDiff > fCurrentDiff ) {
+				fMinimumDiff = fCurrentDiff;
+				iNearestIndex = i;
+			}
+		}					
+		if ( iStrict !== 1 ) {
+			return aToValues[iNearestIndex];
+		}
+	}
+	return null;
 }
 
 function LEMif(a,b,c)
@@ -1369,29 +1417,28 @@ function ltrim (str, charlist) {
     return (str + '').replace(re, '');
 }
 
-function nl2br (str, is_xhtml) {
-    // Converts newlines to HTML line breaks
-    //
-    // version: 1107.2516
-    // discuss at: http://phpjs.org/functions/nl2br
-    // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // +   improved by: Philip Peterson
-    // +   improved by: Onno Marsman
-    // +   improved by: Atli Þór
-    // +   bugfixed by: Onno Marsman
-    // +      input by: Brett Zamir (http://brett-zamir.me)
-    // +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-    // +   improved by: Brett Zamir (http://brett-zamir.me)
-    // +   improved by: Maximusya
-    // *     example 1: nl2br('Kevin\nvan\nZonneveld');
-    // *     returns 1: 'Kevin\nvan\nZonneveld'
-    // *     example 2: nl2br("\nOne\nTwo\n\nThree\n", false);
-    // *     returns 2: '<br>\nOne<br>\nTwo<br>\n<br>\nThree<br>\n'
-    // *     example 3: nl2br("\nOne\nTwo\n\nThree\n", true);
-    // *     returns 3: '\nOne\nTwo\n\nThree\n'
-    var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '' : '<br>';
+function nl2br(str, is_xhtml) {
+  //  discuss at: http://phpjs.org/functions/nl2br/
+  // original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // improved by: Philip Peterson
+  // improved by: Onno Marsman
+  // improved by: Atli Þór
+  // improved by: Brett Zamir (http://brett-zamir.me)
+  // improved by: Maximusya
+  // bugfixed by: Onno Marsman
+  // bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  //    input by: Brett Zamir (http://brett-zamir.me)
+  //   example 1: nl2br('Kevin\nvan\nZonneveld');
+  //   returns 1: 'Kevin<br />\nvan<br />\nZonneveld'
+  //   example 2: nl2br("\nOne\nTwo\n\nThree\n", false);
+  //   returns 2: '<br>\nOne<br>\nTwo<br>\n<br>\nThree<br>\n'
+  //   example 3: nl2br("\nOne\nTwo\n\nThree\n", true);
+  //   returns 3: '<br />\nOne<br />\nTwo<br />\n<br />\nThree<br />\n'
 
-    return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
+  var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br ' + '/>' : '<br>'; // Adjust comment to avoid issue on phpjs.org display
+
+  return (str + '')
+    .replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
 }
 
 function number_format (number, decimals, dec_point, thousands_sep) {

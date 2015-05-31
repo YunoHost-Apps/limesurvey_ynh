@@ -66,43 +66,40 @@ class SurveyAdmin extends Survey_Common_Action
 
     public function regenquestioncodes($iSurveyID, $sSubAction )
     {
-        if (Permission::model()->hasSurveyPermission($iSurveyID, 'surveycontent', 'update'))
+        $clang = $this->getController()->lang;
+        if (!Permission::model()->hasSurveyPermission($iSurveyID, 'surveycontent', 'update'))
         {
-            $clang = $this->getController()->lang;
-
-            //Automatically renumbers the "question codes" so that they follow
-            //a methodical numbering method
-            $iQuestionNumber=1;
-            $iGroupNumber=0;
-            $iSequence=0;
-            $sQuery="SELECT a.qid, a.gid\n"
-            ."FROM {{questions}} as a, {{groups}} g "
-            ."WHERE a.gid=g.gid AND a.sid={$iSurveyID} AND a.parent_qid=0 "
-            ."GROUP BY a.gid, a.qid, g.group_order, question_order "
-            ."ORDER BY g.group_order, question_order";
-            $arResult=dbExecuteAssoc($sQuery) or safe_die ("Error: ".$connect->ErrorMsg());  // Checked
-            $grows = array(); //Create an empty array in case FetchRow does not return any rows
-            foreach ($arResult->readAll() as $grow) {$grows[] = $grow;} // Get table output into array
-            foreach($grows as $grow)
-            {
-                //Go through all the questions
-                if ($sSubAction == 'bygroup' && (!isset($iGroupNumber) || $iGroupNumber != $grow['gid']))
-                { //If we're doing this by group, restart the numbering when the group number changes
-                    $iQuestionNumber=1;
-                    $iGroupNumber = $grow['gid'];
-                    $iSequence++;
-                }
-                $usql="UPDATE {{questions}} "
-                ."SET title='".(($sSubAction == 'bygroup') ? ('G' . $iSequence ) : '')."Q".str_pad($iQuestionNumber, 5, "0", STR_PAD_LEFT)."'\n"
-                ."WHERE qid=".$grow['qid'];
-                //$databaseoutput .= "[$sql]";
-                $uresult=dbExecuteAssoc($usql) or safe_die("Error: ".$connect->ErrorMsg());  // Checked
-                $iQuestionNumber++;
-                $iGroupNumber=$grow['gid'];
-            }
-            $_SESSION['flashmessage'] = $clang->gT("Question codes were successfully regenerated.");
-            LimeExpressionManager::SetDirtyFlag(); // so refreshes syntax highlighting
+            Yii::app()->setFlashMessage($clang->gT("You do not have sufficient rights to access this page."),'error');
+            $this->getController()->redirect(array('admin/survey','sa'=>'view','surveyid'=>$iSurveyID));
         }
+        $oSurvey=Survey::model()->findByPk($iSurveyID);
+        if ($oSurvey->active=='Y')
+        {
+            Yii::app()->setFlashMessage($clang->gT("You can't update question code for an active survey."),'error');
+            $this->getController()->redirect(array('admin/survey','sa'=>'view','surveyid'=>$iSurveyID));
+        }
+        //Automatically renumbers the "question codes" so that they follow
+        //a methodical numbering method
+        $iQuestionNumber=1;
+        $iGroupNumber=0;
+        $iGroupSequence=0;
+        $oQuestions=Question::model()->with('groups')->findAll(array('select'=>'t.qid,t.gid','condition'=>"t.sid=:sid and t.language=:language and parent_qid=0",'order'=>'groups.group_order, question_order','params'=>array(':sid'=>$iSurveyID,':language'=>$oSurvey->language)));
+        foreach($oQuestions as $oQuestion)
+        {
+            if ($sSubAction == 'bygroup' && $iGroupNumber != $oQuestion->gid)
+            { //If we're doing this by group, restart the numbering when the group number changes
+                $iQuestionNumber=1;
+                $iGroupNumber = $oQuestion->gid;
+                $iGroupSequence++;
+            }
+            $sNewTitle=(($sSubAction == 'bygroup') ? ('G' . $iGroupSequence ) : '')."Q".str_pad($iQuestionNumber, 5, "0", STR_PAD_LEFT);
+            Question::model()->updateAll(array('title'=>$sNewTitle),'qid=:qid',array(':qid'=>$oQuestion->qid));
+            $iQuestionNumber++;
+            $iGroupNumber=$oQuestion->gid;
+        }
+
+        Yii::app()->setFlashMessage($clang->gT("Question codes were successfully regenerated."));
+        LimeExpressionManager::SetDirtyFlag(); // so refreshes syntax highlighting
         $this->getController()->redirect(array('admin/survey/sa/view/surveyid/' . $iSurveyID));
     }
 
@@ -137,12 +134,12 @@ class SurveyAdmin extends Survey_Common_Action
 
         $this->_renderWrappedTemplate('survey', $aViewUrls, $arrayed_data);
     }
-    
+
     function fakebrowser()
     {
         $aData['clang'] = $this->getController()->lang;
         Yii::app()->getController()->renderPartial('/admin/survey/newSurveyBrowserMessage', $aData);
-    }    
+    }
 
     /**
     * This function prepares the view for editing a survey
@@ -167,7 +164,7 @@ class SurveyAdmin extends Survey_Common_Action
 
         Yii::app()->loadHelper('/admin/htmleditor');
         initKcfinder();
-        
+
         $esrow = array();
         $esrow = self::_fetchSurveyInfo('editsurvey', $iSurveyID);
         $aData['esrow'] = $esrow;
@@ -307,15 +304,15 @@ class SurveyAdmin extends Survey_Common_Action
         $iSurveyID = Yii::app()->request->getPost('sid', $iSurveyID);
         $iSurveyID = sanitize_int($iSurveyID);
         $clang = $this->getController()->lang;
-        if (!tableExists('survey_'.$iSurveyID))
-        {
-            $_SESSION['flashmessage'] = $clang->gT("Error: Response table does not exist. Survey cannot be deactivated.");
-            $this->getController()->redirect($this->getController()->createUrl("admin/survey/sa/view/surveyid/{$iSurveyID}"));
-        }
         $date = date('YmdHis'); //'His' adds 24hours+minutes to name to allow multiple deactiviations in a day
 
         if (empty($_POST['ok']))
         {
+            if (!tableExists('survey_'.$iSurveyID))
+            {
+                $_SESSION['flashmessage'] = $clang->gT("Error: Response table does not exist. Survey cannot be deactivated.");
+                $this->getController()->redirect($this->getController()->createUrl("admin/survey/sa/view/surveyid/{$iSurveyID}"));
+            }
             $aData['surveyid'] = $iSurveyID;
             $aData['date'] = $date;
             $aData['dbprefix'] = Yii::app()->db->tablePrefix;
@@ -326,17 +323,18 @@ class SurveyAdmin extends Survey_Common_Action
             //See if there is a tokens table for this survey
             if (tableExists("{{tokens_{$iSurveyID}}}"))
             {
-                if (Yii::app()->db->getDriverName() == 'postgre')
+                $toldtable = Yii::app()->db->tablePrefix."tokens_{$iSurveyID}";
+                $tnewtable = Yii::app()->db->tablePrefix."old_tokens_{$iSurveyID}_{$date}";
+                if (Yii::app()->db->getDriverName() == 'pgsql')
                 {
-                    $deactivateresult = Yii::app()->db->createCommand()->renameTable($toldtable . '_tid_seq', $tnewtable . '_tid_seq');
-                    $setsequence = "ALTER TABLE ".Yii::app()->db->quoteTableName($tnewtable)." ALTER COLUMN tid SET DEFAULT nextval('{{{$tnewtable}}}_tid_seq'::regclass);";
-                    $deactivateresult = Yii::app()->db->createCommand($setsequence)->query();
-                    $setidx = "ALTER INDEX {{{$toldtable}}}_idx RENAME TO {{{$tnewtable}}}_idx;";
-                    $deactivateresult = Yii::app()->db->createCommand($setidx)->query();
+                    $tidDefault = Yii::app()->db->createCommand("SELECT pg_attrdef.adsrc FROM pg_attribute JOIN pg_class ON (pg_attribute.attrelid=pg_class.oid) JOIN pg_attrdef ON(pg_attribute.attrelid=pg_attrdef.adrelid AND pg_attribute.attnum=pg_attrdef.adnum) WHERE pg_class.relname='$toldtable' and pg_attribute.attname='tid'")->queryScalar();
+                    if(preg_match("/nextval\('(tokens_\d+_tid_seq\d*)'::regclass\)/", $tidDefault, $matches)){
+                        $oldSeq = $matches[1];
+                        $deactivateresult = Yii::app()->db->createCommand()->renameTable($oldSeq, $tnewtable . '_tid_seq');
+                        $setsequence = "ALTER TABLE ".Yii::app()->db->quoteTableName($toldtable)." ALTER COLUMN tid SET DEFAULT nextval('{$tnewtable}_tid_seq'::regclass);";
+                        $deactivateresult = Yii::app()->db->createCommand($setsequence)->query();
+                    }
                 }
-
-                $toldtable = "{{tokens_{$iSurveyID}}}";
-                $tnewtable = "{{old_tokens_{$iSurveyID}_{$date}}}";
 
                 $tdeactivateresult = Yii::app()->db->createCommand()->renameTable($toldtable, $tnewtable);
 
@@ -346,7 +344,7 @@ class SurveyAdmin extends Survey_Common_Action
 
             //Remove any survey_links to the CPDB
             SurveyLink::model()->deleteLinksBySurvey($iSurveyID);
-            
+
 
             // IF there are any records in the saved_control table related to this survey, they have to be deleted
             $result = SavedControl::model()->deleteSomeRecords(array('sid' => $iSurveyID)); //Yii::app()->db->createCommand($query)->query();
@@ -362,11 +360,15 @@ class SurveyAdmin extends Survey_Common_Action
             $survey = Survey::model()->findByAttributes(array('sid' => $iSurveyID));
             $survey->autonumber_start = $new_autonumber_start;
             $survey->save();
-            if (Yii::app()->db->getDrivername() == 'postgre')
+            if (Yii::app()->db->getDriverName() == 'pgsql')
             {
-                $deactivateresult = Yii::app()->db->createCommand()->renameTable($sOldSurveyTableName . '_id_seq', $sNewSurveyTableName . '_id_seq');
-                $setsequence = "ALTER TABLE $newtable ALTER COLUMN id SET DEFAULT nextval('{$sNewSurveyTableName}_id_seq'::regclass);";
-                $deactivateresult = Yii::app()->db->createCommand($setsequence)->execute();
+                $idDefault = Yii::app()->db->createCommand("SELECT pg_attrdef.adsrc FROM pg_attribute JOIN pg_class ON (pg_attribute.attrelid=pg_class.oid) JOIN pg_attrdef ON(pg_attribute.attrelid=pg_attrdef.adrelid AND pg_attribute.attnum=pg_attrdef.adnum) WHERE pg_class.relname='$sOldSurveyTableName' and pg_attribute.attname='id'")->queryScalar();
+                if(preg_match("/nextval\('(survey_\d+_id_seq\d*)'::regclass\)/", $idDefault, $matches)){
+                    $oldSeq = $matches[1];
+                    $deactivateresult = Yii::app()->db->createCommand()->renameTable($oldSeq, $sNewSurveyTableName . '_id_seq');
+                    $setsequence = "ALTER TABLE ".Yii::app()->db->quoteTableName($sOldSurveyTableName)." ALTER COLUMN id SET DEFAULT nextval('{{{$sNewSurveyTableName}}}_id_seq'::regclass);";
+                    $deactivateresult = Yii::app()->db->createCommand($setsequence)->query();
+                }
             }
 
             $deactivateresult = Yii::app()->db->createCommand()->renameTable($sOldSurveyTableName, $sNewSurveyTableName);
@@ -572,14 +574,13 @@ class SurveyAdmin extends Survey_Common_Action
         $clang = $this->getController()->lang;
         $dateformatdetails = getDateFormatData(Yii::app()->session['dateformat']);
 
-        $surveys = Survey::model();
-        //!!! Is this even possible to execute?
-        if (!Permission::model()->hasGlobalPermission('superadmin','read'))
-            $surveys->permission(Yii::app()->user->getId());
-        $surveys = $surveys->with(array('languagesettings'=>array('condition'=>'surveyls_language=language'), 'owner'))->findAll();
+        $oSurvey = new Survey;
+        $oSurvey->permission(Yii::app()->user->getId());
+
+        $aSurveys = $oSurvey->with(array('languagesettings'=>array('condition'=>'surveyls_language=language'), 'owner'))->findAll();
         $aSurveyEntries = new stdClass();
         $aSurveyEntries->page = 1;
-        foreach ($surveys as $rows)
+        foreach ($aSurveys as $rows)
         {
             if (!isset($rows->owner->attributes)) $aOwner=array('users_name'=>$clang->gT('(None)')); else $aOwner=$rows->owner->attributes;
             $rows = array_merge($rows->attributes, $rows->defaultlanguage->attributes, $aOwner);
@@ -705,7 +706,7 @@ class SurveyAdmin extends Survey_Common_Action
     * @param string $sa
     * @return void
     */
-    public function delete($iSurveyID, $delete = 'no')
+    public function delete($iSurveyID)
     {
         $aData = $aViewUrls = array();
         $aData['surveyid'] = $iSurveyID = (int) $iSurveyID;
@@ -713,7 +714,7 @@ class SurveyAdmin extends Survey_Common_Action
 
         if (Permission::model()->hasSurveyPermission($iSurveyID, 'survey', 'delete'))
         {
-            if ($delete == 'yes')
+            if (Yii::app()->request->getPost("delete") == 'yes')
             {
                 $aData['issuperadmin'] = Permission::model()->hasGlobalPermission('superadmin','read');
                 $this->_deleteSurvey($iSurveyID);
@@ -842,8 +843,8 @@ class SurveyAdmin extends Survey_Common_Action
                 else
                 {
                     $sExtension = "";
-                }            
-                
+                }
+
             }
             elseif ($action == 'copysurvey')
             {
@@ -852,7 +853,7 @@ class SurveyAdmin extends Survey_Common_Action
             }
             // Start traitment and messagebox
             $aData['bFailed'] = false; // Put a var for continue
-            
+
             if ($action == 'importsurvey')
             {
 
@@ -923,11 +924,11 @@ class SurveyAdmin extends Survey_Common_Action
             if ($action == 'importsurvey' && !$aData['bFailed'])
             {
                 $aImportResults=importSurveyFile($sFullFilepath,(isset($_POST['translinksfields'])));
-                if (is_null($aImportResults) || isset($aImportResults['error']))
+                if (is_null($aImportResults) || !empty($aImportResults['error']) )
                 {
                     $aData['sErrorMessage']=$aImportResults['error'];
                     $aData['bFailed'] = true;
-                } 
+                }
             }
             elseif ($action == 'copysurvey' && !$aData['bFailed'])
             {
@@ -950,8 +951,6 @@ class SurveyAdmin extends Survey_Common_Action
             {
                 unlink($sFullFilepath);
             }
-
-            //            if (isset($aImportResults['error']) && $aImportResults['error']) safeDie($aImportResults['error']);
 
             if (!$aData['bFailed'])
             {
@@ -987,7 +986,7 @@ class SurveyAdmin extends Survey_Common_Action
     {
         // Prepare data for the view
         $sBaseLanguage = Survey::model()->findByPk($iSurveyID)->language;
-
+        LimeExpressionManager::StartSurvey($iSurveyID, 'survey');
         LimeExpressionManager::StartProcessingPage(true, Yii::app()->baseUrl);
 
         $aGrouplist = QuestionGroup::model()->getGroups($iSurveyID);
@@ -1160,16 +1159,16 @@ class SurveyAdmin extends Survey_Common_Action
         $aData['sRadixDefault'] = $aLanguageDetails['radixpoint'];
         $aData['sDateFormatDefault'] = $aLanguageDetails['dateformat'];
         foreach (getRadixPointData() as $index=>$radixptdata){
-          $aRadixPointData[$index]=$radixptdata['desc'];  
+          $aRadixPointData[$index]=$radixptdata['desc'];
         }
         $aData['aRadixPointData']=$aRadixPointData;
-        
-        foreach (getDateFormatData (0,Yii::app()->session['adminlang']) as $index => $dateformatdata) 
+
+        foreach (getDateFormatData (0,Yii::app()->session['adminlang']) as $index => $dateformatdata)
         {
-          $aDateFormatData[$index]=$dateformatdata['dateformat'];  
+          $aDateFormatData[$index]=$dateformatdata['dateformat'];
         }
         $aData['aDateFormatData']=$aDateFormatData;
-                
+
         return $aData;
     }
 
@@ -1187,7 +1186,7 @@ class SurveyAdmin extends Survey_Common_Action
         $aData['clang'] = $clang;
         $aData['esrow'] = $esrow;
         $aData['surveyid'] = $iSurveyID;
-        
+
         $beforeSurveySettings = new PluginEvent('beforeSurveySettings');
         $beforeSurveySettings->set('survey', $iSurveyID);
         App()->getPluginManager()->dispatchEvent($beforeSurveySettings);
@@ -1362,12 +1361,12 @@ class SurveyAdmin extends Survey_Common_Action
     function getUrlParamsJSON($iSurveyID)
     {
         $iSurveyID = (int) $iSurveyID;
-        Yii::app()->loadHelper('database');
-        $oResult = dbExecuteAssoc("select '' as act, up.*,q.title, sq.title as sqtitle, q.question, sq.question as sqquestion from {{survey_url_parameters}} up
+        $sBaseLanguage = Survey::model()->findByPk($iSurveyID)->language;
+        $sQuery = "select '' as act, up.*,q.title, sq.title as sqtitle, q.question, sq.question as sqquestion from {{survey_url_parameters}} up
         left join {{questions}} q on q.qid=up.targetqid
         left join {{questions}} sq on sq.qid=up.targetsqid
-        where up.sid={$iSurveyID}");
-        $oResult= $oResult->readAll();
+        where up.sid={$iSurveyID} and q.language='{$sBaseLanguage}' and (sq.language='{$sBaseLanguage}' or sq.language is null)";
+        $oResult = Yii::app()->db->createCommand($sQuery)->queryAll();
         $i = 0;
         $clang = $this->getController()->lang;
         $aData = new stdClass();
@@ -1427,7 +1426,7 @@ class SurveyAdmin extends Survey_Common_Action
             $generalscripts_path = Yii::app()->getConfig('generalscripts');
             $adminscripts_path = Yii::app()->getConfig('adminscripts');
             $styleurl = Yii::app()->getConfig('styleurl');
-                                                                            
+
             $js_files = array(
                 $adminscripts_path . 'surveysettings.js',
             );
@@ -1440,7 +1439,7 @@ class SurveyAdmin extends Survey_Common_Action
         {
             App()->getClientScript()->registerScriptFile($file);
 
-            
+
         }
         App()->getClientScript()->registerPackage('jquery-json');
         App()->getClientScript()->registerPackage('jqgrid');
@@ -1496,7 +1495,7 @@ class SurveyAdmin extends Survey_Common_Action
                 $converter = new Date_Time_Converter($sExpiryDate, $aDateFormatData['phpdate'] . ' H:i:s');
                 $sExpiryDate = $converter->convert("Y-m-d H:i:s");
             }
-                  
+
             $iTokenLength=$_POST['tokenlength'];
             //token length has to be at least 5, otherwise set it to default (15)
             if($iTokenLength < 5)
@@ -1507,7 +1506,7 @@ class SurveyAdmin extends Survey_Common_Action
             {
                 $iTokenLength = 36;
             }
-                              
+
             // Insert base settings into surveys table
             $aInsertData = array(
             'expires' => $sExpiryDate,
@@ -1560,14 +1559,14 @@ class SurveyAdmin extends Survey_Common_Action
                 $aInsertData['adminemail'] = Yii::app()->request->getPost('adminemail');
             } else {
                 $aInsertData['adminemail'] = '';
-                $warning .= $this->getController()->lang->gT("Warning! Notification email was not updated because it was not valid.").'<br/>'; 
+                $warning .= $this->getController()->lang->gT("Warning! Notification email was not updated because it was not valid.").'<br/>';
             }
             if (Yii::app()->request->getPost('bounce_email', '') == ''
                 || validateEmailAddress(Yii::app()->request->getPost('bounce_email'))) {
                 $aInsertData['bounce_email'] = Yii::app()->request->getPost('bounce_email');
             } else {
                 $aInsertData['bounce_email'] = '';
-                $warning .= $this->getController()->lang->gT("Warning! Bounce email was not updated because it was not valid.").'<br/>'; 
+                $warning .= $this->getController()->lang->gT("Warning! Bounce email was not updated because it was not valid.").'<br/>';
             }
 
             if (!is_null($iSurveyID))

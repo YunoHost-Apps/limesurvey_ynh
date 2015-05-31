@@ -95,11 +95,30 @@ class database extends Survey_Common_Action
             {
                 foreach ($aSurveyLanguages as $sLanguage)
                 {
-                    if (!is_null(Yii::app()->request->getPost('defaultanswerscale_0_'.$sLanguage.'_0')))
-                    {
-                        $this->_updateDefaultValues($iQuestionID,0,0,'',$sLanguage,Yii::app()->request->getPost('defaultanswerscale_0_'.$sLanguage.'_0'),true);
+                    // Qick and dirty insert for yes/no defaul value
+                    // write the the selectbox option, or if "EM" is slected, this value to table
+                    if ($sQuestionType == 'Y'){
+                        /// value for all langs
+                        if (Yii::app()->request->getPost('samedefault') == 1){
+                            $sLanguage = $aSurveyLanguages[0];   // turn
+                        }else{
+                            $sCurrentLang = $sLanguage; // edit the next lines
+                        }
+                        if ( Yii::app()->request->getPost('defaultanswerscale_0_'.$sLanguage) == 'EM')  { // Case EM, write expression to database
+                            $this->_updateDefaultValues($iQuestionID,0,0,'',$sLanguage,Yii::app()->request->getPost('defaultanswerscale_0_'.$sLanguage.'_EM'),true);
+                        }
+                        else{
+                            // Case "other", write list value to database
+                            $this->_updateDefaultValues($iQuestionID,0,0,'',$sLanguage,Yii::app()->request->getPost('defaultanswerscale_0_'.$sLanguage),true);
+                        }
+                        ///// end yes/no
+                    }else{
+                        if (!is_null(Yii::app()->request->getPost('defaultanswerscale_0_'.$sLanguage.'_0')))
+                        {
+                            $this->_updateDefaultValues($iQuestionID,0,0,'',$sLanguage,Yii::app()->request->getPost('defaultanswerscale_0_'.$sLanguage.'_0'),true);
+                        }
                     }
-                }
+               }
             }
             Yii::app()->session['flashmessage'] = $clang->gT("Default value settings were successfully saved.");
             LimeExpressionManager::SetDirtyFlag();
@@ -135,12 +154,6 @@ class database extends Survey_Common_Action
                 for ($iSortOrderID=1;$iSortOrderID<$iMaxCount;$iSortOrderID++)
                 {
                     $sCode=sanitize_paranoid_string(Yii::app()->request->getPost('code_'.$iSortOrderID.'_'.$iScaleID));
-                    if (Yii::app()->request->getPost('oldcode_'.$iSortOrderID.'_'.$iScaleID)) {
-                        $sOldCode=sanitize_paranoid_string(Yii::app()->request->getPost('oldcode_'.$iSortOrderID.'_'.$iScaleID));
-                        if($sCode !== $sOldCode) {
-                            Condition::model()->updateAll(array('value'=>$sCode), 'cqid=:cqid AND value=:value', array(':cqid'=>$iQuestionID, ':value'=>$sOldCode));
-                        }
-                    }
 
                     $iAssessmentValue=(int) Yii::app()->request->getPost('assessment_'.$iSortOrderID.'_'.$iScaleID);
                     foreach ($aSurveyLanguages as $sLanguage)
@@ -161,8 +174,11 @@ class database extends Survey_Common_Action
                         {
                             Yii::app()->setFlashMessage($clang->gT("Failed to update answers"),'error');
                         }
-                    } // foreach ($alllanguages as $language)
-                    if(isset($sOldCode) && $sCode !== $sOldCode) {
+                    }
+                    // Updating code (oldcode!==null) => update condition with the new code
+                    $sOldCode=Yii::app()->request->getPost('oldcode_'.$iSortOrderID.'_'.$iScaleID);
+                    if(isset($sOldCode) && $sCode !== $sOldCode)
+                    {
                         Condition::model()->updateAll(array('value'=>$sCode), 'cqid=:cqid AND value=:value', array(':cqid'=>$iQuestionID, ':value'=>$sOldCode));
                     }
                 }  // for ($sortorderid=0;$sortorderid<$maxcount;$sortorderid++)
@@ -283,7 +299,14 @@ class database extends Survey_Common_Action
                                 $oSubQuestion->scale_id=$iScaleID;
                             }
                         }
-                        $bSubQuestionResult=$oSubQuestion->save();
+                        if ($oSubQuestion->qid) {
+                            switchMSSQLIdentityInsert('questions',true);
+                            $bSubQuestionResult=$oSubQuestion->save();
+                            switchMSSQLIdentityInsert('questions',false);
+                        }else
+                        {
+                            $bSubQuestionResult=$oSubQuestion->save();
+                        }
                         if($bSubQuestionResult)
                         {
                             if(substr($subquestionkey,0,3)!='new' && isset($aOldCodes[$iScaleID][$iPosition]) && $aCodes[$iScaleID][$iPosition] !== $aOldCodes[$iScaleID][$iPosition])
@@ -894,10 +917,6 @@ class database extends Survey_Common_Action
                     $url = Yii::app()->request->getPost('url_'.$langname);
                     if ($url == 'http://') {$url="";}
 
-                    $short_title = html_entity_decode(Yii::app()->request->getPost('short_title_'.$langname), ENT_QUOTES, "UTF-8");
-                    $description = html_entity_decode(Yii::app()->request->getPost('description_'.$langname), ENT_QUOTES, "UTF-8");
-                    $welcome = html_entity_decode(Yii::app()->request->getPost('welcome_'.$langname), ENT_QUOTES, "UTF-8");
-                    $endtext = html_entity_decode(Yii::app()->request->getPost('endtext_'.$langname), ENT_QUOTES, "UTF-8");
                     $sURLDescription = html_entity_decode(Yii::app()->request->getPost('urldescrip_'.$langname), ENT_QUOTES, "UTF-8");
                     $sURL = html_entity_decode(Yii::app()->request->getPost('url_'.$langname), ENT_QUOTES, "UTF-8");
 

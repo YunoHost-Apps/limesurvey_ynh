@@ -1,22 +1,14 @@
-// $Id: tokens.js 8633 2010-04-25 12:57:33Z c_schmitz
-
-
-$(document).ready(function() {
-    $("#bounceprocessing").change(turnoff);
-    turnoff();
+$(document).on("change","#bounceprocessing",function(){
+    hideShowParameters();
 });
-
-
-
-function turnoff(ui,evt) {
-    bounce_disabled=($("#bounceprocessing").val()=='N' || $("#bounceprocessing").val()=='G');
-    if (bounce_disabled==true) {bounce_disabled='disabled';}
-    else {bounce_disabled='';}
-    $("#bounceaccounttype").attr('disabled',bounce_disabled);
-    $("#bounceaccounthost").attr('disabled',bounce_disabled);
-    $("#bounceaccountuser").attr('disabled',bounce_disabled);
-    $("#bounceaccountpass").attr('disabled',bounce_disabled);
-    $("#bounceencryption").attr('disabled',bounce_disabled);
-    $("#bounceaccountencryption").attr('disabled',bounce_disabled);
-};
-    
+$(document).ready(function() {
+    hideShowParameters();
+});
+function hideShowParameters(){
+    var disabled=$("#bounceprocessing").val()!="L";
+    $("#bounceaccounttype").prop("disabled",disabled);
+    $("#bounceaccounthost").prop("disabled",disabled);
+    $("#bounceaccountuser").prop("disabled",disabled);
+    $("#bounceaccountpass").prop("disabled",disabled);
+    $("#bounceaccountencryption").prop("disabled",disabled);
+}

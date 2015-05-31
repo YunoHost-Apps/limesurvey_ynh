@@ -55,8 +55,8 @@ function addSelectedParticipantsToCPDB()
         $("#addcpdb").load(postUrl, {
             participantid:token},function(){
                 $(location).attr('href',attMapUrl+'/'+survey_id);
-        });        
-    }    
+        });
+    }
 
     /*$(":checked").each(function() {
     token.push($(this).attr('name'));
@@ -184,8 +184,7 @@ $(document).ready(function() {
                 .appendTo(jQuery(this).parent().parent())
                 .click(function()
                 {
-                    jQuery('#displaytokens').saveRow(row.attr('id'));
-                    func();
+                    jQuery('#displaytokens').saveRow(row.attr('id'), null, null, {}, function(){func();});
                 });
             });
             updatePageAfterGrid();
@@ -331,8 +330,16 @@ $(document).ready(function() {
                     alert(sSelectRowMsg );
                 }
                 else
-                {
-                    window.open(inviteurl+$("#displaytokens").getGridParam("selarrrow").join("|"), "_blank")
+                {                              
+                    var newForm = jQuery('<form>', {
+                        'action': inviteurl,
+                        'target': '_blank'
+                    }).append(jQuery('<input>', {
+                        'name': 'tokenids',
+                        'value': $("#displaytokens").getGridParam("selarrrow").join("|"),
+                        'type': 'hidden'
+                    })).appendTo('body');
+                    newForm.submit();      
                 }
             }
         });
@@ -349,7 +356,15 @@ $(document).ready(function() {
                 }
                 else
                 {
-                    window.open(remindurl+$("#displaytokens").getGridParam("selarrrow").join("|"), "_blank")
+                    var newForm = jQuery('<form>', {
+                        'action': remindurl,
+                        'target': '_blank'
+                    }).append(jQuery('<input>', {
+                        'name': 'tokenids',
+                        'value': $("#displaytokens").getGridParam("selarrrow").join("|"),
+                        'type': 'hidden'
+                    })).appendTo('body');
+                    newForm.submit();                    
                 }
             }
         });
@@ -375,7 +390,7 @@ $(document).ready(function() {
     }
     if (bParticipantPanelPermission==true)
     {
-        $("#displaytokens").navSeparatorAdd("#pager",{});        
+        $("#displaytokens").navSeparatorAdd("#pager",{});
         $("#displaytokens").navButtonAdd('#pager', {
             caption:"",
             title:viewParticipantsLink,
@@ -394,13 +409,14 @@ $(document).ready(function() {
         if(sSearchString != ""){
             var aSearchConditions=new Array;
             for(col in colInformation){
-                if(colInformation[col]['quickfilter'])
-                    aSearchConditions.push(col+"||contains||"+sSearchString);
+                if(colInformation[col]['quickfilter']){
+                    aSearchConditions.push(col);aSearchConditions.push('contains');aSearchConditions.push(sSearchString);aSearchConditions.push("or");
+                }
             }
-            var sSearchConditions=aSearchConditions.join("||or||");
-            oGrid.jqGrid('setGridParam', {url: jsonSearchUrl+"/"+sSearchConditions}).trigger('reloadGrid', [{current: true, page: 1}]);
+            aSearchConditions.pop();// remove last 'or'
+            oGrid.jqGrid('setGridParam', {url: jsonUrl, postData: { searcharray: aSearchConditions} }).trigger('reloadGrid', [{current: true, page: 1}]);
         }else{
-            oGrid.jqGrid('setGridParam', {url: jsonUrl}).trigger('reloadGrid', [{current: true, page: 1}]);
+            oGrid.jqGrid('setGridParam', {url: jsonUrl, postData: { }}).trigger('reloadGrid', [{current: true, page: 1}]);
         }
     }, 500);
 
@@ -409,7 +425,18 @@ $(document).ready(function() {
         reloadAfterSubmit: true,
         closeOnEspace:true
     });
+	
+	// Center modal dialogs
+    $.jgrid.jqModal = $.extend($.jgrid.jqModal || {}, {
+        beforeOpen: centerInfoDialog
+    });
 });
+
+function centerInfoDialog() {
+    var infoDialog = $("#info_dialog");
+    var dialogparent = infoDialog.parent();
+    infoDialog.css({ 'left': Math.round((dialogparent.width() - infoDialog.width()) / 2)+'px' });
+}
 
 function updatePageAfterGrid(){
     var oGrid=$("#displaytokens");

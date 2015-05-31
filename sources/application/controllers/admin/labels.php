@@ -319,37 +319,31 @@ class labels extends Survey_Common_Action
      */
     public function process()
     {
-        if ( Permission::model()->hasGlobalPermission('labelsets','update'))
-        {
-            if (isset($_POST['method']) && get_magic_quotes_gpc())
-                $_POST['method'] = stripslashes($_POST['method']);
-
             $action = returnGlobal('action');
             Yii::app()->loadHelper('admin/label');
             $lid = returnGlobal('lid');
 
-            if ($action == "updateset")
+            if ($action == "updateset" && Permission::model()->hasGlobalPermission('labelsets','update'))
             {
                 updateset($lid);
-                Yii::app()->session['flashmessage'] = Yii::app()->lang->gT("Label set properties sucessfully updated.");
+                Yii::app()->setFlashMessage(Yii::app()->lang->gT("Label set properties sucessfully updated."),'success');
             }
-            if ($action == "insertlabelset")
+            if ($action == "insertlabelset" && Permission::model()->hasGlobalPermission('labelsets','create'))
                 $lid = insertlabelset();
-            if (($action == "modlabelsetanswers") || ($action == "ajaxmodlabelsetanswers"))
+            if (($action == "modlabelsetanswers" || ($action == "ajaxmodlabelsetanswers")) && Permission::model()->hasGlobalPermission('labelsets','update'))
                 modlabelsetanswers($lid);
-            if ($action == "deletelabelset")
+            if ($action == "deletelabelset" && Permission::model()->hasGlobalPermission('labelsets','delete'))
+            {
                 if (deletelabelset($lid))
                 {
-                    Yii::app()->session['flashmessage'] = Yii::app()->lang->gT("Label set sucessfully deleted.");
+                    Yii::app()->setFlashMessage(Yii::app()->lang->gT("Label set sucessfully deleted."),'success');
                     $lid = 0;
                 }
-
-
+            }
             if ($lid)
                 $this->getController()->redirect(array("admin/labels/sa/view/lid/" . $lid));
             else
                 $this->getController()->redirect(array("admin/labels/sa/view"));
-        }
     }
 
     /**
@@ -360,8 +354,11 @@ class labels extends Survey_Common_Action
      */
     public function exportmulti()
     {
-        App()->getClientScript()->registerScriptFile(Yii::app()->getConfig('adminscripts') . 'labels.js');
-        $this->_renderWrappedTemplate('labels', 'exportmulti_view');
+        if (Permission::model()->hasGlobalPermission('labelsets','export'))
+        {
+            App()->getClientScript()->registerScriptFile(Yii::app()->getConfig('adminscripts') . 'labels.js');
+            $this->_renderWrappedTemplate('labels', 'exportmulti_view');
+        }
     }
 
     public function getAllSets()
@@ -372,9 +369,9 @@ class labels extends Survey_Common_Action
 
         foreach($results as $row)
         {
-            $output[$row->lid] = $row->getAttribute('label_name');
+            $output[$row->lid] = flattenText($row->getAttribute('label_name'));
         }
-
+        header('Content-type: application/json');
         echo ls_json_encode($output);
     }
 
@@ -383,6 +380,7 @@ class labels extends Survey_Common_Action
         $lid = Yii::app()->getRequest()->getPost('lid');
         $answers = Yii::app()->getRequest()->getPost('answers');
         $code = Yii::app()->getRequest()->getPost('code');
+        $aAssessmentValues = Yii::app()->getRequest()->getPost('assessmentvalues',array());
         //Create new label set
         $language = "";
         foreach ($answers as $lang => $answer) {
@@ -412,6 +410,7 @@ class labels extends Survey_Common_Action
                 $label->title = $ans;
                 $label->sortorder = $key;
                 $label->language = $lang;
+                $label->assessment_value = isset($aAssessmentValues[$key])?$aAssessmentValues[$key]:0;
                 if(!$label->save())
                     $res = 'fail';
             }

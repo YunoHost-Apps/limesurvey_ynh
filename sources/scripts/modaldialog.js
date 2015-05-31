@@ -1,63 +1,79 @@
-$(document).ready(function() {
-    //    $('#basic').hide();
-    //    var jsonstring = $('#".$ia[1]."').val();
-    //    var filecount = $('#".$ia[1]."_filecount').val();
-    //    displayUploadedFiles(jsonstring, filecount, fieldname, show_title, show_comment, pos);
+$(function() {
+    openUploadModalDialog();
+});
 
-    $(function() {
-        $('.upload').click(function(e) {
-            e.preventDefault();
-            var $this = $(this);
+function openUploadModalDialog(){
+    $('.upload').click(function(e) {
+        e.preventDefault();
+        var $this = $(this);
 
-            var show_title   = getQueryVariable('show_title', this.href);
-            var show_comment = getQueryVariable('show_comment', this.href);
-            var pos          = getQueryVariable('pos', this.href);
-            var fieldname    = getQueryVariable('fieldname', this.href);
-            var buttonsOpts = {};
-            buttonsOpts[translt.returnTxt] = function() {
-                $(this).dialog("close");
-            };
+        var show_title   = getQueryVariable('show_title', this.href);
+        var show_comment = getQueryVariable('show_comment', this.href);
+        var pos          = getQueryVariable('pos', this.href);
+        var fieldname    = getQueryVariable('fieldname', this.href);
+        var buttonsOpts = {};
+        buttonsOpts[translt.returnTxt] = function() {
+            $(this).dialog("close");
+        };
+        var windowwidth = $(window).width()-30;
+        var dialogwidth= Math.min(windowwidth, 940);
 
-            var horizontalPadding = 30;
-            var verticalPadding = 20;
-            $('#uploader').dialog('destroy').remove(); // destroy the old modal dialog
-            $('<iframe id=\"uploader\" name=\"uploader\" class=\"externalSite\" src=\"' + this.href + '\" />').dialog({
-                    title: translt.title,
-                    autoOpen: true,
-                    width: 984,
-                    height: 440,
-                    modal: true,
-                    resizable: true,
-                    autoResize: true,
-                    draggable: true,
-                    closeOnEscape: false,
-                    beforeClose: function() {
-                        var pass;
-                        if(document.getElementById('uploader').contentDocument) {
-                            if(document.getElementById('uploader').contentDocument.defaultView)
-                                {       /*Firefox*/
-                                pass=document.getElementById('uploader').contentDocument.defaultView.saveAndExit(fieldname,show_title,show_comment,pos);
-                            }else{       /*IE8*/
-                                pass=document.getElementById('uploader').contentWindow.saveAndExit(fieldname,show_title,show_comment,pos);
-                            }
-                        }else{    /*IE6*/
+        $('#uploader').dialog('destroy').remove(); // destroy the old modal dialog
+        $('<iframe id=\"uploader\" name=\"uploader\" class=\"externalSite\" src=\"' + this.href + '\" />').dialog({
+                title: translt.title,
+                autoOpen: true,
+                width: dialogwidth,
+                height: 'auto',
+                open: function( event, ui ) {
+                    setWidthUploader();
+                },
+                modal: true,
+                resizable: false,
+                autoResize: false,
+                draggable: true,
+                closeOnEscape: false,
+                beforeClose: function() {
+                    var pass;
+                    if(document.getElementById('uploader').contentDocument) {
+                        if(document.getElementById('uploader').contentDocument.defaultView)
+                            {       /*Firefox*/
+                            pass=document.getElementById('uploader').contentDocument.defaultView.saveAndExit(fieldname,show_title,show_comment,pos);
+                        }else{       /*IE8*/
                             pass=document.getElementById('uploader').contentWindow.saveAndExit(fieldname,show_title,show_comment,pos);
                         }
-                        return pass;
-                    },
-                    overlay: {
-                        opacity: 0.85,
-                        background: 'black'
-                    },
-                    buttons: buttonsOpts,
-                    close: function( ) {
-                        checkconditions();
+                    }else{    /*IE6*/
+                        pass=document.getElementById('uploader').contentWindow.saveAndExit(fieldname,show_title,show_comment,pos);
                     }
-                }).width(984 - horizontalPadding).height(440 - verticalPadding);
-        });
+                    return pass;
+                },
+                overlay: {
+                    opacity: 0.85,
+                    background: 'black'
+                },
+                buttons: buttonsOpts,
+                close: function( ) {
+                    checkconditions();
+                }
+            });
     });
-
+}
+$(window).resize(function() { 
+    setWidthUploader();
+    if($("iframe#uploader") && jQuery.isFunction($("iframe#uploader")[0].contentWindow.fixParentHeigth))
+        $("iframe#uploader")[0].contentWindow.fixParentHeigth();
 });
+/* Reset the position of the dialog (recenter) */
+function resetUploaderPosition(){
+     $( "#uploader" ).dialog( "option", "position", $( "#uploader" ).dialog( "option", "position" ) );
+}
+/* Set the with of upload madal and uploader frame according to windows width */
+function setWidthUploader(){
+    var maxwidth=Math.min($("body").innerWidth()-4, 974);
+    if(maxwidth!=$( "#uploader" ).dialog( "option", "width" )){
+        $("#uploader").dialog( "option", "width", maxwidth).width(maxwidth-18) // Leave 20px for overflow
+    }
+    resetUploaderPosition();
+}
 
 function getQueryVariable(variable, url) {
     var vars = url.split("/");

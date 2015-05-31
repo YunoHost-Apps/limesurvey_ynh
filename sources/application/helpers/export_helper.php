@@ -84,12 +84,12 @@ function SPSSExportData ($iSurveyID, $iLength, $na = '', $q='\'', $header=FALSE)
     // Now see if we have parameters for from (offset) & num (limit)
     $limit = App()->getRequest()->getParam('limit');
     $offset = App()->getRequest()->getParam('offset');
-    
+
     //Now get the query string with all fields to export
     $query = SPSSGetQuery($iSurveyID, $limit, $offset);
-    
+
     $result = $query->query();
-    
+
     $rownr = 0;
 
     foreach ($result as $row) {
@@ -330,7 +330,7 @@ function SPSSGetValues ($field = array(), $qidattributes = null, $language ) {
 */
 function SPSSFieldMap($iSurveyID, $prefix = 'V') {
     global $clang, $surveyprivate;
-    
+
     $typeMap = array(
 '5'=>Array('name'=>'5 Point Choice','size'=>1,'SPSStype'=>'F','Scale'=>3),
 'B'=>Array('name'=>'Array (10 Point Choice)','size'=>1,'SPSStype'=>'F','Scale'=>3),
@@ -434,7 +434,8 @@ function SPSSFieldMap($iSurveyID, $prefix = 'V') {
             $fieldtype = 'A';
             $val_size = 255;
         } elseif ($fieldname == 'lastpage') {
-            $hide = 1;
+            $fieldtype = 'F';
+            $val_size = 7; //Arbitrarilty restrict to 9,999,999 (7 digits) pages
         }
 
         #Get qid (question id)
@@ -530,7 +531,7 @@ function SPSSGetQuery($iSurveyID, $limit = null, $offset = null) {
                 $columns[] = 't.' . $attributefield;
             }
         }
-        
+
         $query->leftJoin('{{tokens_' . $iSurveyID . '}} t',  App()->db->quoteColumnName('s.token') . ' = ' .  App()->db->quoteColumnName('t.token'));
         //LEFT JOIN {{tokens_$iSurveyID}} t ON ";
     }
@@ -545,12 +546,12 @@ function SPSSGetQuery($iSurveyID, $limit = null, $offset = null) {
             $query->where('s.submitdate IS NOT NULL');
             break;
     }
-    
-    if (!empty($limit) & !is_null($offset)) 
+
+    if (!empty($limit) & !is_null($offset))
     {
         $query->limit((int) $limit,  (int) $offset);
     }
-    
+
     return $query;
 }
 
@@ -980,7 +981,7 @@ function quexml_get_lengthth($qid,$attribute,$default, $quexmllang=false)
         $Query = "SELECT value FROM {{question_attributes}} WHERE qid = $qid AND language='$quexmllang' AND attribute='$attribute'";
     else
         $Query = "SELECT value FROM {{question_attributes}} WHERE qid = $qid AND attribute='$attribute'";
-        
+
     //$QueryResult = mysql_query($Query) or die ("ERROR: $QueryResult<br />".mysql_error());
     $QueryResult = Yii::app()->db->createCommand($Query)->query();
 
@@ -1275,12 +1276,12 @@ function quexml_export($surveyi, $quexmllan)
 
                 $question->appendChild($directive);
             }
-            
+
 			if (Yii::app()->getConfig('quexmlshowprintablehelp')==true)
 			{
-				
+
 				$RowQ['printable_help']=quexml_get_lengthth($qid,"printable_help","", $quexmllang);
-            
+
 				if (!empty($RowQ['printable_help']))
 				{
 					$directive = $dom->createElement("directive");
@@ -1324,11 +1325,11 @@ function quexml_export($surveyi, $quexmllan)
                     $response = $dom->createElement("response");
                     $response->setAttribute("varName",QueXMLCleanup($sgq));
                     $response->appendChild(QueXMLCreateFixed($qid,false,false,0,$other,$sgq));
-                    
+
                     $response2 = $dom->createElement("response");
                     $response2->setAttribute("varName",QueXMLCleanup($sgq) . "_comment");
                     $response2->appendChild(QueXMLCreateFree("longtext","40",""));
-                    
+
                     $question->appendChild($response);
                     $question->appendChild($response2);
                     break;
@@ -1428,7 +1429,7 @@ function quexml_export($surveyi, $quexmllan)
                     if ($QROW['value'])
                         $response->setAttribute("varName",QueXMLCleanup($QROW['value']));
                     $response->appendChild(QueXMLCreateFixed($qid,false,false,0,$other,$sgq));
-                    
+
                     //get the header of the second scale of the dual scale question
                     $Query = "SELECT value FROM {{question_attributes}} WHERE qid = $qid AND language='$quexmllang' AND attribute='dualscale_headerB'";
                     $QRE = Yii::app()->db->createCommand($Query)->query();
@@ -1506,10 +1507,12 @@ function concat()
 
 function group_export($action, $iSurveyID, $gid)
 {
+    viewHelper::disableHtmlLogging();
+
     $fn = "limesurvey_group_$gid.lsg";
     $xml = getXMLWriter();
 
-    header("Content-Type: text/html/force-download");
+    header("Content-Type: application/force-download");
     header("Content-Disposition: attachment; filename=$fn");
     header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");    // Date in the past
     header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -1576,7 +1579,7 @@ function groupGetXMLStructure($xml,$gid)
     $iSurveyID=$iSurveyID['sid'];
     $sBaseLanguage=Survey::model()->findByPk($iSurveyID)->language;
     $platform = Yii::app()->db->getDriverName();
-    if ($platform == 'mssql' || $platform =='sqlsrv' || $platform =='dblib') 
+    if ($platform == 'mssql' || $platform =='sqlsrv' || $platform =='dblib')
     {
         $query="SELECT qa.qid, qa.attribute, cast(qa.value as varchar(4000)) as value, qa.language
         FROM {{question_attributes}} qa JOIN {{questions}}  q ON q.qid = qa.qid AND q.sid={$iSurveyID} and q.gid={$gid}
@@ -1611,7 +1614,7 @@ function questionExport($action, $iSurveyID, $gid, $qid)
     $fn = "limesurvey_question_$qid.lsq";
     $xml = getXMLWriter();
 
-    header("Content-Type: text/html/force-download");
+    header("Content-Type: application/force-download");
     header("Content-Disposition: attachment; filename=$fn");
     header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");    // Date in the past
     header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -1692,57 +1695,66 @@ function questionGetXMLStructure($xml,$gid,$qid)
 
 function tokensExport($iSurveyID)
 {
+    $sEmailFiter=trim(App()->request->getPost('filteremail'));
+    $iTokenStatus=App()->request->getPost('tokenstatus');
+    $iInvitationStatus=App()->request->getPost('invitationstatus');
+    $iReminderStatus=App()->request->getPost('reminderstatus');
+    $sTokenLanguage=App()->request->getPost('tokenlanguage');
+
+    $oSurvey=Survey::model()->findByPk($iSurveyID);
+    $bIsNotAnonymous= ($oSurvey->anonymized=='N' && $oSurvey->active=='Y');// db table exist (survey_$iSurveyID) ?
+
     $bquery = "SELECT * FROM {{tokens_$iSurveyID}} where 1=1";
     $databasetype = Yii::app()->db->getDriverName();
-    if (trim($_POST['filteremail'])!='')
+    if ($sEmailFiter!='')
     {
         if (in_array($databasetype, array('mssql', 'sqlsrv', 'dblib')))
         {
-            $bquery .= ' and CAST(email as varchar) like '.dbQuoteAll('%'.$_POST['filteremail'].'%', true);
+            $bquery .= ' and CAST(email as varchar) like '.dbQuoteAll('%'.$sEmailFiter.'%', true);
         }
         else
         {
-            $bquery .= ' and email like '.dbQuoteAll('%'.$_POST['filteremail'].'%', true);
+            $bquery .= ' and email like '.dbQuoteAll('%'.$sEmailFiter.'%', true);
         }
     }
-    if ($_POST['tokenstatus']==1)
+    if ($iTokenStatus==1)
     {
         $bquery .= " and completed<>'N'";
     }
-    if ($_POST['tokenstatus']==2)
+    elseif ($iTokenStatus==2)
     {
         $bquery .= " and completed='N'";
-        if ($thissurvey['anonymized']=='N')
+        if ($bIsNotAnonymous)
         {
             $bquery .=" and token not in (select token from {{survey_$iSurveyID}} group by token)";
         }
     }
-    if ($_POST['tokenstatus']==3 && $thissurvey['anonymized']=='N')
+    if ($iTokenStatus==3 && $bIsNotAnonymous)
     {
         $bquery .= " and completed='N' and token in (select token from {{survey_$iSurveyID}} group by token)";
     }
 
-    if ($_POST['invitationstatus']==1)
+    if ($iInvitationStatus==1)
     {
         $bquery .= " and sent<>'N'";
     }
-    if ($_POST['invitationstatus']==2)
+    if ($iInvitationStatus==2)
     {
         $bquery .= " and sent='N'";
     }
 
-    if ($_POST['reminderstatus']==1)
+    if ($iReminderStatus==1)
     {
         $bquery .= " and remindersent<>'N'";
     }
-    if ($_POST['reminderstatus']==2)
+    if ($iReminderStatus==2)
     {
         $bquery .= " and remindersent='N'";
     }
 
-    if ($_POST['tokenlanguage']!='')
+    if ($sTokenLanguage!='')
     {
-        $bquery .= " and language=".dbQuoteAll($_POST['tokenlanguage']);
+        $bquery .= " and language=".dbQuoteAll($sTokenLanguage);
     }
     $bquery .= " ORDER BY tid";
     Yii::app()->loadHelper('database');

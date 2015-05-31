@@ -79,15 +79,23 @@ class Authentication extends Survey_Common_Action
             // Now authenticate
             if ($identity->authenticate()) 
             {
-                 FailedLoginAttempt::model()->deleteAttempts();
+                FailedLoginAttempt::model()->deleteAttempts();
                 App()->user->setState('plugin', $authMethod);
                 $this->getController()->_GetSessionUserRights(Yii::app()->session['loginID']);
                 Yii::app()->session['just_logged_in'] = true;
                 Yii::app()->session['loginsummary'] = $this->_getSummary();
+
+                $event = new PluginEvent('afterSuccessfulLogin');
+                App()->getPluginManager()->dispatchEvent($event);
+
                 $this->_doRedirect();
 
             } else {
                 // Failed
+                $event = new PluginEvent('afterFailedLoginAttempt');
+                $event->set('identity', $identity);
+                App()->getPluginManager()->dispatchEvent($event);
+
                 $message = $identity->errorMessage;
                 if (empty($message)) {
                     // If no message, return a default message
@@ -105,19 +113,16 @@ class Authentication extends Survey_Common_Action
     */
     public function logout()
     {
-        // Fetch the current user
-        $plugin = App()->user->getState('plugin', null);    // Save for afterLogout, current user will be destroyed by then
-                 
         /* Adding beforeLogout event */
         $beforeLogout = new PluginEvent('beforeLogout');
-        App()->getPluginManager()->dispatchEvent($beforeLogout, array($plugin));
+        App()->getPluginManager()->dispatchEvent($beforeLogout);
 
         App()->user->logout();
         App()->user->setFlash('loginmessage', gT('Logout successful.'));
 
         /* Adding afterLogout event */
         $event = new PluginEvent('afterLogout');
-        App()->getPluginManager()->dispatchEvent($event, array($plugin));
+        App()->getPluginManager()->dispatchEvent($event);
         
         $this->getController()->redirect(array('/admin/authentication/sa/login'));
     }
@@ -140,18 +145,19 @@ class Authentication extends Survey_Common_Action
 
             $aFields = User::model()->findAllByAttributes(array('users_name' => $sUserName, 'email' => $sEmailAddr));
 
+            // Preventing attacker from easily knowing whether the user and email address are valid or not (and slowing down brute force attacks)
+            usleep(rand(Yii::app()->getConfig("minforgottenpasswordemaildelay"),Yii::app()->getConfig("maxforgottenpasswordemaildelay")));
+
             if (count($aFields) < 1)
             {
                 // wrong or unknown username and/or email
-                $aData['errormsg'] = $this->getController()->lang->gT('User name and/or email not found!');
-                $aData['maxattempts'] = '';
-                $this->_renderWrappedTemplate('authentication', 'error', $aData);
+                $aData['message'] = '<br>'.gT('If username and email that you specified are valid, a new password has been sent to you').'<br>';
             }
             else
             {
-                $aData['message'] = $this->_sendPasswordEmail($sEmailAddr, $aFields);
-                $this->_renderWrappedTemplate('authentication', 'message', $aData);
+                $aData['message'] = '<br>'.$this->_sendPasswordEmail($sEmailAddr, $aFields).'</br>';
             }
+            $this->_renderWrappedTemplate('authentication', 'message', $aData);
         }
     }
 
@@ -184,12 +190,11 @@ class Authentication extends Survey_Common_Action
         if (SendEmailMessage($body, $sSubject, $sTo, $sFrom, $sSiteName, false, $sSiteAdminBounce))
         {
             User::model()->updatePassword($aFields[0]['uid'], $sNewPass);
-            $sMessage = $username . '<br />' . $email . '<br /><br />' . $clang->gT('An email with your login data was sent to you.');
+            $sMessage = gT('If username and email that you specified are valid, a new password has been sent to you');
         }
         else
         {
-            $sTmp = str_replace("{NAME}", '<strong>' . $aFields[0]['users_name'] . '</strong>', $clang->gT("Email to {NAME} ({EMAIL}) failed."));
-            $sMessage = str_replace("{EMAIL}", $sEmailAddr, $sTmp) . '<br />';
+            $sMessage = gT("Email failed.");
         }
 
         return $sMessage;

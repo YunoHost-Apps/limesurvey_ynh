@@ -69,7 +69,7 @@ class index extends CAction {
         $thisstep = $param['thisstep'];
         $move=getMove();
         Yii::app()->setConfig('move',$move);
-        $clienttoken = $param['token'];
+        $clienttoken = trim($param['token']);
         $standardtemplaterootdir = Yii::app()->getConfig('standardtemplaterootdir');
         if (is_null($thissurvey) && !is_null($surveyid)) $thissurvey = getSurveyInfo($surveyid);
 
@@ -313,11 +313,8 @@ class index extends CAction {
                 }
             }
 
-            $_SESSION['survey_'.$surveyid]['holdname'] = $sLoadName;
-            $_SESSION['survey_'.$surveyid]['holdpass'] = $sLoadPass;
-
             if ($errormsg == "") {
-                LimeExpressionManager::SetDirtyFlag();  
+                LimeExpressionManager::SetDirtyFlag();
                 buildsurveysession($surveyid);
                 if (loadanswers()){
                     Yii::app()->setConfig('move','movenext');
@@ -378,27 +375,35 @@ class index extends CAction {
             }
             if (!isset($tokenInstance))
             {
-                $tk = Token::model($surveyid)->findByAttributes(array('token' => $token));
-                if($tk->completed == 'N')
+                $oToken = Token::model($surveyid)->findByAttributes(array('token' => $token));
+                if($oToken)
                 {
                     $now = dateShift(date("Y-m-d H:i:s"), "Y-m-d H:i:s", Yii::app()->getConfig("timeadjust"));
-                    if(strtotime($now) < strtotime($tk->validfrom))
+                    if($oToken->completed != 'N' && !empty($oToken->completed))
                     {
-                        $err = $clang->gT("This invitation is not valid yet.");
+                        $sError = $clang->gT("This invitation has already been used.");
                     }
-                    else
+                    elseif(strtotime($now) < strtotime($oToken->validfrom))
                     {
-                        $err = $clang->gT("This invitation is not valid anymore.");
+                        $sError = $clang->gT("This invitation is not valid yet.");
+                    }
+                    elseif(strtotime($now) > strtotime($oToken->validuntil))
+                    {
+                        $sError = $clang->gT("This invitation is not valid anymore.");
+                    }
+                    else // This can not happen
+                    {
+                        $sError = $clang->gT("This is a controlled survey. You need a valid token to participate.");
                     }
                 }
                 else
                 {
-                    $err = $clang->gT("This invitation has already been used.");
+                    $sError = $clang->gT("This is a controlled survey. You need a valid token to participate.");
                 }
                 $asMessage = array(
                 null,
                 $clang->gT("We are sorry but you are not allowed to enter this survey."),
-                $err,
+                $sError,
                 sprintf($clang->gT("For further information please contact %s"), $thissurvey['adminname']." (<a href='mailto:{$thissurvey['adminemail']}'>"."{$thissurvey['adminemail']}</a>)")
                 );
 
@@ -499,25 +504,52 @@ class index extends CAction {
         if (!isset($_SESSION['survey_'.$surveyid]['srid']) && $thissurvey['anonymized'] == "N" && $thissurvey['active'] == "Y" && isset($token) && $token !='')
         {
             // load previous answers if any (dataentry with nosubmit)
-            //$oSurveyTokenInstance=SurveyDynamic::model($surveyid)->find(array('select'=>'id,submitdate,lastpage', 'condition'=>'token=:token', 'order'=>'id DESC','params'=>array('token' => $token)));
-            $oSurveyTokenInstance=SurveyDynamic::model($surveyid)->find(array('condition'=>'token=:token', 'order'=>'id DESC','params'=>array('token' => $token)));
-            if ( $oSurveyTokenInstance )
+             $oResponses  = Response::model($surveyid)->findAllByAttributes(array(
+                'token' => $token
+            ), array('order' => 'id DESC'));
+            if (!empty($oResponses))
             {
-                if((empty($oSurveyTokenInstance->submitdate) || $thissurvey['alloweditaftercompletion'] == 'Y' ) && $thissurvey['tokenanswerspersistence'] == 'Y')
+                /**
+                 * We fire the response selection event when at least 1 response was found.
+                 * If there is just 1 response the plugin still has to option to choose
+                 * NOT to use it.
+                 */
+                $event = new PluginEvent('beforeLoadResponse');
+                $event->set('responses', $oResponses);
+                $event->set('surveyId', $surveyid);
+                App()->pluginManager->dispatchEvent($event);
+
+                $oResponse = $event->get('response');
+                // If $oResponse is false we act as if no response was found.
+                // This allows a plugin to deny continuing a response.
+                if ($oResponse !== false)
                 {
-                    $_SESSION['survey_'.$surveyid]['srid'] = $oSurveyTokenInstance->id;
-                    if (!empty($oSurveyTokenInstance->lastpage))
+                    // If plugin does not set a response we use the first one found, (this replicates pre-plugin behavior)
+                    if (!isset($oResponse) && (!isset($oResponses[0]->submitdate) || $thissurvey['alloweditaftercompletion'] == 'Y') && $thissurvey['tokenanswerspersistence'] == 'Y')
                     {
-                        $_SESSION['survey_'.$surveyid]['LEMtokenResume'] = true;
-                        $_SESSION['survey_'.$surveyid]['step'] = $oSurveyTokenInstance->lastpage;
+                        $oResponse = $oResponses[0];
+                    }
+
+                    if (isset($oResponse))
+                    {
+                        $_SESSION['survey_'.$surveyid]['srid'] = $oResponse->id;
+                        if (!empty($oResponse->lastpage))
+                        {
+                            $_SESSION['survey_'.$surveyid]['LEMtokenResume'] = true;
+                            // If the response was completed and user is allowed to edit after completion start at the beginning and not at the last page - just makes more sense
+                            if (!($oResponse->submitdate && $thissurvey['alloweditaftercompletion'] == 'Y'))
+                            {
+                                $_SESSION['survey_'.$surveyid]['step'] = $oResponse->lastpage;
+                            }
+                        }
+                        buildsurveysession($surveyid);
+                        if(!empty($oResponse->submitdate)) // alloweditaftercompletion
+                        {
+                            $_SESSION['survey_'.$surveyid]['maxstep'] = $_SESSION['survey_'.$surveyid]['totalsteps'];
+                        }
+                        loadanswers();
                     }
                 }
-                buildsurveysession($surveyid);
-                if(!empty($oSurveyTokenInstance->submitdate)) // alloweditaftercompletion
-                {
-                    $_SESSION['survey_'.$surveyid]['maxstep'] = $_SESSION['survey_'.$surveyid]['totalsteps'];
-                }
-                loadanswers();
             }
         }
         // Preview action : Preview right already tested before
@@ -567,7 +599,7 @@ class index extends CAction {
         foreach(array('lang','action','newtest','qid','gid','sid','loadname','loadpass','scid','thisstep','move','token') as $sNeededParam)
         {
             $param[$sNeededParam]=returnGlobal($sNeededParam,true);
-        } 
+        }
 
         return $param;
     }

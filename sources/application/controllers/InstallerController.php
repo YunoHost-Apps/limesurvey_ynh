@@ -47,6 +47,7 @@ class InstallerController extends CController {
     {
         self::_checkInstallation();
         self::_sessioncontrol();
+        Yii::import('application.helpers.common_helper', true);
 
         switch ($action) {
 
@@ -237,6 +238,13 @@ class InstallerController extends CController {
         $aData['classesForStep'] = array('off','off','off','on','off','off');
         $aData['progressValue'] = 40;
         $aData['model'] = $oModel = new InstallerConfigForm;
+        if (isset(Yii::app()->session['populateerror']))
+        {
+            $oModel->addError('dblocation',Yii::app()->session['populateerror']);
+            $oModel->addError('dbpwd','');
+            $oModel->addError('dbuser','');
+            unset(Yii::app()->session['populateerror']);
+        }
 
         if(isset($_POST['InstallerConfigForm']))
         {
@@ -461,7 +469,7 @@ class InstallerController extends CController {
                 $bCreateDB=false;
             }
             break;
-            case 'postgres':
+            case 'pgsql':
             try
             {
                 $this->connection->createCommand("CREATE DATABASE \"$sDatabaseName\" ENCODING 'UTF8'")->execute();
@@ -547,7 +555,7 @@ class InstallerController extends CController {
             case 'mysql':
                 $sql_file = 'mysql';
                 break;
-            case 'dblib': 
+            case 'dblib':
             case 'sqlsrv':
             case 'mssql':
                 $sql_file = 'mssql';
@@ -556,7 +564,7 @@ class InstallerController extends CController {
                 $sql_file = 'pgsql';
                 break;
             default:
-                throw new Exception(sprintf('Unkown database type "%s".', $sDatabaseType));
+                throw new Exception(sprintf('Unknown database type "%s".', $sDatabaseType));
         }
 
         //checking DB Connection
@@ -575,12 +583,15 @@ class InstallerController extends CController {
         }
         else
         {
-            $sConfirmation = $clang->gT('Database was populated but there were errors:').'<p><ul>';
+            $sConfirmation = $clang->gT('There were errors when trying to populate the database:').'<p><ul>';
             foreach ($aErrors as $sError)
             {
                 $sConfirmation.='<li>'.htmlspecialchars($sError).'</li>';
             }
             $sConfirmation.='</ul>';
+            Yii::app()->session['populateerror']=$sConfirmation;
+
+            $this->redirect(array('installer/database'));
         }
 
         Yii::app()->session['tablesexist'] = true;
@@ -617,7 +628,7 @@ class InstallerController extends CController {
                 $sDefaultAdminRealName = $model->adminName;
                 $sDefaultSiteName = $model->siteName;
                 $sDefaultSiteLanguage = $model->surveylang;
-                $sDefaultAdminEmail = $model->adminEmail;                
+                $sDefaultAdminEmail = $model->adminEmail;
 
                 $aData['title'] = $clang->gT("Database configuration");
                 $aData['descp'] = $clang->gT("Please enter the database settings you want to use for LimeSurvey:");
@@ -631,8 +642,16 @@ class InstallerController extends CController {
                 if ($this->connection->getActive() == true) {
                     $sPasswordHash=hash('sha256', $sDefaultAdminPassword);
                     try {
+
+                        if (User::model()->count()>0){
+                            die();
+                        }
                         // Save user
                         $user=new User;
+                        // Fix UserID to 1 for MySQL even if installed in master-master configuration scenario
+                        if (in_array($this->connection->getDriverName(), array('mysql', 'mysqli'))) {
+                            $user->uid=1;
+                        }
                         $user->users_name=$sDefaultAdminUserName;
                         $user->password=$sPasswordHash;
                         $user->full_name=$sDefaultAdminRealName;
@@ -835,10 +854,10 @@ class InstallerController extends CController {
         if (version_compare(PHP_VERSION, '5.3.0', '<'))
             $bProceed = !$aData['verror'] = true;
 
-        if ($this->return_bytes(ini_get('memory_limit'))/1024/1024<64 && ini_get('memory_limit')!=-1)
+        if (convertPHPSizeToBytes(ini_get('memory_limit'))/1024/1024<64 && ini_get('memory_limit')!=-1)
             $bProceed = !$aData['bMemoryError'] = true;
-        
-            
+
+
         // mbstring library check
         if (!check_PHPFunction('mb_convert_encoding', $aData['mbstringPresent']))
             $bProceed = false;
@@ -904,16 +923,15 @@ class InstallerController extends CController {
     function _setup_tables($sFileName, $aDbConfig = array(), $sDatabasePrefix = '')
     {
         extract(empty($aDbConfig) ? self::_getDatabaseConfig() : $aDbConfig);
-        switch ($sDatabaseType) {
-            case 'mysql':
-            case 'mysqli':
-                $this->connection->createCommand("ALTER DATABASE ". $this->connection->quoteTableName($sDatabaseName) ." DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;")->execute();
-                break;
-            case 'pgsql':
-                if (version_compare($this->connection->getServerVersion(),'9','>=')) {
-                    $this->connection->createCommand("ALTER DATABASE ". $this->connection->quoteTableName($sDatabaseName) ." SET bytea_output='escape';")->execute();
-                }
-                break;
+        try{
+            switch ($sDatabaseType) {
+                case 'mysql':
+                case 'mysqli':
+                    $this->connection->createCommand("ALTER DATABASE ". $this->connection->quoteTableName($sDatabaseName) ." DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;")->execute();
+                    break;
+            }
+        } catch(Exception $e) {
+            return array($e->getMessage());
         }
 
         return $this->_executeSQLFile($sFileName, $sDatabasePrefix);
@@ -1052,7 +1070,7 @@ class InstallerController extends CController {
 
             $sConfig .="\t\t" . "),"                                          . "\n"
             ."\t\t"   . ""                                          . "\n"
-                    
+
             ."\t\t"   . "// Uncomment the following line if you need table-based sessions". "\n"
             ."\t\t"   . "// 'session' => array ("                      . "\n"
             ."\t\t\t" . "// 'class' => 'system.web.CDbHttpSession',"   . "\n"
@@ -1133,7 +1151,7 @@ class InstallerController extends CController {
             case 'mysql':
             case 'mysqli':
                 // MySQL allow unix_socket for database location, then test if $sDatabaseLocation start with "/"
-                if(substr($sDatabaseLocation,0,1)=="/") 
+                if(substr($sDatabaseLocation,0,1)=="/")
                     $sDSN = "mysql:unix_socket={$sDatabaseLocation};dbname={$sDatabaseName};";
                 else
                     $sDSN = "mysql:host={$sDatabaseLocation};port={$sDatabasePort};dbname={$sDatabaseName};";
@@ -1153,7 +1171,7 @@ class InstallerController extends CController {
                 }
                 break;
 
-            case 'dblib' : 
+            case 'dblib' :
                 $sDSN = $sDatabaseType.":host={$sDatabaseLocation};dbname={$sDatabaseName}";
                 break;
             case 'mssql' :
@@ -1238,33 +1256,12 @@ class InstallerController extends CController {
             return true;
         } catch(Exception $e) {
             if (!empty($aData['model']) && !empty($aData['clang'])) {
-                $aData['model']->addError('dblocation', $aData['clang']->gT('Try again! Connection with database failed. Reason: ') . $e->message);
+                $aData['model']->addError('dblocation', $aData['clang']->gT('Try again! Connection with database failed. Reason: ') . $e->getMessage());
                 $this->render('/installer/dbconfig_view', $aData);
             } else {
                 return false;
             }
         }
     }
-    
-    /**
-    * This function returns the full number from a PHP ini value
-    * 
-    * @param string $sValue
-    */
-    function return_bytes($sValue) {
-        $sValue = trim($sValue);
-        $sLast = strtolower($sValue[strlen($sValue)-1]);
-        switch($sLast) {
-            // The 'G' modifier is available since PHP 5.1.0
-            case 'g':
-                $sValue *= 1024;
-            case 'm':
-                $sValue *= 1024;
-            case 'k':
-                $sValue *= 1024;
-        }
-
-        return $sValue;
-    }    
 
 }

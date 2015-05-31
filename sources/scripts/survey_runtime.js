@@ -22,6 +22,7 @@ $(document).ready(function()
     navbuttonsJqueryUi();
     showStartPopups();
     addClassEmpty();
+    noScrollOnSelect();
     if (typeof LEMsetTabIndexes === 'function') { LEMsetTabIndexes(); }
 	if (typeof checkconditions!='undefined') checkconditions();
 	if (typeof template_onload!='undefined') template_onload();
@@ -29,9 +30,6 @@ $(document).ready(function()
     {
         $(focus_element).focus();
     }
-    $(".question").find("select").each(function () {
-        hookEvent($(this).attr('id'),'mousewheel',noScroll);
-    });
 
     // Keypad functions
     var kp = $("input.num-keypad");
@@ -153,6 +151,10 @@ function checkconditions(value, name, type, evt_type)
 function fixnum_checkconditions(value, name, type, evt_type, intonly)
 {
     newval = new String(value);
+
+    /**
+     * If have to use parsed value.
+     */
     if(!bNumRealValue)
     {
         if (typeof intonly !=='undefined' && intonly==1) {
@@ -172,8 +174,43 @@ function fixnum_checkconditions(value, name, type, evt_type, intonly)
             newval = '';
         }
     }
+
+    /**
+     * If have to fix numbers automatically.
+     */    
     if(bFixNumAuto)
     {
+
+        /**
+         * Work on length of the number
+         * Avoid numbers longer than 20 characters before the decimal separator and 10 after the decimal separator. 
+         */
+        var midval = newval;
+        var aNewval = midval.split('.');
+        var newval = '';
+        
+        // Treat integer part            
+        if (aNewval.length > 0) {                           
+            var intpart = aNewval[0];
+            newval = (intpart.length > 20) ? '99999999999999999999' : intpart;
+        }
+
+        // Treat decimal part, if there is one.             
+        // Trim after 10th decimal if larger than 10 decimals.
+        if (aNewval.length > 1) {                
+            var decpart = aNewval[1];
+            if (decpart.length > 10){       
+                decpart = decpart.substr(0,10);
+            }
+            else {
+                decpart = aNewval[1];                
+            }
+            newval = newval + "." + decpart;
+        }
+
+        /**
+         * Set display value
+         */ 
         displayVal = newval;
         if (LEMradix === ',') {
             displayVal = displayVal.split('.').join(',');
@@ -183,6 +220,10 @@ function fixnum_checkconditions(value, name, type, evt_type, intonly)
         }
         $('#answer'+name).val(displayVal);
     }
+
+    /**
+     * Check conditions
+     */
     if (typeof evt_type === 'undefined')
     {
         evt_type = 'onchange';
@@ -255,11 +296,12 @@ function activateLanguageChanger(){
                 }
                 $('<form>', {
                     "html": '<input type="hidden" name="lang" value="' + $(this).find('option:selected').val() + '" />',
-                    "action": target
-                }).appendTo(document.body).submit();
+                    "action": target,
+                    "method": 'post'
+                }).appendTo(document.body).append($("input[name='YII_CSRF_TOKEN']")).submit();
             }
         }else{
-            $("form#limesurvey [name='lang']").not($(this)).remove();// Remove other lang
+            $(this).closest('form').find("[name='lang']").not($(this)).remove();// Remove other lang
             $('#changelangbtn').click();
         }
     });
@@ -286,7 +328,7 @@ function manageIndex(){
     });
 }
 /**
- * Put a empty class on empty answer text item (limit to answers part)
+ * Put a empty class on empty answer text item (limit to answers part) 
  * @author Denis Chenu / Shnoulle
  */
 function addClassEmpty()
@@ -307,6 +349,16 @@ function addClassEmpty()
 	});
 }
 
+/**
+ * Disable scroll on select, put it in function to allow update in template
+ * 
+ */
+function noScrollOnSelect()
+{
+    $(".question").find("select").each(function () {
+        hookEvent($(this).attr('id'),'mousewheel',noScroll);
+    });
+}
 /**
  * Adapt cell to have a click on cell do a click on input:radio or input:checkbox (if unique)
  * Using delegate the can be outside document.ready (using .on is possible but on $(document) then : less readbale
