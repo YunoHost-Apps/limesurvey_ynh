@@ -51,6 +51,15 @@ sudo sed -i "s/yunouser/$db_user/g" $final_path/application/config/config.php
 sudo sed -i "s/yunopass/$db_pwd/g" $final_path/application/config/config.php
 sudo sed -i "s/yunobase/$db_user/g" $final_path/application/config/config.php
 
+for user in $(sudo yunohost user list | grep '^  [^ ]*:' | sed -e "s/^  \([^ ]*\):/\1/g")
+do
+    if [ $user != $admin ];
+        then
+            mysql -u $db_user -p$db_pwd $db_user -e "INSERT INTO prefix_users (users_name) VALUES ('$user');INSERT INTO prefix_permissions (entity,entity_id,uid,permission,create_p,read_p,update_p,delete_p,import_p,export_p) SELECT 'global',0,uid,'surveys',1,1,1,1,0,1 FROM prefix_users WHERE users_name='$user'"
+
+        fi
+done
+
 # Set permissions
 sudo chown -R www-data: $final_path
 sudo chmod u+w $final_path/tmp
@@ -68,3 +77,4 @@ sudo service nginx reload
 sudo yunohost app setting $app skipped_uris -v "/"  
 #sudo yunohost app setting $app protected_uris -v "/index.php?r=admin,/index.php?r=plugins,/scripts"
 sudo yunohost app ssowatconf
+
