@@ -11,6 +11,9 @@
         "email": "valentin@grimaud.me",
         "url": "http://www.limesurvey.org/"
     },
+    "requirements": {
+        "yunohost": ">= 2.4"
+    },
     "multi_instance": "true",
     "arguments": {
         "install" : [
