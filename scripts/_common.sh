@@ -241,7 +241,7 @@ ynh_system_user_delete () {
 ynh_configure () {
     local TEMPLATE=$1
     local DEST=$2
-    type j2 2>/dev/null || pip install j2cli
+    type j2 2>/dev/null || sudo pip install j2cli
     j2 "${PKG_DIR}/conf/$TEMPLATE.j2" > "${PKG_DIR}/conf/$TEMPLATE"
     sudo cp "${PKG_DIR}/conf/$TEMPLATE" "$DEST"
 }
