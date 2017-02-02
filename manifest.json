@@ -59,8 +59,8 @@
                     "en": "Choose the default language of this LimeSurvey",
                     "fr": "Choisissez la langue par défault de LimeSurvey"
                 },
-                "choices": ["en_GB", "fr_FR","es_ES", "de_DE"],
-                "default": "en_GB"
+                "choices": ["en", "fr","es", "de"],
+                "default": "en"
             },
             {
                 "name": "is_public",

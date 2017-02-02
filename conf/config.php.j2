@@ -24,24 +24,26 @@
 return array(
         'components' => array(
                 'db' => array(
-                        'connectionString' => 'mysql:host=localhost;port=3306;dbname=yunobase;',
+                        'connectionString' => 'mysql:host=localhost;port=3306;dbname={{ db_name }};',
                         'emulatePrepare' => true,
-                        'username' => 'yunouser',
-                        'password' => 'yunopass',
-                        'charset' => 'utf8',
-                        'tablePrefix' => 'prefix_',
+                        'username' => '{{ db_user }}',
+                        'password' => '{{ db_pwd }}',
+                        'charset' => 'utf8mb4',
+                        'tablePrefix' => 'lime_',
                 ),
 
                 // Uncomment the following line if you need table-based sessions
                 // 'session' => array (
-                        // 'class' => 'system.web.CDbHttpSession',
+                        // 'class' => 'application.core.web.DbHttpSession',
                         // 'connectionID' => 'db',
-                        // 'sessionTableName' => '{{sessions}}',
+                        // 'sessionTableName' => '{% raw %}{{sessions}}{% endraw %}',
                 // ),
 
                 'urlManager' => array(
                         'urlFormat' => 'get',
-                        'rules' => require('routes.php'),
+                        'rules' => array(
+                                // You can add your own rules here
+                        ),
                         'showScriptName' => true,
                 ),
 

@@ -1,10 +1,18 @@
 #!/bin/bash
-app="limesurvey"
-db_user=$app
-db_name=$app
-root_pwd=$(sudo cat /etc/yunohost/mysql)
-domain=$(sudo yunohost app setting $app domain)
+source /usr/share/yunohost/helpers
+source _common.sh
 
-mysql -u root -p$root_pwd -e "DROP DATABASE $db_name ; DROP USER $db_user@localhost ;"
-sudo rm -rf /var/www/$app
-sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
+app=$YNH_APP_INSTANCE_NAME
+user=$app
+local_path=$(sudo yunohost app setting $app local_path)
+domain=$(ynh_app_setting_get $app domain)
+
+ynh_mysql_remove_db "$user" "$app"
+ynh_system_user_delete "$user"
+
+ynh_secure_rm "$local_path"
+ynh_secure_rm "/home/yunohost.app/$app"
+ynh_rm_nginx_conf
+ynh_rm_php_fpm_conf
+sudo yunohost app ssowatconf
+echo -e "\e[0m" # Restore norml color

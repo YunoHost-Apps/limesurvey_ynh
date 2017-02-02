@@ -1,102 +1,63 @@
 #!/bin/bash
+source /usr/share/yunohost/helpers
+source _common.sh
 
-set -e
-# Delete db and user if exit with an error
-function exit_properly 
-{
-    set +e
-    root_pwd=$(sudo cat /etc/yunohost/mysql)
-    mysql -u root -p$root_pwd -e "DROP DATABASE limesurvey ; DROP USER limesurvey@localhost ;"
-    sudo rm -Rf /var/www/limesurvey
-    exit 1
-}
-app="limesurvey"
+ynh_trap_on
+
+export app=$YNH_APP_INSTANCE_NAME
+user=$app
 
 # Retrieve arguments
-domain=$1
-path=$2
-admin=$3
-language=$4
+ynh_export domain path admin is_public language
+export local_path=/var/www/$app
+export data_path=/home/yunohost.app/$app
 
-# Check if admin exists
-sudo yunohost user list --json | grep -qi "\"username\": \"$admin\"" \
-	|| (echo "User does not exist: $admin" && exit 1)
-sudo yunohost app setting $app admin -v $admin
-sudo yunohost app setting $app language -v $language
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THIS ARGS
+#=================================================
+ynh_check_var "$app" "app name not set"
+ynh_user_exists "$admin" || ynh_die "User does not exist: $admin"
+ynh_normalize_url_path "$path"
+ynh_path_validity "$domain$path"
+ynh_local_path_available "$local_path"
+ynh_local_path_available "$data_path"
 
-# Check domain/path availability
-sudo yunohost app checkurl $domain$path -a $app \
-	|| (echo "Path not available: $domain$path" && exit 1)
+#=================================================
+# SETUP THE APP BY MODIFYING THE SYSTEM
+#=================================================
 
-# Remove trailing "/" for next commands
-path=${path%/}
+ynh_save_args domain path admin is_public language local_path
 
-# Generate random password
-db_pwd=$(dd if=/dev/urandom bs=1 count=200 2> /dev/null | tr -c -d '[A-Za-z0-9]' | sed -n 's/\(.\{24\}\).*/\1/p')
+ynh_package_install php5-imap
 
-# Use 'opensondage' as database name and user
-db_user=$app
+ynh_mysql_generate_db "$user" "$app"
 
-# Initialize database and store mysql password for upgrade
-sudo yunohost app initdb $db_user -p $db_pwd
-sudo yunohost app setting $app mysqlpwd -v $db_pwd
+ynh_system_user_create "$user" "$local_path"
 
-# Delete db and user if exit with an error
-trap exit_properly ERR
-
+ynh_setup_source "$local_path" "$user"
     
-# Copy files to the right place
-final_path=/var/www/$app
-upload_path=/home/yunohost.app/$app/upload
-sudo mkdir -p $final_path
-sudo mkdir -p $upload_path
-sudo cp -a ../sources/* $final_path
-sudo rm -Rf $final_path/upload
-sudo cp -a ../sources/upload/* $upload_path
-sudo ln -s $upload_path ../sources/upload
+# Move upload directory in yunohost.app 
+ynh_mv_to_home $local_path/upload
 
-# Db installation
-mysql -u $db_user -p$db_pwd $db_user < ../sources/installer/sql/create-mysql.sql
-sudo sed -i "s/yunoadmin/$admin/g" ../conf/mysql_data.sql
-mysql -u $db_user -p$db_pwd $db_user < ../conf/mysql_data.sql
+ynh_configure config.php "$local_path/application/config/config.php"
 
-
-sudo cp ../conf/config.php.template $final_path/application/config/config.php
-
-sudo sed -i "s/yunouser/$db_user/g" $final_path/application/config/config.php
-sudo sed -i "s/yunopass/$db_pwd/g" $final_path/application/config/config.php
-sudo sed -i "s/yunobase/$db_user/g" $final_path/application/config/config.php
-
-for user in $(sudo yunohost user list | grep '^  [^ ]*:' | sed -e "s/^  \([^ ]*\):/\1/g")
-do
-    if [ $user != $admin ];
-    then
-        mysql -u $db_user -p$db_pwd $db_user -e "INSERT INTO prefix_users (users_name) VALUES ('$user');INSERT INTO prefix_permissions (entity,entity_id,uid,permission,create_p,read_p,update_p,delete_p,import_p,export_p) SELECT 'global',0,uid,'surveys',1,1,1,1,0,1 FROM prefix_users WHERE users_name='$user'"
-    fi
-done
+# Fill LimeSurvey database
+sed 's/`prefix_/`lime_/g' $local_path/installer/sql/create-mysql.sql > ./structure.sql
+mysql -u $db_user -p$db_pwd $db_user < ./structure.sql
+ynh_configure data.sql ./data.sql
+mysql -u $db_user -p$db_pwd $db_user < ./data.sql
 
 # Set permissions
-sudo chown -R www-data:www-data $final_path
-sudo chown -R www-data:www-data $upload_path
-sudo chmod -R 664 $final_path
-sudo find $final_path -type d -print0 | xargs -0 sudo chmod 775 \
-	|| echo "No file to modify"
-sudo chmod -R 664 $upload_path
-sudo find $upload_path -type d -print0 | xargs -0 sudo chmod 775 \
-	|| echo "No file to modify"
-sudo chmod u+w $final_path/tmp
-sudo chmod u+w $upload_path
-sudo chmod u+w $final_path/application/config/
+ynh_set_default_perm $local_path
+ynh_set_default_perm $data_path/upload
+sudo chmod u+w $local_path/tmp
+sudo chmod u+w $data_path/upload
+sudo chmod u+w $local_path/application/config/
 
 sudo yunohost app addaccess $app -u $admin
-
-# Modify Nginx configuration file and copy it to Nginx conf directory
-sudo sed -i "s@PATHTOCHANGE@$path@g" ../conf/nginx.conf
-sudo sed -i "s@ALIASTOCHANGE@$final_path/@g" ../conf/nginx.conf
-sudo cp ../conf/nginx.conf /etc/nginx/conf.d/$domain.d/$app.conf
-# Reload Nginx and regenerate SSOwat conf
-sudo service nginx reload
-sudo yunohost app setting $app skipped_uris -v "/"  
+sudo yunohost app setting $app unprotected_uris -v "/"  
 #sudo yunohost app setting $app protected_uris -v "/index.php?r=admin,/index.php?r=plugins,/scripts"
 sudo yunohost app ssowatconf
 
+ynh_configure_php_fpm
+ynh_configure_nginx
