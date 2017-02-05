@@ -42,3 +42,7 @@ INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key
 INSERT INTO `lime_settings_global` VALUES ('defaultlang','{{ language }}'),('AssetsVersion','2620');
 
 INSERT INTO `lime_users` VALUES (1,'{{ admin }}','9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08','Administrator',0,'{{ language }}','','default','default','default',NULL,1,'2017-02-02 01:03:08',NULL);
+
+{% if is_public == "1" %}
+UPDATE `lime_plugin_settings` SET value='\"0\"' WHERE `id`=21;
+{% endif %} 

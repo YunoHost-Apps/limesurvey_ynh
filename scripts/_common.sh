@@ -206,6 +206,14 @@ ynh_set_default_perm () {
 	    || echo "No file to modify"
 
 }
+ynh_sso_access () {
+    sudo yunohost app setting $app unprotected_uris -v "/"
+
+    if [[ $is_public -eq 0 ]]; then
+        sudo yunohost app setting $app protected_uris -v "$1"
+    fi
+    sudo yunohost app ssowatconf
+}
 
 ynh_read_manifest () {
     python3 -c "import sys, json;print(json.load(open('../manifest.json'))['$1'])"
@@ -235,6 +243,8 @@ EOF
     ynh_package_install_from_equivs ./$app-ynh-deps.control \
         || ynh_die "Unable to install dependencies"
 }
+
+
 
 
 # Create a system user

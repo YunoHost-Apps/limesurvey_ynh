@@ -55,9 +55,7 @@ sudo chmod u+w $data_path/upload
 sudo chmod u+w $local_path/application/config/
 
 sudo yunohost app addaccess $app -u $admin
-sudo yunohost app setting $app unprotected_uris -v "/"  
-#sudo yunohost app setting $app protected_uris -v "/index.php?r=admin,/index.php?r=plugins,/scripts"
-sudo yunohost app ssowatconf
+ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
 
 ynh_configure_php_fpm
 ynh_configure_nginx
