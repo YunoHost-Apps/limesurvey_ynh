@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# causes the shell to exit if any subcommand or pipeline returns a non-zero status
+set -e
+
+# Source YNH helpers
+. /usr/share/yunohost/helpers
+
+# Get app instance name
+app=$YNH_APP_INSTANCE_NAME
+
+# Retrieve arguments
+domain=$(sudo yunohost app setting $app domain)
+path=$(sudo yunohost app setting $app path)
+local_path=$(sudo yunohost app setting $app local_path)
+
+# Copy the app files
+ynh_backup "$local_path" "sources"
+
+# Copy the conf files
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf" "conf/nginx.conf"
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf" "conf/php-fpm.conf"
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf" "conf/php-fpm.ini"
+
+# Save database
+dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
+mysqldump -u "$app" -p"$dbpass" --no-create-db "$app" > ./dump.sql
