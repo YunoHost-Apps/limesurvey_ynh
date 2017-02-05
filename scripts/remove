@@ -8,11 +8,17 @@ local_path=$(sudo yunohost app setting $app local_path)
 domain=$(ynh_app_setting_get $app domain)
 
 ynh_mysql_remove_db "$user" "$app"
-ynh_system_user_delete "$user"
+
 
 ynh_secure_rm "$local_path"
 ynh_secure_rm "/home/yunohost.app/$app"
+
 ynh_rm_nginx_conf
 ynh_rm_php_fpm_conf
+
+# Delete user after php5-fpm is restarted without the app conf
+# We can't delete it before because php5-fpm use it
+ynh_system_user_delete "$user"
+
 sudo yunohost app ssowatconf
 echo -e "\e[0m" # Restore norml color
