@@ -20,5 +20,7 @@ ynh_rm_php_fpm_conf
 # We can't delete it before because php5-fpm use it
 ynh_system_user_delete "$user"
 
+ynh_package_remove $app-ynh-deps
+
 sudo yunohost app ssowatconf
 echo -e "\e[0m" # Restore norml color

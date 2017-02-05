@@ -207,6 +207,36 @@ ynh_set_default_perm () {
 
 }
 
+ynh_read_manifest () {
+    python3 -c "import sys, json;print(json.load(open('../manifest.json'))['$1'])"
+}
+
+
+ynh_app_dependencies  (){
+    export dependencies=$1
+    export project_url=$(ynh_read_manifest 'url')
+    export version=$(ynh_read_manifest 'version')
+    mkdir -p conf
+    cat > ../conf/app-ynh-deps.control.j2 << EOF
+Section: misc
+Priority: optional
+Homepage: {{ project_url }}
+Standards-Version: 3.9.2
+
+Package: {{ app }}-ynh-deps
+Version: {{ version }} 
+Depends: {{ dependencies }}
+Architecture: all
+Description: meta package for {{ app }} (YunoHost app) dependencies
+ This meta-package is only responsible of installing its dependencies.
+EOF
+        
+    ynh_configure app-ynh-deps.control ./$app-ynh-deps.control
+    ynh_package_install_from_equivs ./$app-ynh-deps.control \
+        || ynh_die "Unable to install dependencies"
+}
+
+
 # Create a system user
 #
 # usage: ynh_system_user_create user_name [home_dir]

@@ -28,7 +28,7 @@ ynh_local_path_available "$data_path"
 
 ynh_save_args domain path admin is_public language local_path
 
-ynh_package_install php5-imap
+ynh_app_dependencies php5-imap
 
 ynh_mysql_generate_db "$user" "$app"
 
