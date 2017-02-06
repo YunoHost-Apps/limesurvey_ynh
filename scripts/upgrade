@@ -1,81 +1,68 @@
 #!/bin/bash
+source /usr/share/yunohost/helpers
+source _common.sh
 
-app="limesurvey"
+ynh_trap_on
 
-domain=$(sudo yunohost app setting $app domain)
-path=$(sudo yunohost app setting $app path)
-admin=$(sudo yunohost app setting $app admin)
+export app=$YNH_APP_INSTANCE_NAME
+user=$app
+
+export domain=$(sudo yunohost app setting $app domain)
+export path=$(sudo yunohost app setting $app path)
+export admin=$(sudo yunohost app setting $app admin)
 db_pwd=$(sudo yunohost app setting $app mysqlpwd)
+export local_path=$(sudo yunohost app setting $app local_path)
+export is_public=$(sudo yunohost app setting $app is_public || echo 0)
+export prefix=$(sudo yunohost app setting $app prefix || echo 'prefix_')
+version=$(ynh_read_json "/etc/yunohost/apps/$app/manifest.json" 'version' 2> /dev/null || echo '2.0.5')
+last_version=$(ynh_read_manifest 'version')
 
-db_user=$app
+ynh_exit_if_up_to_date
+ynh_check_var "$app" "app name not set"
+ynh_user_exists "$admin" || err "User does not exist: $admin"
+ynh_normalize_url_path "$path"
 
-# Remove trailing "/" for next commands
-path=${path%/}
+if [ "${version}" = "2.0.5" ]; then
 
-final_path=/var/www/$app
-upload_path=/home/yunohost.app/$app/upload
-sudo mkdir -p $final_path
-sudo mkdir -p $upload_path
+    ynh_save_args path is_public prefix
+
+    ynh_app_dependencies php5-imap
+
+    ynh_system_user_create "$user" "$local_path"
+
+    # Move the upload dir to local_path if needed
+    # The upload dir can't be symlinked in home (not supported by LS)
+    upload_path=/home/yunohost.app/$app/upload
+    if [ -h $local_path/upload ]; then
+        sudo rm $local_path/upload
+        sudo mv $upload_path $local_path/
+    fi
+    
+    sudo yunohost app setting $app skipped_uris -d
+    ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
+
+    ynh_configure_php_fpm
+    ynh_configure_nginx
+
+    ynh_configure migrations/2.0.5.sql ./2.0.5.sql
+    mysql -u $app -p$db_pwd $app < ./2.0.5.sql
+fi
 
 # Backup config, plugins and themes and delete previous files
-sudo mv $final_path/application/config/config.php $final_path/
-old_pwd=$(pwd)
-cd $final_path
-sudo mkdir -p old_plugins
-sudo mv plugins/* old_plugins \
-    || echo "No app to backup"
-sudo mkdir -p old_themes
-sudo mv themes/* old_themes \
-    || echo "No themes to backup"
+ynh_save_persistent modules themes plugins
+ynh_save_persistent data application/config/config.php upload
 
-if [ ! -h $final_path/upload ]; then
-    sudo mv $final_path/upload/* $upload_path/ \
-    || echo "No upload to move"
-fi
-shopt -s extglob
-sudo rm -Rf !(old_plugins|old_themes|config.php)
-shopt -u extglob
-
-# Copie new files and restore config, plugins and themes
-cd $old_pwd
-sudo cp -a ../sources/* $final_path
-cd $final_path/old_plugins
-sudo rm -Rf $(ls $final_path/plugins)
-cd $final_path/old_themes
-sudo rm -Rf $(ls $final_path/themes)
-cd $old_pwd
-sudo cp -a $final_path/old_plugins/* $final_path/plugins/ \
-    || echo "No plugin to restore"
-sudo cp -a $final_path/old_themes/* $final_path/themes/ \
-    || echo "No theme to restore"
-
-sudo mv $final_path/config.php $final_path/application/config/
-
-# Reset Upload symbolic link
-sudo rm -Rf $final_path/upload
-sudo ln -s $upload_path ../sources/upload
-
-
-# Create user
-for user in $(sudo yunohost user list | grep '^  [^ ]*:' | sed -e "s/^  \([^ ]*\):/\1/g")
-do
-    if [ $user != $admin ];
-    then
-        mysql -u $db_user -p$db_pwd $db_user -e "INSERT IGNORE INTO prefix_users (users_name) VALUES ('$user');INSERT IGNORE INTO prefix_permissions (entity,entity_id,uid,permission,create_p,read_p,update_p,delete_p,import_p,export_p) SELECT 'global',0,uid,'surveys',1,1,1,1,0,1 FROM prefix_users WHERE users_name='$user'"
-    fi
-done
+# Copie new files and restore config, plugins, upload and themes
+sudo rm -Rf $local_path
+ynh_setup_source "$local_path" "$user"
 
 # Set permissions
-sudo chown -R www-data:www-data $final_path
-sudo chown -R www-data:www-data $upload_path
-sudo chmod -R 664 $final_path
-sudo find $final_path -type d -print0 | xargs -0 sudo chmod 775 \
-	|| echo "No file to modify"
-sudo chmod -R 664 $upload_path
-sudo find $upload_path -type d -print0 | xargs -0 sudo chmod 775 \
-	|| echo "No file to modify"
-sudo chmod u+w $final_path/tmp
-sudo chmod u+w $upload_path
-sudo chmod u+w $final_path/application/config/
+ynh_set_default_perm $local_path
+sudo chmod -R u+w $local_path/tmp
+sudo chmod -R u+w $local_path/upload
+sudo chmod -R u+w $local_path/application/config/
 
+# Migrate DB
+cd $local_path/application/commands
+ynh_exec_as "$app" php console.php update 
 

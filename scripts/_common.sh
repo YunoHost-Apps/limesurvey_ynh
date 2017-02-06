@@ -15,7 +15,7 @@ ynh_exit_properly () {
     trap '' EXIT
     set +eu
     echo -e "\e[91m \e[1m"  
-    echo -e "!!\n  $app install's script has encountered an error. Installation was cancelled.\n!!" >&2
+    err "$app script has encountered an error."
 
     if type -t CLEAN_SETUP > /dev/null; then
         CLEAN_SETUP
@@ -185,8 +185,59 @@ ynh_setup_source () {
             || ynh_die "Unable to apply patches"    
 
     fi
+
+    # Apply persistent modules (upgrade only)
+    ynh_restore_persistent modules
+
+    # Apply persistent data (upgrade only)
+    ynh_restore_persistent data
+
 }
 
+# TODO support SOURCE_ID
+ynh_save_persistent () {
+    local TYPE=$1
+    local DIR=/tmp/ynh-persistent/$TYPE/$app/app
+    sudo mkdir -p $DIR
+    sudo touch $DIR/dir_names
+    shift
+    i=1
+    for PERSISTENT_DIR in $@;
+    do
+        if [ -e $local_path/$PERSISTENT_DIR  ]; then
+            sudo mv $local_path/$PERSISTENT_DIR $DIR/$i
+            sudo su -c "echo -n '$PERSISTENT_DIR ' >> $DIR/dir_names"
+            ((i++))
+        fi
+    done
+}
+
+# TODO support SOURCE_ID
+ynh_restore_persistent () {
+    local TYPE=$1
+    local DIR=/tmp/ynh-persistent/$TYPE/$app/app
+    shift
+    if [ -d $DIR  ]; then
+        i=1
+        for PERSISTENT_DIR in $(cat $DIR/dir_names);
+        do
+            if [ "$TYPE" = "modules" ]; then
+                for updated_subdir in $(ls $local_path/$PERSISTENT_DIR);
+                do
+                    sudo rm -Rf $DIR/$i/$updated_subdir
+                done
+            fi
+            if [ -d $DIR/$i ]; then
+                sudo mv $DIR/$i/* $local_path/$PERSISTENT_DIR/ 2> /dev/null || true
+            else
+                sudo mv $DIR/$i $local_path/$PERSISTENT_DIR 2> /dev/null || true
+            fi
+            ((i++))
+        done
+        sudo rm -Rf $DIR
+    fi
+
+}
 ynh_mv_to_home () {
     local APP_PATH="/home/yunohost.app/$app/"
     local DATA_PATH="$1"
@@ -215,10 +266,46 @@ ynh_sso_access () {
     sudo yunohost app ssowatconf
 }
 
-ynh_read_manifest () {
-    python3 -c "import sys, json;print(json.load(open('../manifest.json'))['$1'])"
+ynh_exit_if_up_to_date () {
+    if [ "${version}" = "${last_version}" ]; then
+        info "Up-to-date, nothing to do"
+        exit 0
+    fi
 }
 
+function log() {
+  echo "${1}"
+}
+
+function info() {
+  log "[INFO] ${1}"
+}
+
+function warn() {
+  log "[WARN] ${1}"
+}
+
+function err() {
+  log "[ERR] ${1}"
+}
+
+function to_logs() {
+
+  # When yunohost --verbose or bash -x
+  if $_ISVERBOSE; then
+    cat
+  else
+    cat > /dev/null
+  fi
+}
+
+ynh_read_json () {
+    sudo python3 -c "import sys, json;print(json.load(open('$1'))['$2'])"
+}
+
+ynh_read_manifest () {
+    ynh_read_json '../manifest.json' "$1"
+}
 
 ynh_app_dependencies  (){
     export dependencies=$1

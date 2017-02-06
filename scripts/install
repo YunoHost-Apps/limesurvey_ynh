@@ -10,6 +10,7 @@ user=$app
 # Retrieve arguments
 ynh_export domain path admin is_public language
 export local_path=/var/www/$app
+export prefix=lime_
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THIS ARGS
@@ -19,13 +20,12 @@ ynh_user_exists "$admin" || ynh_die "User does not exist: $admin"
 ynh_normalize_url_path "$path"
 ynh_path_validity "$domain$path"
 ynh_local_path_available "$local_path"
-ynh_local_path_available "$data_path"
 
 #=================================================
 # SETUP THE APP BY MODIFYING THE SYSTEM
 #=================================================
 
-ynh_save_args domain path admin is_public language local_path
+ynh_save_args domain path admin is_public language local_path prefix
 
 ynh_app_dependencies php5-imap
 
@@ -38,16 +38,16 @@ ynh_setup_source "$local_path" "$user"
 ynh_configure config.php "$local_path/application/config/config.php"
 
 # Fill LimeSurvey database
-sed 's/`prefix_/`lime_/g' $local_path/installer/sql/create-mysql.sql > ./structure.sql
+sed "s/\`prefix_/\`$prefix/g" $local_path/installer/sql/create-mysql.sql > ./structure.sql
 mysql -u $db_user -p$db_pwd $db_user < ./structure.sql
 ynh_configure data.sql ./data.sql
 mysql -u $db_user -p$db_pwd $db_user < ./data.sql
 
 # Set permissions
 ynh_set_default_perm $local_path
-sudo chmod u+w $local_path/tmp
-sudo chmod u+w $local_path/upload
-sudo chmod u+w $local_path/application/config/
+sudo chmod -R u+w $local_path/tmp
+sudo chmod -R u+w $local_path/upload
+sudo chmod -R u+w $local_path/application/config/
 
 sudo yunohost app addaccess $app -u $admin
 ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
