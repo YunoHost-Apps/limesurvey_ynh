@@ -4,7 +4,7 @@ source _common.sh
 
 app=$YNH_APP_INSTANCE_NAME
 user=$app
-local_path=$(sudo yunohost app setting $app local_path)
+local_path=$(ynh_app_setting_get $app local_path)
 domain=$(ynh_app_setting_get $app domain)
 
 ynh_mysql_remove_db "$user" "$app"
