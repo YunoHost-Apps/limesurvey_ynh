@@ -258,10 +258,10 @@ ynh_set_default_perm () {
 
 }
 ynh_sso_access () {
-    ynh_app_setting_set $app unprotected_uris -v "/"
+    ynh_app_setting_set $app unprotected_uris "/"
 
     if [[ $is_public -eq 0 ]]; then
-        ynh_app_setting_set $app protected_uris -v "$1"
+        ynh_app_setting_set $app protected_uris "$1"
     fi
     sudo yunohost app ssowatconf
 }
