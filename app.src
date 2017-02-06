@@ -1,2 +1,3 @@
-SOURCE_URL=https://www.limesurvey.org/stable-release?download=1984:limesurvey2620%20170124targz
-SOURCE_SUM=2e414c2b6aa031e28a88693e0abb1a7f78b5e80444dbedb2164519886058a0e5
+SOURCE_URL=https://www.limesurvey.org/stable-release?download=1994:limesurvey2622%20170203targz
+SOURCE_SUM=04aef224292ebacbfdf5c92cedc94de2f5900688bde33481a8908b15023df933
+SOURCE_FILE=limesurvey2.62.2+170203.tar.gz
