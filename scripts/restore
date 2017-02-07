@@ -147,7 +147,7 @@ dbuser=$user
 # CHECK IF THE APP CAN BE RESTORED
 #=================================================
 
-ynh_path_validity "$domain$path"
+#ynh_path_validity "$domain$path"
 ynh_check_restore
 
 #=================================================

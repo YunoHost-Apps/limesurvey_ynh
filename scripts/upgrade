@@ -38,7 +38,7 @@ if [ "${version}" = "2.0.5" ]; then
         sudo mv $upload_path $local_path/
     fi
     
-    sudo yunohost app setting $app skipped_uris -d
+    ynh_app_setting_delete $app skipped_uris
     ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
 
     ynh_configure_php_fpm
