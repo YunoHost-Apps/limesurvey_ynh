@@ -273,23 +273,23 @@ ynh_exit_if_up_to_date () {
     fi
 }
 
-function log() {
+log() {
   echo "${1}"
 }
 
-function info() {
+info() {
   log "[INFO] ${1}"
 }
 
-function warn() {
+warn() {
   log "[WARN] ${1}"
 }
 
-function err() {
+err() {
   log "[ERR] ${1}"
 }
 
-function to_logs() {
+to_logs() {
 
   # When yunohost --verbose or bash -x
   if $_ISVERBOSE; then
@@ -311,6 +311,7 @@ ynh_app_dependencies  (){
     export dependencies=$1
     export project_url=$(ynh_read_manifest 'url')
     export version=$(ynh_read_manifest 'version')
+    export dep_app=${app/__/-}
     mkdir -p conf
     cat > ../conf/app-ynh-deps.control.j2 << EOF
 Section: misc
@@ -318,7 +319,7 @@ Priority: optional
 Homepage: {{ project_url }}
 Standards-Version: 3.9.2
 
-Package: {{ app }}-ynh-deps
+Package: {{ dep_app }}-ynh-deps
 Version: {{ version }} 
 Depends: {{ dependencies }}
 Architecture: all
@@ -326,8 +327,8 @@ Description: meta package for {{ app }} (YunoHost app) dependencies
  This meta-package is only responsible of installing its dependencies.
 EOF
         
-    ynh_configure app-ynh-deps.control ./$app-ynh-deps.control
-    ynh_package_install_from_equivs ./$app-ynh-deps.control \
+    ynh_configure app-ynh-deps.control ./$dep_app-ynh-deps.control
+    ynh_package_install_from_equivs ./$dep_app-ynh-deps.control \
         || ynh_die "Unable to install dependencies"
 }
 
