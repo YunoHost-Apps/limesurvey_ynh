@@ -1,0 +1,177 @@
+#!/bin/bash
+source /usr/share/yunohost/helpers
+#source _common.sh
+
+#================================================
+# COPY of _common.sh (workaround for a bug)
+#================================================
+log() {
+  echo "${1}"
+}
+
+info() {
+  log "[INFO] ${1}"
+}
+
+warn() {
+  log "[WARN] ${1}"
+}
+
+err() {
+  log "[ERR] ${1}"
+}
+ynh_exit_properly () {  
+    exit_code=$?
+    if [ "$exit_code" -eq 0 ]; then
+            exit 0  
+    fi
+    trap '' EXIT
+    set +eu
+    echo -e "\e[91m \e[1m"  
+    err "$app script has encountered an error."
+
+    if type -t CLEAN_SETUP > /dev/null; then
+        CLEAN_SETUP
+    fi
+
+    ynh_die
+}
+
+ynh_trap_on () {
+    set -eu
+    trap ynh_exit_properly EXIT # Capturing exit signals on shell script
+}
+
+ynh_path_validity () {
+    sudo yunohost app checkurl $1 -a $app
+}
+
+ynh_read_json () {
+    sudo python3 -c "import sys, json;print(json.load(open('$1'))['$2'])"
+}
+
+ynh_read_manifest () {
+    ynh_read_json '../manifest.json' "$1"
+}
+
+ynh_app_dependencies  (){
+    export dependencies=$1
+    export project_url=$(ynh_read_manifest 'url')
+    export version=$(ynh_read_manifest 'version')
+    export dep_app=${app/__/-}
+    mkdir -p conf
+    cat > ../conf/app-ynh-deps.control.j2 << EOF
+Section: misc
+Priority: optional
+Homepage: {{ project_url }}
+Standards-Version: 3.9.2
+
+Package: {{ dep_app }}-ynh-deps
+Version: {{ version }} 
+Depends: {{ dependencies }}
+Architecture: all
+Description: meta package for {{ app }} (YunoHost app) dependencies
+ This meta-package is only responsible of installing its dependencies.
+EOF
+        
+    ynh_configure app-ynh-deps.control ./$dep_app-ynh-deps.control
+    ynh_package_install_from_equivs ./$dep_app-ynh-deps.control \
+        || ynh_die "Unable to install dependencies"
+}
+
+ynh_system_user_create () {
+    if ! ynh_system_user_exists "$1"    # Check if the user exists on the system
+    then    # If the user doesn't exist
+        if [ $# -ge 2 ]; then   # If a home dir is mentioned
+            user_home_dir="-d $2"
+        else
+            user_home_dir="--no-create-home"
+        fi
+        sudo useradd $user_home_dir --system --user-group $1 --shell /usr/sbin/nologin || ynh_die "Unable to create $1 system account"
+    fi
+}
+
+
+ynh_set_default_perm () {
+    local DIRECTORY=$1
+    # Set permissions
+    sudo chown -R $app:$app $DIRECTORY
+    sudo chmod -R 664 $DIRECTORY
+    sudo find $DIRECTORY -type d -print0 | xargs -0 sudo chmod 775 \
+	    || echo "No file to modify"
+
+}
+ynh_sso_access () {
+    ynh_app_setting_set $app unprotected_uris "/"
+
+    if [[ $is_public -eq 0 ]]; then
+        ynh_app_setting_set $app protected_uris "$1"
+    fi
+    sudo yunohost app ssowatconf
+}
+
+ynh_check_restore () {
+    for dest in $(cat ./list| cut -d ' ' -f2);
+    do
+        [[ -e $dest ]] && ynh_die \
+"The destination directory '$dest' already exists.\
+You should safely delete it before restoring this app."
+    done
+}
+
+ynh_restore () {
+    while IFS= read -r instruction
+    do
+        sudo cp -a ./$instruction
+    done < ./list
+}    
+#===============================================
+
+
+ynh_trap_on
+
+export app=$YNH_APP_INSTANCE_NAME
+user=$app
+
+export domain=$(ynh_app_setting_get $app domain)
+export path=$(ynh_app_setting_get $app path)
+export admin=$(ynh_app_setting_get $app admin)
+db_pwd=$(ynh_app_setting_get $app mysqlpwd)
+export local_path=$(ynh_app_setting_get $app local_path)
+export is_public=$(ynh_app_setting_get $app is_public)
+export prefix=$(ynh_app_setting_get $app prefix)
+dbname=$app
+dbuser=$user
+
+#=================================================
+# CHECK IF THE APP CAN BE RESTORED
+#=================================================
+
+ynh_path_validity "$domain$path"
+ynh_check_restore
+
+#=================================================
+# RESTORE THE APP BY MODIFYING THE SYSTEM
+#=================================================
+ynh_app_dependencies php5-imap
+
+ynh_system_user_create "$user" "$local_path"
+
+# Create and restore the database
+ynh_mysql_create_db "$dbname" "$dbuser" "$dbpass"
+ynh_mysql_connect_as "$dbuser" "$dbpass" "$dbname" < ./dump.sql
+
+# Restore file
+ynh_restore
+
+# Fix app ownerships & permissions
+ynh_set_default_perm $local_path
+sudo chmod -R u+w $local_path/tmp
+sudo chmod -R u+w $local_path/upload
+sudo chmod -R u+w $local_path/application/config/
+
+ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
+
+# Reload services
+sudo service php5-fpm restart || true
+sudo service nginx reload || true
