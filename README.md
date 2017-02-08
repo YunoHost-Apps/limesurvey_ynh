@@ -12,7 +12,7 @@ http://www.limesurvey.org/
 **Categories:** Productivity, Poll
 
 **Upgrade this package:**  
-`sudo yunohost app upgrade --verbose example -u https://github.com/YunoHost-Apps/example_ynh`
+`sudo yunohost app upgrade --verbose LimeSurvey -u https://github.com/YunoHost-Apps/limesurvey_ynh`
 
 **Multi-user:** Yes. 
 
