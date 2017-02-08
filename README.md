@@ -1,12 +1,21 @@
-limesurvey_ynh
-===============
-
 LimeSurvey for YunoHost
+===============
 
 LimeSurvey is used to create advanced poll.
 
 http://www.limesurvey.org/
 
-About this package
---------------
-The "private" check is disbled because the answer part need to be public (only the admin part is private). Currently, the package check tools is not able to test it.
+**Package by:** ljf (I will maintain this package at least until beggining of 2018)
+
+**Patches author:** Schnoulle
+
+**Categories:** Productivity, Poll
+
+**Upgrade this package:**  
+`sudo yunohost app upgrade --verbose example -u https://github.com/YunoHost-Apps/example_ynh`
+
+**Multi-user:** Yes. 
+
+**Private/Public mode:** In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. 
+
+**SSO/LDAP:** SSO and LDAP are configured.

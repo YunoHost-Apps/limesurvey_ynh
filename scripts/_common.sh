@@ -304,7 +304,11 @@ ynh_read_json () {
 }
 
 ynh_read_manifest () {
-    ynh_read_json '../manifest.json' "$1"
+    if [ -f '../manifest.json' ] ; then
+        ynh_read_json '../manifest.json' "$1"
+    else
+        ynh_read_json '../settings/manifest.json' "$1"
+    fi
 }
 
 ynh_app_dependencies  (){
@@ -312,7 +316,7 @@ ynh_app_dependencies  (){
     export project_url=$(ynh_read_manifest 'url')
     export version=$(ynh_read_manifest 'version')
     export dep_app=${app/__/-}
-    mkdir -p conf
+    mkdir -p ../conf
     cat > ../conf/app-ynh-deps.control.j2 << EOF
 Section: misc
 Priority: optional
