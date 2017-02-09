@@ -12,8 +12,10 @@ export path=$(ynh_app_setting_get $app path)
 export admin=$(ynh_app_setting_get $app admin)
 db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 export local_path=$(ynh_app_setting_get $app local_path)
-export is_public=$(ynh_app_setting_get $app is_public || echo 0)
-export prefix=$(ynh_app_setting_get $app prefix || echo 'prefix_')
+export is_public=$(ynh_app_setting_get $app is_public)
+is_public=${is_public:-0}
+export prefix=$(ynh_app_setting_get $app prefix)
+prefix=${prefix:-prefix_}
 version=$(ynh_read_json "/etc/yunohost/apps/$app/manifest.json" 'version' 2> /dev/null || echo '2.0.5')
 last_version=$(ynh_read_manifest 'version')
 
