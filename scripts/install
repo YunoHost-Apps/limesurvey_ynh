@@ -43,6 +43,12 @@ mysql -u $db_user -p$db_pwd $db_user < ./structure.sql
 ynh_configure data.sql ./data.sql
 mysql -u $db_user -p$db_pwd $db_user < ./data.sql
 
+# Randomize Password user
+ls_cli=$local_path/application/commands/console.php
+set +x
+ynh_exec_as "$user" php $ls_cli resetpassword "$admin" "$(ynh_string_random 24)"
+set -x
+
 # Set permissions
 ynh_set_default_perm $local_path
 sudo chmod -R u+w $local_path/tmp
