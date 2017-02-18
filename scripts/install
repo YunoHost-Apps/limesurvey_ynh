@@ -34,10 +34,10 @@ ynh_mysql_generate_db "$user" "$app"
 ynh_system_user_create "$user" "$local_path"
 
 ynh_setup_source "$local_path" "$user"
-    
+
 ynh_configure config.php "$local_path/application/config/config.php"
 
-# Fill LimeSurvey database
+# Fill LimeSurvey database @todo replace by command action from limesurvey
 sed "s/\`prefix_/\`$prefix/g" $local_path/installer/sql/create-mysql.sql > ./structure.sql
 mysql -u $db_user -p$db_pwd $db_user < ./structure.sql
 ynh_configure data.sql ./data.sql
@@ -53,10 +53,10 @@ set -x
 ynh_set_default_perm $local_path
 sudo chmod -R u+w $local_path/tmp
 sudo chmod -R u+w $local_path/upload
-sudo chmod -R u+w $local_path/application/config/
+#~ sudo chmod -R u+w $local_path/application/config/
 
 sudo yunohost app addaccess $app -u $admin
-ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
+ynh_sso_access "/index.php?r=admin"
 
 ynh_configure_php_fpm
 ynh_configure_nginx

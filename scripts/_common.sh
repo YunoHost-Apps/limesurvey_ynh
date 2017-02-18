@@ -7,14 +7,14 @@ ynh_check_var () {
     test -n "$1" || ynh_die "$2"
 }
 
-ynh_exit_properly () {  
+ynh_exit_properly () {
     exit_code=$?
     if [ "$exit_code" -eq 0 ]; then
-            exit 0  
+            exit 0
     fi
     trap '' EXIT
     set +eu
-    echo -e "\e[91m \e[1m"  
+    echo -e "\e[91m \e[1m"
     err "$app script has encountered an error."
 
     if type -t CLEAN_SETUP > /dev/null; then
@@ -89,7 +89,7 @@ ynh_local_path_available () {
     fi
 }
 
-# Save listed var in YunoHost app settings 
+# Save listed var in YunoHost app settings
 # usage: ynh_save_args VARNAME1 [VARNAME2 [...]]
 ynh_save_args () {
     for var in $@;
@@ -113,7 +113,7 @@ ynh_mysql_generate_db () {
 
     export db_pwd=$(ynh_string_random) # Generate a random password
     ynh_check_var "$db_pwd" "db_pwd empty"
-    
+
     ynh_mysql_create_db "$db_name" "$db_user" "$db_pwd" # Create the database
 
     ynh_app_setting_set $app mysqlpwd $db_pwd   # Store the password in the app's config
@@ -161,9 +161,9 @@ ynh_setup_source () {
     fi
     echo "$SOURCE_SUM $SOURCE_FILE" |$SUM_PRG -c --status \
         || ynh_die "Corrupt source"
-    
+
     sudo mkdir -p "$DEST"
-    sudo chown $AS_USER: "$DEST" 
+    sudo chown $AS_USER: "$DEST"
     if [ "$(echo ${SOURCE_FILE##*.})" == "gz" ]; then
         ynh_exec_as "$AS_USER" tar xf $SOURCE_FILE -C "$DEST" --strip-components 1
     elif [ "$(echo ${SOURCE_FILE##*.})" == "bz2" ]; then
@@ -171,18 +171,18 @@ ynh_setup_source () {
     elif [ "$(echo ${SOURCE_FILE##*.})" == "zip" ]; then
         mkdir -p "/tmp/$SOURCE_FILE"
         ynh_exec_as "$AS_USER" unzip -q $SOURCE_FILE -d "/tmp/$SOURCE_FILE"
-        ynh_exec_as "$AS_USER" mv "/tmp/$SOURCE_FILE"/./. "$DEST" 
+        ynh_exec_as "$AS_USER" mv "/tmp/$SOURCE_FILE"/./. "$DEST"
         rmdir "$/tmp/$SOURCE_FILE"
     else
         false
     fi
-    
+
     # Apply patches
     if [ -f ${PKG_DIR}/patches/$SOURCE_ID-*.patch  ]; then
         (cd "$DEST" \
         && for p in ${PKG_DIR}/patches/$SOURCE_ID-*.patch; do \
             ynh_exec_as "$AS_USER" patch -p1 < $p; done) \
-            || ynh_die "Unable to apply patches"    
+            || ynh_die "Unable to apply patches"
 
     fi
 
@@ -324,13 +324,13 @@ Homepage: {{ project_url }}
 Standards-Version: 3.9.2
 
 Package: {{ dep_app }}-ynh-deps
-Version: {{ version }} 
+Version: {{ version }}
 Depends: {{ dependencies }}
 Architecture: all
 Description: meta package for {{ app }} (YunoHost app) dependencies
  This meta-package is only responsible of installing its dependencies.
 EOF
-        
+
     ynh_configure app-ynh-deps.control ./$dep_app-ynh-deps.control
     ynh_package_install_from_equivs ./$dep_app-ynh-deps.control \
         || ynh_die "Unable to install dependencies"
@@ -387,11 +387,11 @@ ynh_configure_php_fpm () {
     finalphpconf=/etc/php5/fpm/pool.d/$app.conf
     ynh_configure php-fpm.conf /etc/php5/fpm/pool.d/$app.conf
     sudo chown root: $finalphpconf
-    
+
     finalphpini=/etc/php5/fpm/conf.d/20-$app.ini
     sudo cp ../conf/php-fpm.ini $finalphpini
     sudo chown root: $finalphpini
-    
+
     sudo service php5-fpm reload
 }
 
