@@ -1,4 +1,4 @@
-INSERT INTO `lime_plugins` (`id`, `name`, `active`) VALUES 
+INSERT INTO `lime_plugins` (`id`, `name`, `active`) VALUES
 (2,'AuditLog',0),
 (3,'oldUrlCompat',0),
 (4,'ExportR',0),
@@ -6,15 +6,9 @@ INSERT INTO `lime_plugins` (`id`, `name`, `active`) VALUES
 (6,'extendedStartPage',0),
 (7,'ExportSTATAxml',0),
 (8,'QuickMenu',0),
-(9,'AuthLDAP',0);
+(9,'AuthLDAP',1);
 
-INSERT INTO `lime_permissions` (`id`, `entity`, `entity_id`, `uid`, `permission`, `create_p`, `read_p`, `update_p`, `delete_p`, `import_p`, `export_p`) VALUES 
-(1,'global',0,1,'superadmin',0,1,0,0,0,0),
-(2,'global',0,2,'auth_ldap',0,1,0,0,0,0),
-(3,'global',0,2,'surveys',1,0,0,0,0,0);
-
-
-INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key`, `value`) VALUES 
+INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key`, `value`) VALUES
 (1,9,NULL,NULL,'server','\"ldap:\\/\\/localhost\"'),
 (2,9,NULL,NULL,'ldapport','\"\"'),
 (3,9,NULL,NULL,'ldapversion','\"3\"'),
@@ -41,8 +35,13 @@ INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key
 
 INSERT INTO `lime_settings_global` VALUES ('defaultlang','{{ language }}'),('AssetsVersion','2620');
 
-INSERT INTO `lime_users` VALUES (1,'{{ admin }}','9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08','Administrator',0,'{{ language }}','','default','default','default',NULL,1,'2017-02-02 01:03:08',NULL);
+INSERT INTO `lime_users` VALUES (2,'{{ admin }}','9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08','Administrator',0,'{{ language }}','','default','default','default',NULL,1,'2017-02-02 01:03:08',NULL);
+
+INSERT INTO `lime_permissions` (`id`, `entity`, `entity_id`, `uid`, `permission`, `create_p`, `read_p`, `update_p`, `delete_p`, `import_p`, `export_p`) VALUES
+(2,'global',0,2,'superadmin',0,1,0,0,0,0),
+(3,'global',0,2,'auth_ldap',0,1,0,0,0,0),
+(4,'global',0,2,'auth_webserver',0,1,0,0,0,0);
 
 {% if is_public == "1" %}
 UPDATE `lime_plugin_settings` SET value='\"0\"' WHERE `id`=21;
-{% endif %} 
+{% endif %}

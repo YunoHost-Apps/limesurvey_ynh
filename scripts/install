@@ -37,18 +37,14 @@ ynh_setup_source "$local_path" "$user"
 
 ynh_configure config.php "$local_path/application/config/config.php"
 
-# Fill LimeSurvey database @todo replace by command action from limesurvey
-sed "s/\`prefix_/\`$prefix/g" $local_path/installer/sql/create-mysql.sql > ./structure.sql
-mysql -u $db_user -p$db_pwd $db_user < ./structure.sql
-ynh_configure data.sql ./data.sql
-mysql -u $db_user -p$db_pwd $db_user < ./data.sql
-
 # Randomize Password user
 ls_cli=$local_path/application/commands/console.php
 set +x
-ynh_exec_as "$user" php $ls_cli resetpassword "$admin" "$(ynh_string_random 24)"
+ynh_exec_as "$user" php $ls_cli install "ynh_admin" "$(ynh_string_random 24)" "Administrator" "$admin@$domain"
 set -x
-
+# Setup^extra DB part (@todo : replace by a plugin system)
+ynh_configure data.sql ./data.sql
+mysql -u $db_user -p$db_pwd $db_user < ./data.sql
 # Set permissions
 ynh_set_default_perm $local_path
 sudo chmod -R u+w $local_path/tmp

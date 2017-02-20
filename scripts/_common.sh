@@ -178,7 +178,7 @@ ynh_setup_source () {
     fi
 
     # Apply patches
-    if [ -f ${PKG_DIR}/patches/$SOURCE_ID-*.patch  ]; then
+    if [ $(find ${PKG_DIR}/patches/ -type f -name "$SOURCE_ID-*.patch"  | wc -l) ]; then
         (cd "$DEST" \
         && for p in ${PKG_DIR}/patches/$SOURCE_ID-*.patch; do \
             ynh_exec_as "$AS_USER" patch -p1 < $p; done) \

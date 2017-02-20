@@ -56,7 +56,12 @@ return array(
         // LimeSurvey developers: Set this to 2 to additionally display STRICT PHP error messages and get full access to standard templates
                 'debug'=>0,
                 'debugsql'=>0, // Set this to 1 to enanble sql logging, only active when debug = 2
-				'enableLdap'=>true
+                /* yunohost part */
+                'auth_webserver_user_map' => array( '{{ admin }}'=>'ynh_admin'),// Primary user as ynh admin
+                'auth_webserver_autocreate_user'=>1,
+                'auth_webserver_autocreate_permissions'=>array(
+                        'superadmin' => array('create'=>true,'read'=>true,'update'=>true,'delete'=>true),
+                ),
         )
 );
 /* End of file config.php */
