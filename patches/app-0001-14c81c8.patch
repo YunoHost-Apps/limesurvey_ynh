@@ -1,16 +1,17 @@
-From 7ca49326dafe4d9896e67aebe414edcd3ce8c1af Mon Sep 17 00:00:00 2001
+From 14c81c86b7692794e7b251de3628f9afe353e020 Mon Sep 17 00:00:00 2001
 From: Denis Chenu <denis@sondages.pro>
-Date: Thu, 19 Jan 2017 00:02:45 +0100
-Subject: [PATCH] [feature] Allow update via PHP cli
+Date: Wed, 15 Feb 2017 01:15:35 +0100
+Subject: [PATCH] [feature][yunohost] Allow update via PHP cli - Included in
+ LimeSurvey 3.0
 
 ---
  application/commands/UpdateCommand.php | 90 ++++++++++++++++++++++++++++++++++
- 1 files changed, 90 insertions(+)
+ 1 file changed, 90 insertions(+)
  create mode 100644 application/commands/UpdateCommand.php
 
 diff --git a/application/commands/UpdateCommand.php b/application/commands/UpdateCommand.php
 new file mode 100644
-index 0000000..41ef107
+index 0000000..faa216f
 --- /dev/null
 +++ b/application/commands/UpdateCommand.php
 @@ -0,0 +1,90 @@
@@ -18,7 +19,8 @@ index 0000000..41ef107
 + /*
 + * @author Denis Chenu <denis@sondages.pro>
 + * @license GPL v3
-+ * @version 0.1
++ * @version 0.1.1
++ * @deprecated in LimeSurvey 3.0/develop UpdateDbCommand do it
 + *
 + * Copyright (C) 2017 Denis Chenu
 + * This program is free software: you can redistribute it and/or modify
@@ -44,11 +46,10 @@ index 0000000..41ef107
 +            Yii::import('application.helpers.update.updatedb_helper', true);
 +            $result=db_upgrade_all($currentDbVersion);/* @todo : fix bad echoing here */
 +            if ($result) {
-+                //printf(gT("Database has been successfully upgraded to version %s"),$dbversionnumber)."\n";
 +                echo "Database has been successfully upgraded to version $newDbVersion \n";
 +            } else {
-+                //echo gT("Please fix this error in your database and try again")."\n";
 +                echo "Please fix this error in your database and try again\n";
++                return 1;
 +            }
 +        } else {
 +            echo "no need update ".$newDbVersion ." ". $currentDbVersion ."\n";
@@ -57,6 +58,7 @@ index 0000000..41ef107
 +
 +    /**
 +     * Fonction to set all needed (and unneeded) config
++     * @deprecated in LimeSurvey 3.0/develop version config is set by LimeSurvey Core
 +     * @return void
 +     */
 +    private function _setConfigs(){
@@ -81,15 +83,15 @@ index 0000000..41ef107
 +        foreach($aVersionConfigs as $sConfig=>$versionConfig){
 +            Yii::app()->setConfig($sConfig,$versionConfig);
 +        }
-+        /* LS 3 version */
-+        Yii::app()->setConfig('runtimedir',$sRootDir.DIRECTORY_SEPARATOR."tmp".DIRECTORY_SEPARATOR."runtime");
++
 +        if(file_exists(Yii::app()->basePath. DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php'))
 +        {
 +            $config = require(Yii::app()->basePath. DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php');
 +            if(is_array($config['config']) && !empty($config['config']))
 +            {
-+                foreach($config['config'] as $key=>$value)
++                foreach($config['config'] as $key=>$value) {
 +                    Yii::app()->setConfig($key,$value);
++                }
 +            }
 +        }
 +        $oSettings=SettingGlobal::model()->findAll();
@@ -103,4 +105,3 @@ index 0000000..41ef107
 +    }
 +
 +}
-+?>
