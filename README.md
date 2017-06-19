@@ -7,7 +7,7 @@ http://www.limesurvey.org/
 
 **Package by:** ljf (I will maintain this package at least until beggining of 2018)
 
-**Patches author:** Schnoulle
+**Patches author:** Shnoulle
 
 **Categories:** Productivity, Poll
 
