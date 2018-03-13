@@ -1,9 +1,12 @@
-location {{ path }} {
-       alias {{ local_path }}/;
+{% if path_url != "/" %}
+rewrite ^{{ path_url }}$ {{ path_url }}/ permanent;
+{% endif %}
+location {{ path_url }}/ {
+       alias {{ final_path }}/;
        index index.php;
       # if (!-e $request_filename)
        #{
-       #       rewrite ^(.+)$ {{ path }}/index.php?q=$1 last;
+       #       rewrite ^(.+)$ {{ path_url }}/index.php?q=$1 last;
        #}
        if ($scheme = http) {
              rewrite ^ https://$server_name$request_uri? permanent;
@@ -24,6 +27,6 @@ location {{ path }} {
   include conf.d/yunohost_panel.conf.inc;
 }
 
-location ~ ^{{ path }}(data|config|\.ht|db_structure\.xml|README) {
+location ~ ^{{ path_url }}(data|config|\.ht|db_structure\.xml|README) {
        deny all;
 }
