@@ -18,7 +18,6 @@ set_permissions () {
 	    || echo "No file to modify"
     #chown root: $final_path/application/config/config.php
     chmod -R u+w $final_path/tmp
-    chmod -R u+w $final_path/templates
     chmod -R u+w $final_path/upload
     chmod -R u+w $final_path/application/config/
 }
