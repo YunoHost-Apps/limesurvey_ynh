@@ -53,8 +53,8 @@ ynh_export () {
 }
 
 # Check the path doesn't exist
-# usage: ynh_local_path_available PATH
-ynh_local_path_available () {
+# usage: ynh_final_path_available PATH
+ynh_final_path_available () {
     if [ -e "$1" ]
     then
         ynh_die "This path '$1' already contains a folder"
@@ -99,8 +99,8 @@ ynh_save_persistent () {
     i=1
     for PERSISTENT_DIR in $@;
     do
-        if [ -e $local_path/$PERSISTENT_DIR  ]; then
-            mv $local_path/$PERSISTENT_DIR $DIR/$i
+        if [ -e $final_path/$PERSISTENT_DIR  ]; then
+            mv $final_path/$PERSISTENT_DIR $DIR/$i
             echo -n '$PERSISTENT_DIR ' >> $DIR/dir_names
             ((i++))
         fi
@@ -117,15 +117,15 @@ ynh_restore_persistent () {
         for PERSISTENT_DIR in $(cat $DIR/dir_names);
         do
             if [ "$TYPE" = "modules" ]; then
-                for updated_subdir in $(ls $local_path/$PERSISTENT_DIR);
+                for updated_subdir in $(ls $final_path/$PERSISTENT_DIR);
                 do
                     ynh_secure_remove $DIR/$i/$updated_subdir
                 done
             fi
             if [ -d $DIR/$i ]; then
-                mv $DIR/$i/* $local_path/$PERSISTENT_DIR/ 2> /dev/null || true
+                mv $DIR/$i/* $final_path/$PERSISTENT_DIR/ 2> /dev/null || true
             else
-                mv $DIR/$i $local_path/$PERSISTENT_DIR 2> /dev/null || true
+                mv $DIR/$i $final_path/$PERSISTENT_DIR 2> /dev/null || true
             fi
             ((i++))
         done
@@ -344,7 +344,7 @@ ynh_version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
 #
 # usage: ynh_version_le "0.5"
 ynh_version_le() {
-    local version=$(ynh_read_manifest "/etc/yunohost/apps/$YNH_APP_INSTANCE_NAME/manifest.json" "version" || echo 1.0)
+    local version=$(ynh_read_json "/etc/yunohost/apps/$YNH_APP_INSTANCE_NAME/manifest.json" "version" || echo 1.0)
     ynh_version_gt "$1" "${version}"
 }
 
@@ -370,3 +370,15 @@ is_jessie () {
 	fi
 }
 
+# Reload (or other actions) a service and print a log in case of failure.
+#
+# usage: ynh_system_reload service_name [action]
+# | arg: service_name - Name of the service to reload
+# | arg: action - Action to perform with systemctl. Default: reload
+ynh_system_reload () {
+        local service_name=$1
+        local action=${2:-reload}
+
+        # Reload, restart or start and print the log if the service fail to start or reload
+        systemctl $action $service_name || ( journalctl --lines=20 -u $service_name >&2 && false)
+}
