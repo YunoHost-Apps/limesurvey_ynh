@@ -7,7 +7,7 @@
 #=================================================
 
 source /usr/share/yunohost/helpers
-source _common.sh
+source ../settings/scripts/_common.sh
 
 #=================================================
 # MANAGE SCRIPT FAILURE
@@ -23,7 +23,7 @@ ynh_abort_if_errors
 export app=$YNH_APP_INSTANCE_NAME
 
 export domain=$(ynh_app_setting_get $app domain)
-export path_url=$(ynh_app_setting_get $app path_url)
+export path_url=$(ynh_app_setting_get $app path)
 export admin=$(ynh_app_setting_get $app admin)
 export final_path=$(ynh_app_setting_get $app final_path)
 export is_public=$(ynh_app_setting_get $app is_public)
