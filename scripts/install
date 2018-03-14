@@ -1,62 +1,171 @@
 #!/bin/bash
+
+#=================================================
+# GENERIC STARTING
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
 source /usr/share/yunohost/helpers
 source _common.sh
 
-ynh_trap_on
+#=================================================
+# MANAGE FAILURE OF THE SCRIPT
+#=================================================
+
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
 
 export app=$YNH_APP_INSTANCE_NAME
-user=$app
 
 # Retrieve arguments
-ynh_export domain path admin is_public language
-export local_path=/var/www/$app
+ynh_export domain path_url admin is_public language
 export prefix=lime_
+export db_name=$(ynh_sanitize_dbid $app)
+export db_user=$db_name
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THIS ARGS
 #=================================================
-ynh_check_var "$app" "app name not set"
-ynh_user_exists "$admin" || ynh_die "User does not exist: $admin"
-ynh_normalize_url_path "$path"
-ynh_path_validity "$domain$path"
-ynh_local_path_available "$local_path"
+
+export final_path=/var/www/$app
+test ! -e "$final_path" || ynh_die "This path already contains a folder"
+
+# Normalize the url path syntax
+path_url=$(ynh_normalize_url_path $path_url)
+
+# Check web path availability
+ynh_webpath_available $domain $path_url
+# Register (book) web path
+ynh_webpath_register $app $domain $path_url
 
 #=================================================
-# SETUP THE APP BY MODIFYING THE SYSTEM
+# STANDARD MODIFICATIONS
+#=================================================
+# INSTALL DEPENDENCIES
 #=================================================
 
-ynh_save_args domain path admin is_public language local_path prefix
+ynh_install_app_dependencies $pkg_dependencies
 
-ynh_app_dependencies php5-imap
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+ynh_save_args domain admin is_public language final_path prefix path_url db_name db_user
 
-ynh_mysql_generate_db "$user" "$app"
+#=================================================
+# CREATE A SQL BDD
+#=================================================
 
-ynh_system_user_create "$user" "$local_path"
+ynh_mysql_setup_db $db_user $db_name
+export db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 
-ynh_setup_source "$local_path" "$user"
-    
-ynh_configure config.php "$local_path/application/config/config.php"
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
 
-# Fill LimeSurvey database
-sed "s/\`prefix_/\`$prefix/g" $local_path/installer/sql/create-mysql.sql > ./structure.sql
-mysql -u $db_user -p$db_pwd $db_user < ./structure.sql
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source "$final_path"
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+# Create a dedicated nginx config
+ynh_add_nginx_config
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+
+# Create a system user
+ynh_system_user_create $app
+
+#=================================================
+# PHP-FPM CONFIGURATION
+#=================================================
+
+# Create a dedicated php-fpm config
+ynh_add_fpm_config
+
+#=================================================
+# SECURING FILES AND DIRECTORIES
+#=================================================
+# Set permissions
+set_permissions
+
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# CONFIGURE
+#=================================================
+ynh_configure config.php "$final_path/application/config/config.php"
+
+#=================================================
+# INSTALL
+#=================================================
+ls_cli=$final_path/application/commands/console.php
+fullname=$(ynh_user_get_info "$admin" "fullname")
+mail=$(ynh_user_get_info "$admin" "mail")
+
+# Permission should be correctly set before to do this
+ynh_exec_as "$app" php $ls_cli install "$admin" "$(ynh_string_random 24)" "$fullname" "$mail"
+
+#=================================================
+# STORE THE CHECKSUM OF THE CONFIG FILE
+#=================================================
+
+# Calculate and store the config file checksum into the app settings
+ynh_store_file_checksum "$final_path/application/config/config.php"
+
+#=================================================
+# LOAD SQL SPECIFIC CONFIG
+#=================================================
 ynh_configure data.sql ./data.sql
 mysql -u $db_user -p$db_pwd $db_user < ./data.sql
 
-# Randomize Password user
-ls_cli=$local_path/application/commands/console.php
-set +x
-ynh_exec_as "$user" php $ls_cli resetpassword "$admin" "$(ynh_string_random 24)"
-set -x
+#=================================================
+# Add nice themes
+#=================================================
+#ynh_setup_source "$final_path/upload/templates/libreform" libreform
+#ynh_setup_source "$final_path/upload/templates/librepoll" librepoll
 
+
+#=================================================
+# GENERIC FINALISATION
+#=================================================
+# SECURING FILES AND DIRECTORIES
+#=================================================
 # Set permissions
-ynh_set_default_perm $local_path
-sudo chmod -R u+w $local_path/tmp
-sudo chmod -R u+w $local_path/upload
-sudo chmod -R u+w $local_path/application/config/
+set_permissions
 
-sudo yunohost app addaccess $app -u $admin
+#=================================================
+# SETUP FAIL2BAN
+#=================================================
+
+#ynh_add_fail2ban_config "/var/log/nginx/${domain}-error.log" "PHP message: Leed: wrong login for .* client: <HOST>" 5
+
+#=================================================
+# SETUP SSOWAT
+#=================================================
+yunohost app addaccess $app -u $admin
 ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
 
-ynh_configure_php_fpm
-ynh_configure_nginx
+#=================================================
+# RELOAD NGINX
+#=================================================
+
+systemctl reload nginx
+
+#=================================================
+# SEND A README FOR THE ADMIN
+#=================================================
+ynh_print_OFF
+message="You can now create a poll on this address: https://${domain}${path_url}/admin/
+If you facing an issue or want to improve this app, please open a new issue in this project: https://github.com/YunoHost-Apps/limesurvey_ynh"
+
+ynh_send_readme_to_admin "$message" "$admin"
+ynh_print_ON
