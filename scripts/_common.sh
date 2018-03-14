@@ -231,7 +231,7 @@ ynh_add_fpm_config () {
 	sudo chown root: "$finalphpconf"
 	ynh_store_file_checksum "$finalphpconf"
 
-	if [ -e "../conf/php-fpm.ini" ]
+	if [ -e "../conf/php-fpm.ini.j2" ]
 	then
 		finalphpini="$fpm_config_dir/conf.d/20-$app.ini"
 		ynh_backup_if_checksum_is_different "$finalphpini"
