@@ -1,21 +1,71 @@
-LimeSurvey for YunoHost
-===============
+# LimeSurvey for YunoHost
 
+[![Integration level](https://dash.yunohost.org/integration/limesurvey.svg)](https://ci-apps.yunohost.org/jenkins/job/limesurvey%20%28Community%29/lastBuild/consoleFull)  
+[![Install LimeSurvey with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=limesurvey)
+
+> *This package allow you to install LimeSurvey quickly and simply on a YunoHost server.  
+If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to know how to install and enjoy it.*
+
+## Overview
 LimeSurvey is used to create advanced poll.
 
-http://www.limesurvey.org/
-
-**Package by:** ljf (I will maintain this package at least until beggining of 2018)
-
-**Patches author:** Shnoulle
+**Shipped version:** 2.62.5
 
 **Categories:** Productivity, Poll
 
-**Upgrade this package:**  
-`sudo yunohost app upgrade --verbose LimeSurvey -u https://github.com/YunoHost-Apps/limesurvey_ynh`
+## Screenshots
 
-**Multi-user:** Yes. 
+![](https://www.limesurvey.org/images/news/LimeSurvey3Beta/generalsettings.PNG)
 
-**Private/Public mode:** In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. 
+## Configuration
 
-**SSO/LDAP:** SSO and LDAP are configured.
+Before to run the install YunoHost ask you an admin user, you can use it to connecte you on https://your_limesurvey_url/admin/
+
+## Documentation
+
+* YunoHost documentation: There no other documentations, feel free to contribute.
+
+## YunoHost specific features
+
+
+* In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. 
+* SSO and LDAP are configured.
+* Login secured by fail2ban
+
+#### Multi-users support
+
+Not supported.
+
+#### Supported architectures
+
+* x86-64b - [![Build Status](https://ci-apps.yunohost.org/jenkins/job/leed%20(Community)/badge/icon)](https://ci-apps.yunohost.org/jenkins/job/limesurvey%20(Community)/)
+* ARMv8-A - [![Build Status](https://ci-apps.yunohost.org/jenkins/job/leed%20(Community)%20(%7EARM%7E)/badge/icon)](https://ci-apps.yunohost.org/jenkins/job/limesurvey%20(Community)%20(%7EARM%7E)/)
+
+## Limitations
+
+## Additionnal informations
+
+## Links
+
+ * Report a bug: https://github.com/YunoHost-Apps/limesurvey_ynh/issues
+ * Website: https://www.limesurvey.org
+ * YunoHost website: https://yunohost.org/
+
+---
+
+Developers infos
+----------------
+
+**Package by:** ljf
+
+**Patches author:** Shnoulle
+
+Please do your pull request to the [testing branch](https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing).
+
+To try the testing branch, please proceed like that.
+```
+sudo yunohost app install https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --verbose
+or
+sudo yunohost app upgrade leed -u https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --verbose
+```
+
