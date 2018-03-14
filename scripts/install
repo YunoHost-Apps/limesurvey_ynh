@@ -160,7 +160,7 @@ systemctl reload nginx
 #=================================================
 ynh_print_OFF
 message="You can now create a poll on this address: https://${domain}${path_url}/admin/
-If you facing an issue or want to improve this app, please open a new issue in this project: https://github.com/YunoHost-Apps/libresurvey_ynh"
+If you facing an issue or want to improve this app, please open a new issue in this project: https://github.com/YunoHost-Apps/limesurvey_ynh"
 
 ynh_send_readme_to_admin "$message" "$admin"
 ynh_print_ON
