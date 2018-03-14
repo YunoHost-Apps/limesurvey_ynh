@@ -1,34 +1,53 @@
 #!/bin/bash
 
-# causes the shell to exit if any subcommand or pipeline returns a non-zero status
-set -e
+#=================================================
+# GENERIC STARTING
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+source /usr/share/yunohost/helpers
 
-# Source YNH helpers
-. /usr/share/yunohost/helpers
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
 
-backup_dir=$1
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
-# Get app instance name
+#=================================================
+# LOAD SETTINGS
+#=================================================
+
 app=$YNH_APP_INSTANCE_NAME
 
-# Retrieve arguments
 domain=$(ynh_app_setting_get $app domain)
-path=$(ynh_app_setting_get $app path)
-local_path=$(ynh_app_setting_get $app local_path)
+final_path=$(ynh_app_setting_get $app final_path)
+db_name=$(ynh_app_setting_get $app db_name)
+db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 
-my_ynh_backup () {
-    ynh_backup $@
-    echo $2 $1 >> $backup_dir/list    
-}
+#=================================================
+# STANDARD BACKUP STEPS
+#=================================================
+# BACKUP OF THE MAIN DIR OF THE APP
+#=================================================
 
-# Copy the app files
-my_ynh_backup "$local_path" "sources"
+ynh_backup "$final_path"
 
-# Copy the conf files
-my_ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf" "conf/nginx.conf"
-my_ynh_backup "/etc/php5/fpm/pool.d/$app.conf" "conf/php-fpm.conf"
-my_ynh_backup "/etc/php5/fpm/conf.d/20-$app.ini" "conf/php-fpm.ini"
+#=================================================
+# BACKUP OF THE NGINX CONFIGURATION
+#=================================================
 
-# Save database
-dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
-mysqldump -u "$app" -p"$dbpass" --no-create-db "$app" > ./dump.sql
+ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
+
+#=================================================
+# BACKUP OF THE PHP-FPM CONFIGURATION
+#=================================================
+
+ynh_backup "/etc/php5/fpm/pool.d/$app.conf"
+ynh_backup "/etc/php5/fpm/conf.d/20-$app.ini"
+
+#=================================================
+# BACKUP OF THE SQL BDD
+#=================================================
+
+ynh_mysql_dump_db "$db_name" > db.sql

@@ -1,4 +1,4 @@
 #!/bin/bash
 # TODO delete user with LimeSurvey cli
 # An action need to be added to the cli with a patch
-echo "[warn] You may need to delete this user in your LimeSurvey instances"
+echo "[warn] You may need to delete this user in your LibreSurvey instances"
