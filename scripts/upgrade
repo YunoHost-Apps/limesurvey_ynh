@@ -57,7 +57,6 @@ if ynh_version_le "2.0.5" ; then
     prefix=${prefix:-prefix_}
     db_name=${db_name:-$app}
     final_path=$(ynh_app_setting_get $app local_path)
-    ynh_save_args path_url is_public prefix db_name final_path db_user
 
     ynh_install_app_dependencies $pkg_dependencies
     # Move the upload dir to final_path if needed
@@ -74,9 +73,18 @@ if ynh_version_le "2.0.5" ; then
     ynh_configure migrations/2.0.5.sql ./2.0.5.sql
     mysql -u $app -p$db_pwd $db_name < ./2.0.5.sql
 fi
+if ynh_version_le "2.62.2-1" ; then
+    is_public=${is_public:-0}
+    prefix=${prefix:-prefix_}
+    db_name=${db_name:-$app}
+    final_path=$(ynh_app_setting_get $app local_path)
+    ynh_save_args path_url is_public prefix db_name final_path db_user
+fi
 if ynh_version_le "2.62.2-2" ; then
-    # Move old templates in backup dir
-    mv $final_path/upload/templates /home/yunohost.backup/$app-old-templates
+    # Move old templates  and themes in backup dir
+    mv $final_path/upload/templates /home/yunohost.backup/$app.bkp/old-templates
+    mkdir -p /home/yunohost.backup/$app.bkp/old-themes
+    mv $final_path/themes/* /home/yunohost.backup/$app.bkp/old-themes/
 fi
 
 #=================================================
@@ -86,16 +94,15 @@ fi
 #=================================================
 
 # Backup config, plugins and themes and delete previous files
-ynh_save_persistent modules themes plugins
-ynh_save_persistent data application/config/config.php upload
+ynh_keep_if_no_upgrade themes/admin/* themes/question/* themes/survey/* plugins/*
+ynh_keep application/config/config.php upload
 
 # Copie new files and restore config, plugins, upload and themes
 ynh_secure_remove $final_path
 ynh_setup_source "$final_path"	# Télécharge la source, décompresse et copie dans $final_path
 
 # Restore config, plugins and themes
-ynh_restore_persistent modules
-ynh_restore_persistent data
+ynh_restore_persistent
 
 #=================================================
 # NGINX CONFIGURATION
@@ -126,7 +133,7 @@ set_permissions
 
 # Migrate DB
 cd $final_path/application/commands
-ynh_exec_as "$app" php console.php update 
+ynh_exec_as "$app" php console.php updatedb 
 
 #=================================================
 # RELOAD NGINX

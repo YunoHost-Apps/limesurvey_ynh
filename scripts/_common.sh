@@ -88,45 +88,52 @@ ynh_exec_as() {
 }
 
 
-# TODO support SOURCE_ID
+# usage: ynh_save_persistent MODE RELATIVE_PATH 
 ynh_save_persistent () {
     local TYPE=$1
-    local DIR=/tmp/ynh-persistent/$TYPE/$app/app
-    mkdir -p $DIR
-    touch $DIR/dir_names
-    shift
-    i=1
-    for PERSISTENT_DIR in $@;
-    do
-        if [ -e $final_path/$PERSISTENT_DIR  ]; then
-            mv $final_path/$PERSISTENT_DIR $DIR/$i
-            echo -n '$PERSISTENT_DIR ' >> $DIR/dir_names
-            ((i++))
-        fi
-    done
+    local DIR=/tmp/ynh-persistent/$app
+    set +u
+    i=${#YNH_PERSISTENT_DIR[@]}
+    i=${i:-0}
+    set -u
+    [ "$i" -eq "0" ] && ynh_secure_remove $DIR && mkdir -p $DIR
+    if [ -e $final_path/$2  ]; then
+        mv $final_path/$2 $DIR/$i
+        YNH_PERSISTENT_MODE[$i]=$1
+        YNH_PERSISTENT_DIR[$i]=$2
+    fi
 }
 
-# TODO support SOURCE_ID
+ynh_keep_if_no_upgrade () {
+    for elt in $@;
+    do
+        ynh_save_persistent KEEP_IF_NO_UPGRADE $elt
+    done
+}
+ynh_keep () {
+    for elt in $@;
+    do
+        ynh_save_persistent KEEP $elt
+    done
+}
+# usage: ynh_restore_persistent
 ynh_restore_persistent () {
-    local TYPE=$1
-    local DIR=/tmp/ynh-persistent/$TYPE/$app/app
-    shift
-    if [ -d $DIR  ]; then
-        i=1
-        for PERSISTENT_DIR in $(cat $DIR/dir_names);
+    local DIR=/tmp/ynh-persistent/$app
+    if [ -d $DIR ]; then
+        i=0
+        for PERSISTENT_DIR in "${YNH_PERSISTENT_DIR[@]}";
         do
-            if [ "$TYPE" = "modules" ]; then
-                for updated_subdir in $(ls $final_path/$PERSISTENT_DIR);
-                do
-                    ynh_secure_remove $DIR/$i/$updated_subdir
-                done
-            fi
-            if [ -d $DIR/$i ]; then
-                mv $DIR/$i/* $final_path/$PERSISTENT_DIR/ 2> /dev/null || true
+            if [ "${YNH_PERSISTENT_MODE[$i]}" = "KEEP_IF_NO_UPGRADE" ]; then
+                if [ ! -e $final_path/$PERSISTENT_DIR ]; then
+                    mv $DIR/$i $final_path/$PERSISTENT_DIR
+                fi
             else
-                mv $DIR/$i $final_path/$PERSISTENT_DIR 2> /dev/null || true
+                if [ -e $final_path/$PERSISTENT_DIR ]; then
+                    ynh_secure_remove $final_path/$PERSISTENT_DIR
+                fi
+                mv $DIR/$i $final_path/$PERSISTENT_DIR
             fi
-            ((i++))
+            ((i+=1))
         done
         ynh_secure_remove $DIR
     fi

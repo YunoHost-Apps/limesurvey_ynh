@@ -2,7 +2,7 @@
     "name": "LimeSurvey",
     "id": "limesurvey",
     "packaging_format": 1,
-    "version": "3.5.0-1",
+    "version": "3.5.0-4",
     "description": {
         "en": "LimeSurvey is used to create advanced poll.",
         "fr": "LimeSurvey est un outil de création et diffusion de sondage en ligne."
