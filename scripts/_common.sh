@@ -305,8 +305,8 @@ ynh_abort_if_up_to_date () {
 	local force_upgrade=${YNH_FORCE_UPGRADE:-0}
 	local package_check=${PACKAGE_CHECK_EXEC:-0}
 
-	local version=$(ynh_read_manifest "/etc/yunohost/apps/$YNH_APP_INSTANCE_NAME/manifest.json" "version" || echo 1.0)
-	local last_version=$(ynh_read_manifest "../manifest.json" "version" || echo 1.0)
+	local version=$(ynh_read_json "/etc/yunohost/apps/$YNH_APP_INSTANCE_NAME/manifest.json" "version" || echo 1.0)
+	local last_version=$(ynh_read_manifest "version" || echo 1.0)
 	if [ "$version" = "$last_version" ]
 	then
 		if [ "$force_upgrade" != "0" ]

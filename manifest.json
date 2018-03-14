@@ -2,7 +2,7 @@
     "name": "LibreSurvey",
     "id": "libresurvey",
     "packaging_format": 1,
-    "version": "2.62.5-1",
+    "version": "2.62.5-2",
     "description": {
         "en": "LibreSurvey is used to create advanced poll.",
         "fr": "LibreSurvey est un outil de création et diffusion de sondage en ligne."
