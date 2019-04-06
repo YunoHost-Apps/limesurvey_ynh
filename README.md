@@ -9,7 +9,7 @@ If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to
 ## Overview
 LimeSurvey is used to create advanced poll.
 
-**Shipped version:** 2.62.5
+**Shipped version:** 3.16.1
 
 **Categories:** Productivity, Poll
 
