@@ -32,3 +32,5 @@ location {{ path_url }}/ {
 location ~ ^{{ path_url }}(data|config|\.ht|db_structure\.xml|README) {
        deny all;
 }
+
+more_set_headers "X-Frame-Options : ALLOWALL";
