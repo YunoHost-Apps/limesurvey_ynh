@@ -15,7 +15,7 @@
     },
     "url": "https://www.limesurvey.org/",
     "requirements": {
-        "yunohost": ">= 2.7.2"
+        "yunohost": ">= 3.5.2"
     },
     "multi_instance": true,
     "services": [
@@ -55,6 +55,7 @@
             },
             {
                 "name": "language",
+                "type": "string",
                 "ask": {
                     "en": "Choose the default language of this LimeSurvey",
                     "fr": "Choisissez la langue par défault de LimeSurvey"
