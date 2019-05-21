@@ -2,7 +2,7 @@
     "name": "LimeSurvey",
     "id": "limesurvey",
     "packaging_format": 1,
-    "version": "3.16.1~ynh2",
+    "version": "3.17.1~ynh1",
     "description": {
         "en": "LimeSurvey is used to create advanced poll.",
         "fr": "LimeSurvey est un outil de création et diffusion de sondage en ligne."
@@ -15,7 +15,7 @@
     },
     "url": "https://www.limesurvey.org/",
     "requirements": {
-        "yunohost": ">= 2.7.2"
+        "yunohost": ">= 3.5.2"
     },
     "multi_instance": true,
     "services": [
@@ -55,6 +55,7 @@
             },
             {
                 "name": "language",
+                "type": "string",
                 "ask": {
                     "en": "Choose the default language of this LimeSurvey",
                     "fr": "Choisissez la langue par défault de LimeSurvey"
