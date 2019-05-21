@@ -31,34 +31,34 @@ export db_user=$db_name
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THIS ARGS
 #=================================================
+ynh_script_progression --message="Validating installation parameters..." --time --weight=1
 
 export final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
 
-# Normalize the url path syntax
-path_url=$(ynh_normalize_url_path $path_url)
-
-# Check web path availability
-ynh_webpath_available $domain $path_url
 # Register (book) web path
 ynh_webpath_register $app $domain $path_url
+
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+ynh_script_progression --message="Storing installation settings..." --time --weight=1
+
+ynh_save_args domain admin is_public language final_path prefix path_url db_name db_user
 
 #=================================================
 # STANDARD MODIFICATIONS
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
+ynh_script_progression --message="Installing dependencies..." --time --weight=1
 
 ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
-# STORE SETTINGS FROM MANIFEST
-#=================================================
-ynh_save_args domain admin is_public language final_path prefix path_url db_name db_user
-
-#=================================================
 # CREATE A SQL BDD
 #=================================================
+ynh_script_progression --message="Creating a MySQL database..." --time --weight=1
 
 ynh_mysql_setup_db $db_user $db_name
 export db_pwd=$(ynh_app_setting_get $app mysqlpwd)
@@ -66,6 +66,7 @@ export db_pwd=$(ynh_app_setting_get $app mysqlpwd)
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_script_progression --message="Setting up source files..." --time --weight=1
 
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
@@ -73,12 +74,15 @@ ynh_setup_source "$final_path"
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
+ynh_script_progression --message="Configuring nginx web server..." --time --weight=1
+
 # Create a dedicated nginx config
 ynh_add_nginx_config
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
+ynh_script_progression --message="Configuring system user..." --time --weight=1
 
 # Create a system user
 ynh_system_user_create $app
@@ -86,6 +90,7 @@ ynh_system_user_create $app
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
+ynh_script_progression --message="Configuring php-fpm..." --time --weight=1
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
@@ -93,6 +98,7 @@ ynh_add_fpm_config
 #=================================================
 # SECURING FILES AND DIRECTORIES
 #=================================================
+
 # Set permissions
 set_permissions
 
@@ -139,33 +145,41 @@ mysql -u $db_user -p$db_pwd $db_user < ./data.sql
 #=================================================
 # SECURING FILES AND DIRECTORIES
 #=================================================
+ynh_script_progression --message="Apply permissions..." --time --weight=1
 # Set permissions
 set_permissions
 
 #=================================================
 # SETUP FAIL2BAN
 #=================================================
-
+# ynh_script_progression --message="Configuring fail2ban..." --time --weight=1
 #ynh_add_fail2ban_config "/var/log/nginx/${domain}-error.log" "PHP message: Leed: wrong login for .* client: <HOST>" 5
 
 #=================================================
 # SETUP SSOWAT
 #=================================================
+ynh_script_progression --message="Configuring SSOwat..." --time --weight=1
+
 yunohost app addaccess $app -u $admin
 ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
 
 #=================================================
 # RELOAD NGINX
 #=================================================
+ynh_script_progression --message="Reloading nginx web server..." --time --weight=1
 
 systemctl reload nginx
 
 #=================================================
 # SEND A README FOR THE ADMIN
 #=================================================
+ynh_script_progression --message="Sending some explanation to use $app..." --time --weight=1
+
 ynh_print_OFF
 message="You can now create a poll on this address: https://${domain}${path_url}/admin/
 If you facing an issue or want to improve this app, please open a new issue in this project: https://github.com/YunoHost-Apps/limesurvey_ynh"
 
 ynh_send_readme_to_admin "$message" "$admin"
 ynh_print_ON
+
+ynh_script_progression --message="Installation of $app completed" --time --last
