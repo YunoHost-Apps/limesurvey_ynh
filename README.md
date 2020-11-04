@@ -1,6 +1,6 @@
 # LimeSurvey for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/limesurvey.svg)](https://ci-apps.yunohost.org/jenkins/job/limesurvey%20%28Community%29/lastBuild/consoleFull)  
+[![Integration level](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)  
 [![Install LimeSurvey with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=limesurvey)
 
 > *This package allow you to install LimeSurvey quickly and simply on a YunoHost server.  
