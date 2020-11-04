@@ -4,8 +4,8 @@
     "packaging_format": 1,
     "version": "3.17.1~ynh1",
     "description": {
-        "en": "LimeSurvey is used to create advanced poll.",
-        "fr": "LimeSurvey est un outil de création et diffusion de sondage en ligne."
+        "en": "Creation and distribution survey tool.",
+        "fr": "Outil de création et diffusion de sondage."
     },
     "license": "GPL-2.0+",
     "maintainer": {
@@ -20,7 +20,7 @@
     "multi_instance": true,
     "services": [
         "nginx",
-        "php5-fpm",
+        "php7.0-fpm",
         "mysql"
     ],
     "arguments": {
@@ -67,7 +67,7 @@
                 "name": "is_public",
                 "type": "boolean",
                 "ask": {
-                    "en": "Will people without YunoHost account have LimeSurvey account to be able to create polls ?",
+                    "en": "Will people without YunoHost account have LimeSurvey account to be able to create polls?",
                     "fr": "Est-ce que des personnes sans compte YunoHost aurront un compte LimeSurvey pour créer des questionnaires ?"
                 },
                 "default": 1
