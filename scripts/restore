@@ -106,12 +106,6 @@ ynh_mysql_connect_as --user=$db_user --password=$db_pwd --database=$db_name < ./
 #set_permissions
 
 #=================================================
-# SETUP SSOWAT
-#=================================================
-
-ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
-
-#=================================================
 # GENERIC FINALIZATION
 #=================================================
 # RELOAD NGINX AND PHP-FPM

@@ -37,31 +37,6 @@ ynh_set_default_perm () {
 	    || echo "No file to modify"
 
 }
-ynh_check_var () {
-    test -n "$1" || ynh_die "$2"
-}
-
-ynh_export () {
-    local ynh_arg=""
-    for var in $@;
-    do
-        ynh_arg=$(echo $var | awk '{print toupper($0)}')
-        if [ "$var" == "path_url" ]; then
-            ynh_arg="PATH"
-        fi
-        ynh_arg="YNH_APP_ARG_$ynh_arg"
-        export $var=${!ynh_arg}
-    done
-}
-
-# Check the path doesn't exist
-# usage: ynh_final_path_available PATH
-ynh_final_path_available () {
-    if [ -e "$1" ]
-    then
-        ynh_die "This path '$1' already contains a folder"
-    fi
-}
 
 # Save listed var in YunoHost app settings 
 # usage: ynh_save_args VARNAME1 [VARNAME2 [...]]
@@ -75,8 +50,6 @@ ynh_save_args () {
         ynh_app_setting_set $app $setting_var ${!var}
     done
 }
-
-
 
 # usage: ynh_save_persistent MODE RELATIVE_PATH 
 ynh_save_persistent () {
@@ -129,72 +102,6 @@ ynh_restore_persistent () {
     fi
 
 }
-ynh_mv_to_home () {
-    local APP_PATH="/home/yunohost.app/$app/"
-    local DATA_PATH="$1"
-    mkdir -p "$APP_PATH"
-    chown $app: "$APP_PATH"
-    ynh_exec_as "$app" mv "$DATA_PATH" "$APP_PATH"
-    ynh_exec_as "$app" ln -s "$APP_PATH$DATA_PATH" "$DATA_PATH"
-
-}
-
-ynh_sso_access () {
-    ynh_app_setting_set $app unprotected_uris "/"
-
-    if [[ $is_public -eq 0 ]]; then
-        ynh_app_setting_set $app protected_uris "$1"
-    fi
-    yunohost app ssowatconf
-}
-
-ynh_exit_if_up_to_date () {
-    if [ "${version}" = "${last_version}" ]; then
-        info "Up-to-date, nothing to do"
-        ynh_die "Up-to-date, nothing to do" 0
-    fi
-}
-
-log() {
-  echo "${1}"
-}
-
-info() {
-  log "[INFO] ${1}"
-}
-
-warn() {
-  log "[WARN] ${1}"
-}
-
-err() {
-  log "[ERR] ${1}"
-}
-
-to_logs() {
-
-  # When yunohost --verbose or bash -x
-  if $_ISVERBOSE; then
-    cat
-  else
-    cat > /dev/null
-  fi
-}
-
-ynh_read_json () {
-    sudo python3 -c "import sys, json;print(json.load(open('$1'))['$2'])"
-}
-
-
-
-ynh_configure () {
-    local TEMPLATE=$1
-    local DEST=$2
-    type j2 2>/dev/null || sudo pip install j2cli
-    j2 "${PKG_DIR}/conf/$TEMPLATE.j2" > "${PKG_DIR}/conf/$TEMPLATE"
-    sudo cp "${PKG_DIR}/conf/$TEMPLATE" "$DEST"
-}
-
 
 # Send an email to inform the administrator
 #
