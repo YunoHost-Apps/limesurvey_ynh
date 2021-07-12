@@ -34,6 +34,8 @@ return array(
             'tablePrefix' => 'lime_',
         ),
 
+        'emcache' => array('class' => 'CFileCache'),
+
         // Uncomment the following lines if you need table-based sessions.
         // Note: Table-based sessions are currently not supported on MSSQL server.
         // 'session' => array (
