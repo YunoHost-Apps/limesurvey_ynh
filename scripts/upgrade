@@ -1,13 +1,13 @@
 #!/bin/bash
 
 #=================================================
-# GENERIC STARTING
+# GENERIC START
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source /usr/share/yunohost/helpers
 source _common.sh
+source /usr/share/yunohost/helpers
 
 #=================================================
 # LOAD SETTINGS
@@ -49,7 +49,7 @@ ynh_abort_if_errors
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..." --time --weight=1
+ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
 #
 # N.B. : the followings setting migrations snippets are provided as *EXAMPLES*
@@ -87,45 +87,6 @@ fi
 # Create a permission if needed
 if ! ynh_permission_exists --permission="api"; then
     ynh_permission_create --permission="api" --url="/api" --allowed="visitors" --show_tile="false" --protected="true"
-fi
-
-#=================================================
-# STEP Migrations
-#=================================================
-
-if ynh_version_le "2.0.5" ; then
-    is_public=${is_public:-0}
-    prefix=${prefix:-prefix_}
-    db_name=${db_name:-$app}
-    final_path=$(ynh_app_setting_get $app local_path)
-
-    ynh_install_app_dependencies $pkg_dependencies
-    # Move the upload dir to final_path if needed
-    # The upload dir can't be symlinked in home (not supported by LS)
-    upload_path=/home/yunohost.app/$app/upload
-    if [ -h $final_path/upload ]; then
-        rm $final_path/upload
-        mv $upload_path $final_path/
-    fi
-    
-    ynh_app_setting_delete $app skipped_uris
-    ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
-
-    ynh_configure migrations/2.0.5.sql ./2.0.5.sql
-    mysql -u $app -p$db_pwd $db_name < ./2.0.5.sql
-fi
-if ynh_version_le "2.62.2-1" ; then
-    is_public=${is_public:-0}
-    prefix=${prefix:-prefix_}
-    db_name=${db_name:-$app}
-    final_path=$(ynh_app_setting_get $app local_path)
-    ynh_save_args path_url is_public prefix db_name final_path db_user
-fi
-if ynh_version_le "2.62.2-2" ; then
-    # Move old templates  and themes in backup dir
-    mv $final_path/upload/templates /home/yunohost.backup/$app.bkp/old-templates
-    mkdir -p /home/yunohost.backup/$app.bkp/old-themes
-    mv $final_path/themes/* /home/yunohost.backup/$app.bkp/old-themes/
 fi
 
 #=================================================
@@ -197,7 +158,7 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reloading NGINX web server..." --time --weight=1
+ynh_script_progression --message="Reloading NGINX web server..." --weight=1
 
 ynh_systemd_action --service_name=nginx --action=reload
 
@@ -205,4 +166,4 @@ ynh_systemd_action --service_name=nginx --action=reload
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --time --last
+ynh_script_progression --message="Upgrade of $app completed" --last
