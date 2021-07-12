@@ -10,7 +10,7 @@
 		setup_sub_dir=1
 		setup_root=1
 		setup_nourl=0
-		setup_private=0
+		setup_private=1
 		setup_public=1
 		upgrade=1
 		upgrade=1	from_commit=a451e536d79ff0d2b73f3c0d888243a567e7c77e

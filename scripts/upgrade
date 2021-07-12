@@ -90,6 +90,14 @@ if ! ynh_permission_exists --permission="api"; then
 fi
 
 #=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
+
+# Create a dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
+
+#=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -116,12 +124,11 @@ ynh_script_progression --message="Upgrading NGINX web server configuration..." -
 ynh_add_nginx_config
 
 #=================================================
-# CREATE DEDICATED USER
+# UPGRADE DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
+ynh_script_progression --message="Upgrading dependencies..." --time --weight=1
 
-# Create a dedicated user (if not existing)
-ynh_system_user_create --username=$app --home_dir="$final_path"
+ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # PHP-FPM CONFIGURATION
