@@ -88,9 +88,9 @@ ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$final_path"
 
-chmod 750 "$final_path"
-chmod -R o-rwx "$final_path"
-chown -R $app:www-data "$final_path"
+#chmod 750 "$final_path"
+#chmod -R o-rwx "$final_path"
+#chown -R $app:www-data "$final_path"
 
 #=================================================
 # NGINX CONFIGURATION
@@ -113,7 +113,7 @@ ynh_add_fpm_config
 #=================================================
 
 # Set permissions
-#set_permissions
+set_permissions
 
 #=================================================
 # SPECIFIC SETUP
@@ -167,7 +167,7 @@ ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name
 #=================================================
 ynh_script_progression --message="Apply permissions..." --weight=1
 
-#set_permissions
+set_permissions
 
 #=================================================
 # SETUP FAIL2BAN
