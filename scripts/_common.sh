@@ -288,27 +288,3 @@ ynh_abort_if_up_to_date () {
 	fi
 }
 
-
-ynh_version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
-
-# In upgrade script allow to test if the app is less than or equal a specific version
-#
-# usage: ynh_version_le "0.5"
-ynh_version_le() {
-    local version=$(ynh_read_json "/etc/yunohost/apps/$YNH_APP_INSTANCE_NAME/manifest.json" "version" || echo 1.0)
-    ynh_version_gt "$1" "${version}"
-}
-
-
-# Reload (or other actions) a service and print a log in case of failure.
-#
-# usage: ynh_system_reload service_name [action]
-# | arg: service_name - Name of the service to reload
-# | arg: action - Action to perform with systemctl. Default: reload
-ynh_system_reload () {
-        local service_name=$1
-        local action=${2:-reload}
-
-        # Reload, restart or start and print the log if the service fail to start or reload
-        systemctl $action $service_name || ( journalctl --lines=20 -u $service_name >&2 && false)
-}
