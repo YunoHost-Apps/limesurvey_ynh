@@ -19,7 +19,6 @@ ynh_abort_if_errors
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
-export prefix=lime_
 
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
@@ -49,8 +48,6 @@ ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
 ynh_app_setting_set --app=$app --key=admin --value=$admin
 ynh_app_setting_set --app=$app --key=language --value=$language
-
-ynh_save_args prefix
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -112,13 +109,6 @@ ynh_script_progression --message="Configuring PHP-FPM..." --weight=1
 ynh_add_fpm_config
 
 #=================================================
-# SECURING FILES AND DIRECTORIES
-#=================================================
-
-# Set permissions
-set_permissions
-
-#=================================================
 # SPECIFIC SETUP
 #=================================================
 # CONFIGURE
@@ -138,13 +128,6 @@ mail=$(ynh_user_get_info "$admin" "mail")
 ynh_exec_as "$app" php $ls_cli install "$admin" "$(ynh_string_random 24)" "$fullname" "$mail"
 
 #=================================================
-# STORE THE CHECKSUM OF THE CONFIG FILE
-#=================================================
-
-# Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum "$final_path/application/config/config.php"
-
-#=================================================
 # LOAD SQL SPECIFIC CONFIG
 #=================================================
 
@@ -160,17 +143,9 @@ ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name
 #=================================================
 # Add nice themes
 #=================================================
+
 #ynh_setup_source "$final_path/upload/templates/libreform" libreform
 #ynh_setup_source "$final_path/upload/templates/librepoll" librepoll
-
-#=================================================
-# GENERIC FINALISATION
-#=================================================
-# SECURING FILES AND DIRECTORIES
-#=================================================
-ynh_script_progression --message="Apply permissions..." --weight=1
-
-set_permissions
 
 #=================================================
 # SETUP FAIL2BAN
