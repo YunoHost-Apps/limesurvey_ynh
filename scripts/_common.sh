@@ -6,7 +6,9 @@
 # App package root directory should be the parent folder
 PKG_DIR=$(cd ../; pwd)
 
-pkg_dependencies="php7.0-cli php7.0-imap python-pip php7.0-gd php7.0-ldap php7.0-zip"
+YNH_PHP_VERSION="7.3"
+
+pkg_dependencies="php${YNH_PHP_VERSION}-cli php${YNH_PHP_VERSION}-imap python-pip php${YNH_PHP_VERSION}-gd php${YNH_PHP_VERSION}-ldap php${YNH_PHP_VERSION}-zip"
 
 #=================================================
 # SPECIFIC HELPERS
@@ -25,6 +27,7 @@ set_permissions () {
 #=================================================
 # COMMON HELPERS
 #=================================================
+
 ynh_set_default_perm () {
     local DIRECTORY=$1
     # Set permissions
@@ -73,19 +76,6 @@ ynh_save_args () {
     done
 }
 
-# Execute a command as another user
-# usage: ynh_exec_as USER COMMAND [ARG ...]
-ynh_exec_as() {
-  local USER=$1
-  shift 1
-
-  if [[ $USER = $(whoami) ]]; then
-    eval "$@"
-  else
-    # use sudo twice to be root and be allowed to use another user
-    sudo sudo -u "$USER" "$@"
-  fi
-}
 
 
 # usage: ynh_save_persistent MODE RELATIVE_PATH 
@@ -195,13 +185,6 @@ ynh_read_json () {
     sudo python3 -c "import sys, json;print(json.load(open('$1'))['$2'])"
 }
 
-ynh_read_manifest () {
-    if [ -f '../manifest.json' ] ; then
-        ynh_read_json '../manifest.json' "$1"
-    else
-        ynh_read_json '../settings/manifest.json' "$1"
-    fi
-}
 
 
 ynh_configure () {
@@ -212,41 +195,6 @@ ynh_configure () {
     sudo cp "${PKG_DIR}/conf/$TEMPLATE" "$DEST"
 }
 
-ynh_add_nginx_config () {
-    finalnginxconf="/etc/nginx/conf.d/$domain.d/$app.conf"
-	ynh_backup_if_checksum_is_different "$finalnginxconf"
-    ynh_configure nginx.conf "$finalnginxconf"
-    ynh_store_file_checksum "$finalnginxconf"
-    service nginx reload
-}
-
-ynh_add_fpm_config () {
-	# Configure PHP-FPM 7.0 by default
-	local fpm_config_dir="/etc/php/7.0/fpm"
-	local fpm_service="php7.0-fpm"
-	# Configure PHP-FPM 5 on Debian Jessie
-	if is_jessie; then
-		fpm_config_dir="/etc/php5/fpm"
-		fpm_service="php5-fpm"
-	fi
-	ynh_app_setting_set $app fpm_config_dir "$fpm_config_dir"
-	ynh_app_setting_set $app fpm_service "$fpm_service"
-	finalphpconf="$fpm_config_dir/pool.d/$app.conf"
-	ynh_backup_if_checksum_is_different "$finalphpconf"
-	ynh_configure php-fpm.conf "$finalphpconf"
-	sudo chown root: "$finalphpconf"
-	ynh_store_file_checksum "$finalphpconf"
-
-	if [ -e "../conf/php-fpm.ini.j2" ]
-	then
-		finalphpini="$fpm_config_dir/conf.d/20-$app.ini"
-		ynh_backup_if_checksum_is_different "$finalphpini"
-		ynh_configure php-fpm.ini "$finalphpini"
-		chown root: "$finalphpini"
-		ynh_store_file_checksum "$finalphpini"
-	fi
-    systemctl reload $fpm_service
-}
 
 # Send an email to inform the administrator
 #
@@ -340,22 +288,7 @@ ynh_abort_if_up_to_date () {
 	fi
 }
 
-# Remove any logs for all the following commands.
-#
-# usage: ynh_print_OFF
-# WARNING: You should be careful with this helper, and never forgot to use ynh_print_ON as soon as possible to restore the logging.
-ynh_print_OFF () {
-	set +x
-}
 
-# Restore the logging after ynh_print_OFF
-#
-# usage: ynh_print_ON
-ynh_print_ON () {
-	set -x
-	# Print an echo only for the log, to be able to know that ynh_print_ON has been called.
-	echo ynh_print_ON > /dev/null
-}
 ynh_version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
 
 # In upgrade script allow to test if the app is less than or equal a specific version
@@ -366,27 +299,6 @@ ynh_version_le() {
     ynh_version_gt "$1" "${version}"
 }
 
-ynh_debian_release () {
-	lsb_release --codename --short
-}
-
-is_stretch () {
-	if [ "$(ynh_debian_release)" == "stretch" ]
-	then
-		return 0
-	else
-		return 1
-	fi
-}
-
-is_jessie () {
-	if [ "$(ynh_debian_release)" == "jessie" ]
-	then
-		return 0
-	else
-		return 1
-	fi
-}
 
 # Reload (or other actions) a service and print a log in case of failure.
 #

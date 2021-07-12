@@ -12,46 +12,87 @@ source _common.sh
 #=================================================
 # LOAD SETTINGS
 #=================================================
-export app=$YNH_APP_INSTANCE_NAME
+ynh_script_progression --message="Loading installation settings..." --weight=1
 
-export domain=$(ynh_app_setting_get $app domain)
-export path_url=$(ynh_app_setting_get $app path)
-export admin=$(ynh_app_setting_get $app admin)
-export final_path=$(ynh_app_setting_get $app final_path)
-export is_public=$(ynh_app_setting_get $app is_public)
-export prefix=$(ynh_app_setting_get $app prefix)
-export db_pwd=$(ynh_app_setting_get $app mysqlpwd)
-export db_name=$(ynh_app_setting_get $app db_name)
-export db_user=$(ynh_app_setting_get $app db_user)
+app=$YNH_APP_INSTANCE_NAME
+
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+admin=$(ynh_app_setting_get --app=$app --key=admin)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
+phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+
+prefix=$(ynh_app_setting_get $app prefix)
 
 #=================================================
 # CHECK VERSION
 #=================================================
 
-ynh_abort_if_up_to_date
+upgrade_type=$(ynh_check_app_version_changed)
 
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
+ynh_script_progression --message="Backing up $app before upgrading (may take a while)..." --weight=7
 
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
-	# restore it if the upgrade fails
-	ynh_restore_upgradebackup
+    # restore it if the upgrade fails
+    ynh_restore_upgradebackup
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
 #=================================================
-# CHECK THE PATH
+# ENSURE DOWNWARD COMPATIBILITY
 #=================================================
+ynh_script_progression --message="Ensuring downward compatibility..." --time --weight=1
 
-path_url=$(ynh_normalize_url_path $path_url)	# Vérifie et corrige la syntaxe du path.
+#
+# N.B. : the followings setting migrations snippets are provided as *EXAMPLES*
+# of what you may want to do in some cases (e.g. a setting was not defined on
+# some legacy installs and you therefore want to initiaze stuff during upgrade)
+#
+
+# If db_name doesn't exist, create it
+#if [ -z "$db_name" ]; then
+#   db_name=$(ynh_sanitize_dbid --db_name=$app)
+#   ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+#fi
+
+# If final_path doesn't exist, create it
+#if [ -z "$final_path" ]; then
+#   final_path=/var/www/$app
+#   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+#fi
+
+### If nobody installed your app before 4.1,
+### then you may safely remove these lines
+
+# Cleaning legacy permissions
+if ynh_legacy_permissions_exists; then
+    ynh_legacy_permissions_delete_all
+
+    ynh_app_setting_delete --app=$app --key=is_public
+fi
+
+if ! ynh_permission_exists --permission="admin"; then
+    # Create the required permissions
+    ynh_permission_create --permission="admin" --url="/admin" --allowed=$admin
+fi
+
+# Create a permission if needed
+if ! ynh_permission_exists --permission="api"; then
+    ynh_permission_create --permission="api" --url="/api" --allowed="visitors" --show_tile="false" --protected="true"
+fi
 
 #=================================================
 # STEP Migrations
 #=================================================
+
 if ynh_version_le "2.0.5" ; then
     is_public=${is_public:-0}
     prefix=${prefix:-prefix_}
@@ -108,24 +149,31 @@ ynh_restore_persistent
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
+ynh_script_progression --message="Upgrading NGINX web server configuration..." --weight=1
 
+# Create a dedicated NGINX config
 ynh_add_nginx_config
 
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
+ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
 
-ynh_system_user_create $app	# Create the dedicated user, if not exist
+# Create a dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
 
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
+ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=1
 
-ynh_add_fpm_config	# Créer le fichier de configuration du pool php-fpm et le configure.
+# Create a dedicated PHP-FPM config
+ynh_add_fpm_config
 
 #=================================================
 # SECURING FILES AND DIRECTORIES
 #=================================================
+
 set_permissions
 
 #=================================================
@@ -137,12 +185,6 @@ cd $final_path
 ynh_exec_as "$app" php application/commands/console.php updatedb 
 
 #=================================================
-# RELOAD NGINX
-#=================================================
-
-ynh_system_reload nginx
-
-#=================================================
 # Send message to the admin
 #=================================================
 
@@ -151,3 +193,16 @@ if ynh_version_le "2.62.2-2" ; then
     ynh_warn "$message"
     ynh_send_readme_to_admin "$message" "$admin"
 fi
+
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_script_progression --message="Reloading NGINX web server..." --time --weight=1
+
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression --message="Upgrade of $app completed" --time --last

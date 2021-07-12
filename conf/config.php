@@ -24,10 +24,10 @@
 return array(
         'components' => array(
                 'db' => array(
-                        'connectionString' => 'mysql:host=localhost;port=3306;dbname={{ db_name }};',
+                        'connectionString' => 'mysql:host=localhost;port=3306;dbname=__DB_NAME__;',
                         'emulatePrepare' => true,
-                        'username' => '{{ db_user }}',
-                        'password' => '{{ db_pwd }}',
+                        'username' => '__DB_NAME__',
+                        'password' => '__DB_PWD__',
                         'charset' => 'utf8mb4',
                         'tablePrefix' => 'lime_',
                 ),
