@@ -25,6 +25,7 @@ path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
+password=$YNH_APP_ARG_PASSWORD
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -121,11 +122,15 @@ ynh_add_config --template="../conf/config.php" --destination="$final_path/applic
 #=================================================
 
 ls_cli=$final_path/application/commands/console.php
+
 fullname=$(ynh_user_get_info "$admin" "fullname")
 mail=$(ynh_user_get_info "$admin" "mail")
 
 # Permission should be correctly set before to do this
-ynh_exec_as "$app" php $ls_cli install "$admin" "$(ynh_string_random 24)" "$fullname" "$mail"
+ynh_exec_as "$app" php $ls_cli install "$admin" "$password" "$fullname" "$mail"
+
+# Permission should be correctly set before to do this
+#ynh_exec_as "$app" php $ls_cli install "$admin" "$(ynh_string_random 24)" "$fullname" "$mail"
 
 #=================================================
 # LOAD SQL SPECIFIC CONFIG
