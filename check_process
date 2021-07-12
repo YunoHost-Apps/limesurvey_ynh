@@ -13,7 +13,6 @@
 		setup_private=1
 		setup_public=1
 		upgrade=1
-		upgrade=1	from_commit=a451e536d79ff0d2b73f3c0d888243a567e7c77e
 		backup_restore=1
 		multi_instance=1
         change_url=0
@@ -21,6 +20,6 @@
 Email=ljf+libresurvey_ynh@reflexlibre.net
 Notification=down
 ;;; Upgrade options
-	; commit=a451e536d79ff0d2b73f3c0d888243a567e7c77e
-		name=2.62.5-2
+	; commit=
+		name=
 	manifest_arg=domain=DOMAIN&path=PATH&admin=USER&language=en&is_public=1&
