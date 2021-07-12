@@ -256,35 +256,3 @@ $(yunohost tools diagnosis | grep -B 100 "services:" | sed '/services:/d')"
 	# Send the email to the recipients
 	echo "$mail_message" | $mail_bin -a "Content-Type: text/plain; charset=UTF-8" -s "$mail_subject" "$recipients"
 }
-
-# Exit without error if the package is up to date
-#
-# This helper should be used to avoid an upgrade of a package
-# when it's not needed.
-#
-# To force an upgrade, even if the package is up to date,
-# you have to set the variable YNH_FORCE_UPGRADE before.
-# example: sudo YNH_FORCE_UPGRADE=1 yunohost app upgrade MyApp
-#
-# usage: ynh_abort_if_up_to_date
-ynh_abort_if_up_to_date () {
-	local force_upgrade=${YNH_FORCE_UPGRADE:-0}
-	local package_check=${PACKAGE_CHECK_EXEC:-0}
-
-	local version=$(ynh_read_json "/etc/yunohost/apps/$YNH_APP_INSTANCE_NAME/manifest.json" "version" || echo 1.0)
-	local last_version=$(ynh_read_manifest "version" || echo 1.0)
-	if [ "$version" = "$last_version" ]
-	then
-		if [ "$force_upgrade" != "0" ]
-		then
-			echo "Upgrade forced by YNH_FORCE_UPGRADE." >&2
-			unset YNH_FORCE_UPGRADE
-		elif [ "$package_check" != "0" ]
-		then
-			echo "Upgrade forced for package check." >&2
-		else
-			ynh_die "Up-to-date, nothing to do" 0
-		fi
-	fi
-}
-
