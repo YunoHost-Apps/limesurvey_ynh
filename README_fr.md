@@ -17,6 +17,10 @@ Outil de création et diffusion de sondage
 
 **Démo :** https://demo.example.com
 
+## Captures d'écran
+
+![](./doc/screenshots/create_html_statistic_screen.png)
+
 ## Avertissements / informations importantes
 
 ## YunoHost specific features

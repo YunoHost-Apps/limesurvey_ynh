@@ -21,6 +21,10 @@ Creation and distribution survey tool
 
 **Demo:** https://demo.example.com
 
+## Screenshots
+
+![](./doc/screenshots/create_html_statistic_screen.png)
+
 ## Disclaimers / important information
 
 ## YunoHost specific features
