@@ -51,26 +51,17 @@ ynh_abort_if_errors
 #=================================================
 ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
-#
-# N.B. : the followings setting migrations snippets are provided as *EXAMPLES*
-# of what you may want to do in some cases (e.g. a setting was not defined on
-# some legacy installs and you therefore want to initiaze stuff during upgrade)
-#
-
 # If db_name doesn't exist, create it
-#if [ -z "$db_name" ]; then
-#   db_name=$(ynh_sanitize_dbid --db_name=$app)
-#   ynh_app_setting_set --app=$app --key=db_name --value=$db_name
-#fi
+if [ -z "$db_name" ]; then
+   db_name=$(ynh_sanitize_dbid --db_name=$app)
+   ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+fi
 
 # If final_path doesn't exist, create it
-#if [ -z "$final_path" ]; then
-#   final_path=/var/www/$app
-#   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
-#fi
-
-### If nobody installed your app before 4.1,
-### then you may safely remove these lines
+if [ -z "$final_path" ]; then
+   final_path=/var/www/$app
+   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+fi
 
 # Cleaning legacy permissions
 if ynh_legacy_permissions_exists; then
@@ -114,6 +105,7 @@ fi
 chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
+chmod 755 "$final_path/{tmp, upload, application/config"
 
 #=================================================
 # NGINX CONFIGURATION
@@ -139,28 +131,11 @@ ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=1
 ynh_add_fpm_config
 
 #=================================================
-# SECURING FILES AND DIRECTORIES
-#=================================================
-
-#set_permissions
-
-#=================================================
 # UPGRADE DB
 #=================================================
 
 # Migrate DB
-cd $final_path
-ynh_exec_as "$app" php application/commands/console.php updatedb 
-
-#=================================================
-# Send message to the admin
-#=================================================
-
-if ynh_version_le "2.62.2-2" ; then
-    message="LimeSurvey has been upgraded from version to version 3, note this new version change completely the survey themes system. If you have added or created manually some templates they won't be available in your LimeSurvey, a copy of their source code has been done in /home/yunohost.backup/$app-old-templates/. See https://manual.limesurvey.org/New_Template_System_in_LS3.x"
-    ynh_warn "$message"
-    ynh_send_readme_to_admin "$message" "$admin"
-fi
+ynh_exec_as "$app" php $final_path/application/commands/console.php updatedb 
 
 #=================================================
 # RELOAD NGINX

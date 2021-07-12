@@ -13,15 +13,6 @@ pkg_dependencies="php${YNH_PHP_VERSION}-cli php${YNH_PHP_VERSION}-mysql php${YNH
 #=================================================
 # SPECIFIC HELPERS
 #=================================================
-set_permissions () {
-
-    find $final_path -type f -name "*.php" -print0 | xargs -0 chmod 400 \
-	    || echo "No file to modify"
-    #chown root: $final_path/application/config/config.php
-    chmod -R u+w $final_path/tmp
-    chmod -R u+w $final_path/upload
-    chmod -R u+w $final_path/application/config/
-}
 
 #=================================================
 # COMMON HELPERS
@@ -63,19 +54,15 @@ ynh_send_readme_to_admin() {
 	}
 	recipients=$(find_mails "$recipients")
 
-	local mail_subject="☁️🆈🅽🅷☁️: \`$app\` was just installed!"
+	local mail_subject="☁️🆈🅽🅷☁️: \`$app\` has important message for you"
 
 	local mail_message="This is an automated message from your beloved YunoHost server.
-
 Specific information for the application $app.
-
 $app_message
-
 ---
 Automatic diagnosis data from YunoHost
-
 $(yunohost tools diagnosis | grep -B 100 "services:" | sed '/services:/d')"
-
+	
 	# Define binary to use for mail command
 	if [ -e /usr/bin/bsd-mailx ]
 	then

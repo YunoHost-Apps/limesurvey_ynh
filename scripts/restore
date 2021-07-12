@@ -72,6 +72,7 @@ ynh_restore_file --origin_path="$final_path"
 chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
+chmod 755 "$final_path/{tmp, upload, application/config"
 
 #=================================================
 # RESTORE THE PHP-FPM CONFIGURATION
@@ -108,14 +109,6 @@ ynh_script_progression --message="Reloading NGINX web server and PHP-FPM..." --w
 
 ynh_systemd_action --service_name=php$phpversion-fpm --action=reload
 ynh_systemd_action --service_name=nginx --action=reload
-
-#=================================================
-# SEND A README FOR THE ADMIN
-#=================================================
-
-message="If you facing an issue or want to improve this app, please open a new issue in this project: https://github.com/YunoHost-Apps/leed_ynh"
-
-ynh_send_readme_to_admin "$message" "$admin"
 
 #=================================================
 # END OF SCRIPT
