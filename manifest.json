@@ -11,7 +11,6 @@
     "upstream": {
         "license": "GPL-2.0+",
         "website": "https://www.limesurvey.org",
-        "demo": "https://demo.example.com",
         "admindoc": "https://manual.limesurvey.org/LimeSurvey_Manual/fr",
         "userdoc": "https://yunohost.org/apps",
         "code": "https://github.com/LimeSurvey/LimeSurvey"
@@ -71,10 +70,6 @@
             {
                 "name": "password",
                 "type": "password",
-                "help": {
-                    "en": "Use the help field to add an information for the admin about this question.",
-                    "fr": "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
-                },
                 "example": "Choose a password"
             }
         ]
