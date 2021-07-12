@@ -88,9 +88,9 @@ ynh_setup_source --dest_dir="$final_path"
 chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
-chmod 755 "$final_path/limesurvey/tmp"
-chmod 755 "$final_path/limesurvey/upload"
-chmod 755 "$final_path/limesurvey/application/config/"
+chmod 755 "$final_path/tmp"
+chmod 755 "$final_path/upload"
+chmod 755 "$final_path/application/config/"
 
 #=================================================
 # NGINX CONFIGURATION
