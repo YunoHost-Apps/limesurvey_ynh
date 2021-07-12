@@ -19,7 +19,7 @@ Creation and distribution survey tool
 
 **Shipped version:** 5.0.7~ynh1
 
-**Demo:** https://demo.example.com
+
 
 ## Screenshots
 

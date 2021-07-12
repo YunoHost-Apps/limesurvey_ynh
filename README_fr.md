@@ -15,7 +15,7 @@ Outil de création et diffusion de sondage
 
 **Version incluse :** 5.0.7~ynh1
 
-**Démo :** https://demo.example.com
+
 
 ## Captures d'écran
 
