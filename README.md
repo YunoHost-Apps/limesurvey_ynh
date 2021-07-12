@@ -17,7 +17,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 Creation and distribution survey tool
 
-**Shipped version:** 3.17.1~ynh1
+**Shipped version:** 3.27.6~ynh1
 
 **Demo:** https://demo.example.com
 

@@ -13,7 +13,7 @@ Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour
 
 Outil de création et diffusion de sondage
 
-**Version incluse :** 3.17.1~ynh1
+**Version incluse :** 3.27.6~ynh1
 
 **Démo :** https://demo.example.com
 
