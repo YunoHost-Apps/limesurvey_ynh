@@ -151,6 +151,7 @@ ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name
 # SETUP FAIL2BAN
 #=================================================
 # ynh_script_progression --message="Configuring fail2ban..." --time --weight=1
+
 #ynh_add_fail2ban_config "/var/log/nginx/${domain}-error.log" "PHP message: Leed: wrong login for .* client: <HOST>" 5
 
 #=================================================
