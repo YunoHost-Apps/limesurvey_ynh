@@ -1,91 +1,92 @@
 #!/bin/bash
 
 #=================================================
-# GENERIC STARTING
+# GENERIC START
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source /usr/share/yunohost/helpers
 source _common.sh
+source /usr/share/yunohost/helpers
 
 #=================================================
 # LOAD SETTINGS
 #=================================================
-export app=$YNH_APP_INSTANCE_NAME
+ynh_script_progression --message="Loading installation settings..." --weight=1
 
-export domain=$(ynh_app_setting_get $app domain)
-export path_url=$(ynh_app_setting_get $app path)
-export admin=$(ynh_app_setting_get $app admin)
-export final_path=$(ynh_app_setting_get $app final_path)
-export is_public=$(ynh_app_setting_get $app is_public)
-export prefix=$(ynh_app_setting_get $app prefix)
-export db_pwd=$(ynh_app_setting_get $app mysqlpwd)
-export db_name=$(ynh_app_setting_get $app db_name)
-export db_user=$(ynh_app_setting_get $app db_user)
+app=$YNH_APP_INSTANCE_NAME
+
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+admin=$(ynh_app_setting_get --app=$app --key=admin)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
+phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+
+prefix=$(ynh_app_setting_get $app prefix)
 
 #=================================================
 # CHECK VERSION
 #=================================================
 
-ynh_abort_if_up_to_date
+upgrade_type=$(ynh_check_app_version_changed)
 
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
+ynh_script_progression --message="Backing up $app before upgrading (may take a while)..." --weight=7
 
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
-	# restore it if the upgrade fails
-	ynh_restore_upgradebackup
+    # restore it if the upgrade fails
+    ynh_restore_upgradebackup
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
 #=================================================
-# CHECK THE PATH
+# ENSURE DOWNWARD COMPATIBILITY
 #=================================================
+ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
-path_url=$(ynh_normalize_url_path $path_url)	# Vérifie et corrige la syntaxe du path.
+# If db_name doesn't exist, create it
+if [ -z "$db_name" ]; then
+   db_name=$(ynh_sanitize_dbid --db_name=$app)
+   ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+fi
+
+# If final_path doesn't exist, create it
+if [ -z "$final_path" ]; then
+   final_path=/var/www/$app
+   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+fi
+
+# Cleaning legacy permissions
+if ynh_legacy_permissions_exists; then
+    ynh_legacy_permissions_delete_all
+
+    ynh_app_setting_delete --app=$app --key=is_public
+fi
+
+if ! ynh_permission_exists --permission="admin"; then
+    # Create the required permissions
+    ynh_permission_create --permission="admin" --url="/admin" --allowed=$admin
+fi
+
+# Create a permission if needed
+if ! ynh_permission_exists --permission="api"; then
+    ynh_permission_create --permission="api" --url="/api" --allowed="visitors" --show_tile="false" --protected="true"
+fi
 
 #=================================================
-# STEP Migrations
+# CREATE DEDICATED USER
 #=================================================
-if ynh_version_le "2.0.5" ; then
-    is_public=${is_public:-0}
-    prefix=${prefix:-prefix_}
-    db_name=${db_name:-$app}
-    final_path=$(ynh_app_setting_get $app local_path)
+ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
 
-    ynh_install_app_dependencies $pkg_dependencies
-    # Move the upload dir to final_path if needed
-    # The upload dir can't be symlinked in home (not supported by LS)
-    upload_path=/home/yunohost.app/$app/upload
-    if [ -h $final_path/upload ]; then
-        rm $final_path/upload
-        mv $upload_path $final_path/
-    fi
-    
-    ynh_app_setting_delete $app skipped_uris
-    ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
-
-    ynh_configure migrations/2.0.5.sql ./2.0.5.sql
-    mysql -u $app -p$db_pwd $db_name < ./2.0.5.sql
-fi
-if ynh_version_le "2.62.2-1" ; then
-    is_public=${is_public:-0}
-    prefix=${prefix:-prefix_}
-    db_name=${db_name:-$app}
-    final_path=$(ynh_app_setting_get $app local_path)
-    ynh_save_args path_url is_public prefix db_name final_path db_user
-fi
-if ynh_version_le "2.62.2-2" ; then
-    # Move old templates  and themes in backup dir
-    mv $final_path/upload/templates /home/yunohost.backup/$app.bkp/old-templates
-    mkdir -p /home/yunohost.backup/$app.bkp/old-themes
-    mv $final_path/themes/* /home/yunohost.backup/$app.bkp/old-themes/
-fi
+# Create a dedicated user (if not existing)
+ynh_system_user_create --username=$app --home_dir="$final_path"
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -93,61 +94,60 @@ fi
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
-# Backup config, plugins and themes and delete previous files
-ynh_keep_if_no_upgrade plugins/*
-ynh_keep application/config/config.php
-ynh_keep upload
+if [ "$upgrade_type" == "UPGRADE_APP" ]
+then
+    ynh_script_progression --message="Upgrading source files..." --weight=1
 
-# Copie new files and restore config, plugins, upload and themes
-ynh_secure_remove $final_path
-ynh_setup_source "$final_path"	# Télécharge la source, décompresse et copie dans $final_path
+    # Download, check integrity, uncompress and patch the source from app.src
+    ynh_setup_source --dest_dir="$final_path" --keep="$final_path/plugins/* $final_path/application/config/config.php $final_path/upload"
+fi
 
-# Restore config, plugins and themes
-ynh_restore_persistent
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+chmod 755 "$final_path/tmp"
+chmod 755 "$final_path/upload"
+chmod 755 "$final_path/application/config/"
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
+ynh_script_progression --message="Upgrading NGINX web server configuration..." --weight=1
 
+# Create a dedicated NGINX config
 ynh_add_nginx_config
 
 #=================================================
-# CREATE DEDICATED USER
+# UPGRADE DEPENDENCIES
 #=================================================
+ynh_script_progression --message="Upgrading dependencies..." --weight=1
 
-ynh_system_user_create $app	# Create the dedicated user, if not exist
+ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
+ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=1
 
-ynh_add_fpm_config	# Créer le fichier de configuration du pool php-fpm et le configure.
-
-#=================================================
-# SECURING FILES AND DIRECTORIES
-#=================================================
-set_permissions
+# Create a dedicated PHP-FPM config
+ynh_add_fpm_config
 
 #=================================================
 # UPGRADE DB
 #=================================================
 
 # Migrate DB
-cd $final_path
-ynh_exec_as "$app" php application/commands/console.php updatedb 
+ynh_exec_as "$app" php $final_path/application/commands/console.php updatedb 
 
 #=================================================
 # RELOAD NGINX
 #=================================================
+ynh_script_progression --message="Reloading NGINX web server..." --weight=1
 
-ynh_system_reload nginx
+ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
-# Send message to the admin
+# END OF SCRIPT
 #=================================================
 
-if ynh_version_le "2.62.2-2" ; then
-    message="LimeSurvey has been upgraded from version to version 3, note this new version change completely the survey themes system. If you have added or created manually some templates they won't be available in your LimeSurvey, a copy of their source code has been done in /home/yunohost.backup/$app-old-templates/. See https://manual.limesurvey.org/New_Template_System_in_LS3.x"
-    ynh_warn "$message"
-    ynh_send_readme_to_admin "$message" "$admin"
-fi
+ynh_script_progression --message="Upgrade of $app completed" --last

@@ -38,8 +38,8 @@ INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key
 (20, 5, NULL, NULL, 'serverkey', '"REMOTE_USER"'),
 (21, 5,NULL,NULL,'is_default','\"1\"');
 
-INSERT INTO `lime_settings_global` VALUES ('defaultlang','{{ language }}'),('AssetsVersion','2620');
+INSERT INTO `lime_settings_global` VALUES ('defaultlang','__LANGUAGE__'),('AssetsVersion','2620');
 
-{% if is_public == "1" %}
+{% if __IS_PUBLIC__ == "1" %}
 UPDATE `lime_plugin_settings` SET value='\"0\"' WHERE `id`=21;
 {% endif %} 

@@ -6,8 +6,8 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source /usr/share/yunohost/helpers
 source _common.sh
+source /usr/share/yunohost/helpers
 
 #=================================================
 # MANAGE FAILURE OF THE SCRIPT
@@ -20,166 +20,189 @@ ynh_abort_if_errors
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
 
-export app=$YNH_APP_INSTANCE_NAME
+domain=$YNH_APP_ARG_DOMAIN
+path_url=$YNH_APP_ARG_PATH
+admin=$YNH_APP_ARG_ADMIN
+is_public=$YNH_APP_ARG_IS_PUBLIC
+language=$YNH_APP_ARG_LANGUAGE
+password=$YNH_APP_ARG_PASSWORD
 
-# Retrieve arguments
-ynh_export domain path_url admin is_public language
-export prefix=lime_
-export db_name=$(ynh_sanitize_dbid $app)
-export db_user=$db_name
+app=$YNH_APP_INSTANCE_NAME
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THIS ARGS
 #=================================================
-ynh_script_progression --message="Validating installation parameters..." --time --weight=1
+ynh_script_progression --message="Validating installation parameters..." --weight=1
 
-export final_path=/var/www/$app
-test ! -e "$final_path" || ynh_die "This path already contains a folder"
+final_path=/var/www/$app
+test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
 
 # Register (book) web path
-ynh_webpath_register $app $domain $path_url
+ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
-ynh_script_progression --message="Storing installation settings..." --time --weight=1
+ynh_script_progression --message="Storing installation settings..." --weight=1
 
-ynh_save_args domain admin is_public language final_path prefix path_url db_name db_user
+ynh_app_setting_set --app=$app --key=domain --value=$domain
+ynh_app_setting_set --app=$app --key=path --value=$path_url
+ynh_app_setting_set --app=$app --key=admin --value=$admin
+ynh_app_setting_set --app=$app --key=language --value=$language
 
 #=================================================
 # STANDARD MODIFICATIONS
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-ynh_script_progression --message="Installing dependencies..." --time --weight=1
+ynh_script_progression --message="Installing dependencies..." --weight=1
 
 ynh_install_app_dependencies $pkg_dependencies
 
 #=================================================
-# CREATE A SQL BDD
+# CREATE A MYSQL DATABASE
 #=================================================
-ynh_script_progression --message="Creating a MySQL database..." --time --weight=1
+ynh_script_progression --message="Creating a MySQL database..." --weight=1
 
-ynh_mysql_setup_db $db_user $db_name
-export db_pwd=$(ynh_app_setting_get $app mysqlpwd)
+db_name=$(ynh_sanitize_dbid --db_name=$app)
+db_user=$db_name
+ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+ynh_mysql_setup_db --db_user=$db_user --db_name=$db_name
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..." --weight=1
+
+# Create a system user
+ynh_system_user_create --username=$app --home_dir="$final_path"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Setting up source files..." --time --weight=1
+ynh_script_progression --message="Setting up source files..." --weight=1
 
+ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source "$final_path"
+ynh_setup_source --dest_dir="$final_path"
+
+chmod 750 "$final_path"
+chmod -R o-rwx "$final_path"
+chown -R $app:www-data "$final_path"
+chmod 755 "$final_path/tmp"
+chmod 755 "$final_path/upload"
+chmod 755 "$final_path/application/config/"
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring nginx web server..." --time --weight=1
+ynh_script_progression --message="Configuring NGINX web server..." --weight=1
 
 # Create a dedicated nginx config
 ynh_add_nginx_config
 
 #=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Configuring system user..." --time --weight=1
-
-# Create a system user
-ynh_system_user_create $app
-
-#=================================================
 # PHP-FPM CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring php-fpm..." --time --weight=1
+ynh_script_progression --message="Configuring PHP-FPM..." --weight=1
 
 # Create a dedicated php-fpm config
 ynh_add_fpm_config
-
-#=================================================
-# SECURING FILES AND DIRECTORIES
-#=================================================
-
-# Set permissions
-set_permissions
-
 
 #=================================================
 # SPECIFIC SETUP
 #=================================================
 # CONFIGURE
 #=================================================
-ynh_configure config.php "$final_path/application/config/config.php"
+
+ynh_add_config --template="../conf/config.php" --destination="$final_path/application/config/config.php"
 
 #=================================================
 # INSTALL
 #=================================================
+
 ls_cli=$final_path/application/commands/console.php
+
 fullname=$(ynh_user_get_info "$admin" "fullname")
 mail=$(ynh_user_get_info "$admin" "mail")
 
 # Permission should be correctly set before to do this
-ynh_exec_as "$app" php $ls_cli install "$admin" "$(ynh_string_random 24)" "$fullname" "$mail"
+ynh_exec_as "$app" php $ls_cli install "$admin" "$password" "$fullname" "$mail"
 
-#=================================================
-# STORE THE CHECKSUM OF THE CONFIG FILE
-#=================================================
-
-# Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum "$final_path/application/config/config.php"
+# Permission should be correctly set before to do this
+#ynh_exec_as "$app" php $ls_cli install "$admin" "$(ynh_string_random 24)" "$fullname" "$mail"
 
 #=================================================
 # LOAD SQL SPECIFIC CONFIG
 #=================================================
-ynh_configure data.sql ./data.sql
-mysql -u $db_user -p$db_pwd $db_user < ./data.sql
+
+#ynh_add_config --template="../conf/data.sql" --destination="$final_path/data.sql"
+
+#ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name" < $final_path/data.sql
+
+#ynh_secure_remove --file=$final_path/data.sql
+
+#if [ $is_public -eq 1 ]
+#then
+#	ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name" <<< "UPDATE `lime_plugin_settings` SET value='\"0\"' WHERE `id`=21;"
+#fi
 
 #=================================================
 # Add nice themes
 #=================================================
+
 #ynh_setup_source "$final_path/upload/templates/libreform" libreform
 #ynh_setup_source "$final_path/upload/templates/librepoll" librepoll
-
-
-#=================================================
-# GENERIC FINALISATION
-#=================================================
-# SECURING FILES AND DIRECTORIES
-#=================================================
-ynh_script_progression --message="Apply permissions..." --time --weight=1
-# Set permissions
-set_permissions
 
 #=================================================
 # SETUP FAIL2BAN
 #=================================================
 # ynh_script_progression --message="Configuring fail2ban..." --time --weight=1
+
 #ynh_add_fail2ban_config "/var/log/nginx/${domain}-error.log" "PHP message: Leed: wrong login for .* client: <HOST>" 5
 
 #=================================================
 # SETUP SSOWAT
 #=================================================
-ynh_script_progression --message="Configuring SSOwat..." --time --weight=1
+ynh_script_progression --message="Configuring permissions..." --weight=1
 
-yunohost app addaccess $app -u $admin
-ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
+# Make app public if necessary
+if [ $is_public -eq 1 ]
+then
+	ynh_permission_update --permission="main" --add="visitors"
+fi
+
+# Only the admin can access the admin panel of the app (if the app has an admin panel)
+ynh_permission_create --permission="admin" --url="/admin" --allowed=$admin
+
+
+#ynh_script_progression --message="Configuring SSOwat..." --weight=1
+
+#yunohost app addaccess $app -u $admin
+#ynh_sso_access "/index.php?r=admin,/index.php?r=plugins,/scripts"
 
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reloading nginx web server..." --time --weight=1
+ynh_script_progression --message="Reloading NGINX web server..." --weight=1
 
-systemctl reload nginx
+ynh_systemd_action --service_name=nginx --action=reload
 
 #=================================================
 # SEND A README FOR THE ADMIN
 #=================================================
-ynh_script_progression --message="Sending some explanation to use $app..." --time --weight=1
+ynh_script_progression --message="Sending a readme for the admin..." --weight=1
 
-ynh_print_OFF
-message="You can now create a poll on this address: https://${domain}${path_url}/admin/
-If you facing an issue or want to improve this app, please open a new issue in this project: https://github.com/YunoHost-Apps/limesurvey_ynh"
+message="LimeSurvey was successfully installed :)
 
-ynh_send_readme_to_admin "$message" "$admin"
-ynh_print_ON
+You can now create a poll on this address: https://$domain$path_url/admin/
 
-ynh_script_progression --message="Installation of $app completed" --time --last
+If you are facing any problem or want to improve this app, please open a new issue here: https://github.com/YunoHost-Apps/limesurvey_ynh/issues"
+
+ynh_send_readme_to_admin "$message"
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression --message="Installation of $app completed" --last
