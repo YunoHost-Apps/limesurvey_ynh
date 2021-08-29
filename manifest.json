@@ -61,8 +61,8 @@
                 "name": "is_public",
                 "type": "boolean",
                 "help": {
-                    "en": "If enabled, LimeSurvey will be accessible by people who do not have an account. This can be changed later via the webadmin.",
-                    "fr": "Si cette case est cochée, LimeSurvey sera accessible aux personnes n’ayant pas de compte. Vous pourrez changer ceci plus tard via la webadmin."
+                    "en": "In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. ",
+                    "fr": "En mode privé, seuls les utilisateurs YunoHost autorisés peuvent créer un sondage. En mode public, il est possible de créer un sondage sans compte YunoHost."
                 },
                 "default": true
             },
