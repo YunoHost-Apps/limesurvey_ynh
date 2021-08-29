@@ -31,7 +31,6 @@ Outil de création et diffusion de sondage
 ## Documentations et ressources
 
 * Site officiel de l'app : https://www.limesurvey.org
-* Documentation officielle utilisateur : https://yunohost.org/apps
 * Documentation officielle de l'admin : https://manual.limesurvey.org/LimeSurvey_Manual/fr
 * Dépôt de code officiel de l'app : https://github.com/LimeSurvey/LimeSurvey
 * Documentation YunoHost pour cette app : https://yunohost.org/app_limesurvey
