@@ -12,7 +12,6 @@
         "license": "GPL-2.0+",
         "website": "https://www.limesurvey.org",
         "admindoc": "https://manual.limesurvey.org/LimeSurvey_Manual/fr",
-        "userdoc": "https://yunohost.org/apps",
         "code": "https://github.com/LimeSurvey/LimeSurvey"
     },
     "license": "GPL-2.0+",
