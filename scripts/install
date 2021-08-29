@@ -136,6 +136,9 @@ ynh_exec_as "$app" php $ls_cli install "$admin" "$password" "$fullname" "$mail"
 # LOAD SQL SPECIFIC CONFIG
 #=================================================
 
+ynh_configure data.sql ./data.sql
+mysql -u $db_user -p$db_pwd $db_user < ./data.sql
+
 #ynh_add_config --template="../conf/data.sql" --destination="$final_path/data.sql"
 
 #ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name" < $final_path/data.sql
