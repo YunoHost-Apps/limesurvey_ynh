@@ -14,6 +14,14 @@ pkg_dependencies="php${YNH_PHP_VERSION}-cli php${YNH_PHP_VERSION}-mysql php${YNH
 # SPECIFIC HELPERS
 #=================================================
 
+ynh_configure () {
+    local TEMPLATE=$1
+    local DEST=$2
+    type j2 2>/dev/null || sudo pip install j2cli
+    j2 "${PKG_DIR}/conf/$TEMPLATE.j2" > "${PKG_DIR}/conf/$TEMPLATE"
+    sudo cp "${PKG_DIR}/conf/$TEMPLATE" "$DEST"
+}
+
 #=================================================
 # COMMON HELPERS
 #=================================================
