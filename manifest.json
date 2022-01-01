@@ -6,7 +6,7 @@
         "en": "Creation and distribution survey tool",
         "fr": "Outil de création et diffusion de sondage"
     },
-    "version": "5.0.7~ynh1",
+    "version": "5.2.6~ynh1",
     "url": "https://www.limesurvey.org/",
     "upstream": {
         "license": "GPL-2.0+",
@@ -21,7 +21,7 @@
         "url": "https://reflexlibre.net"
     },
     "requirements": {
-        "yunohost": ">= 4.2.4"
+        "yunohost": ">= 4.3.0"
     },
     "multi_instance": true,
     "services": [

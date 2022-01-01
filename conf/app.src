@@ -1,4 +1,6 @@
-SOURCE_URL=https://github.com/LimeSurvey/LimeSurvey/archive/refs/tags/5.0.7+210628.tar.gz
-SOURCE_SUM=efde82aabe036263e2ab938315ede8b697f1aafeffedd1d48dc492af9bbddf42
+SOURCE_URL=https://github.com/LimeSurvey/LimeSurvey/archive/refs/tags/5.2.6+211213.tar.gz
+SOURCE_SUM=d097af55794000d87ad8f88698597f6cba2e972499819d3f4bd55748f1de1765
 SOURCE_SUM_PRG=sha256sum
-SOURCE_FILENAME=limesurvey-5.0.7+210628.tar.gz
+SOURCE_FILENAME=limesurvey.tar.gz
+
+
