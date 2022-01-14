@@ -90,7 +90,7 @@ chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
 chmod 750 "$final_path/tmp"
-chmod 750 "$data_dir/upload"
+chmod 750 "$final_path/upload"
 chmod 750 "$final_path/application/config/"
 
 #=================================================
@@ -112,13 +112,6 @@ ynh_add_fpm_config
 #=================================================
 # SPECIFIC SETUP
 #=================================================
-# CONFIGURE
-#=================================================
-ynh_script_progression --message="Configuring Limesurvey..." --weight=1
-
-ynh_add_config --template="../conf/config.php" --destination="$final_path/application/config/config.php"
-
-#=================================================
 # CREATE THE DATA DIRECTORY
 #=================================================
 ynh_script_progression --message="Creating a data directory..." --weight=1
@@ -129,6 +122,13 @@ mkdir -p $datadir
 mv "$final_path/upload" $datadir/upload
 chown -R $app:www-data "$datadir"
 chmod -R o-rwx "$datadir"
+
+#=================================================
+# CONFIGURE
+#=================================================
+ynh_script_progression --message="Configuring Limesurvey..." --weight=1
+
+ynh_add_config --template="../conf/config.php" --destination="$final_path/application/config/config.php"
 
 #=================================================
 # INSTALL
@@ -175,13 +175,13 @@ ynh_script_progression --message="Configuring permissions..." --weight=1
 
 if [ $is_public -eq 1 ]
 then
-    allowed_groups="visitors"
+    allowed_groups="visitors $admin"
 else
     allowed_groups="$admin"
 fi
-ynh_permission_update --permission="main" --url="/admin" --allowed="$allowed_groups"
+ynh_permission_update --permission="main" --show_tile="false" --add="visitors"
 
-ynh_permission_create --permission="answer" --url="/" --allowed="visitors" --show_tile="false"
+ynh_permission_create --permission="admin" --url="/admin" --allowed=$allowed_groups  --show_tile="true"
 
 
 #=================================================

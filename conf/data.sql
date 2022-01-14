@@ -17,7 +17,7 @@ INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key
 (9, 5, NULL, NULL, 'domainsuffix', 'null'),
 (10, 5, NULL, NULL, 'searchuserattribute', '\"uid\"'),
 (11, 5, NULL, NULL, 'usersearchbase', '\"ou=users,dc=yunohost,dc=org\"'),
-(12, 5, NULL, NULL, 'extrauserfilter', '\"(&(|(objectclass=posixAccount))(uid=%uid)(permission=cn=__APP__.main,ou=permission,dc=yunohost,dc=org))\"'),
+(12, 5, NULL, NULL, 'extrauserfilter', '\"(&(objectClass=inetOrgPerson)(permission=cn=__APP__.admin,ou=permission,dc=yunohost,dc=org))\"'),
 (13, 5, NULL, NULL, 'binddn', '\"\"'),
 (14, 5, NULL, NULL, 'bindpwd', '\"\"'),
 (15, 5, NULL, NULL, 'mailattribute', '\"mail\"'),
@@ -25,8 +25,8 @@ INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key
 (17, 5, NULL, NULL, 'is_default', '\"\"'),
 (18, 5, NULL, NULL, 'autocreate', '\"1\"'),
 (19, 5, NULL, NULL, 'automaticsurveycreation', '\"1\"'),
-(20, 5, NULL, NULL, 'groupsearchbase', '\"ou=groups,dc=yunohost,dc=org\"'),
-(21, 5, NULL, NULL, 'groupsearchfilter', '\"(&(objectclass=top)(memberUid=*))\"'),
+(20, 5, NULL, NULL, 'groupsearchbase', '\"\"'),
+(21, 5, NULL, NULL, 'groupsearchfilter', '\"\"'),
 (22, 5, NULL, NULL, 'allowInitialUser', '\"1\"');
 
 
@@ -35,7 +35,6 @@ INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key
 #(24, 7, NULL, NULL, 'serverkey', '"REMOTE_USER"'),
 #(25, 7,NULL,NULL,'is_default','\"1\"');
 
-INSERT INTO `lime_settings_global` VALUESi
+INSERT INTO `lime_settings_global` VALUES
 ('defaultlang','__LANGUAGE__'),
-('AssetsVersion','30214'),
-('DBVersion', 449);
+('AssetsVersion','30214');
