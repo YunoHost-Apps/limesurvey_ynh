@@ -66,10 +66,11 @@ fi
 
 # If datadir doesn't exist, create it
 if [ -z "$datadir" ]; then
-   datadir=/home/yunohost.app/$app
-   ynh_app_setting_set --app=$app --key=datadir --value=$datadir/upload
+   datadir=/home/yunohost.app/$app/upload
+   ynh_app_setting_set --app=$app --key=datadir --value=$datadir
    mkdir -p $datadir
-   mv "$final_path/upload" $datadir/upload
+    # Remove upload if empty
+    rmdir $datadir && mv "$final_path/upload" $datadir || true
    chown -R $app:www-data "$datadir"
    chmod -R o-rwx "$datadir"
 fi

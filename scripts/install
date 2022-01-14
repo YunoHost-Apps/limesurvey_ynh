@@ -116,10 +116,11 @@ ynh_add_fpm_config
 #=================================================
 ynh_script_progression --message="Creating a data directory..." --weight=1
 
-datadir=/home/yunohost.app/limesurvey
-ynh_app_setting_set --app=$app --key=datadir --value=$datadir/upload
+datadir=/home/yunohost.app/limesurvey/upload
+ynh_app_setting_set --app=$app --key=datadir --value=$datadir
 mkdir -p $datadir
-mv "$final_path/upload" $datadir/upload
+# Remove upload if empty
+rmdir $datadir && mv "$final_path/upload" $datadir || true
 chown -R $app:www-data "$datadir"
 chmod -R o-rwx "$datadir"
 
@@ -158,7 +159,7 @@ ynh_secure_remove --file=./data.sql
 # Add nice themes
 #=================================================
 
-ynh_setup_source "$final_path/upload/templates/libreform" libreform
+#ynh_setup_source "$datadir/upload/templates/libreform" libreform
 #ynh_setup_source "$final_path/upload/templates/librepoll" librepoll
 
 #=================================================
