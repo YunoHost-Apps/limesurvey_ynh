@@ -34,6 +34,7 @@ Creation and distribution survey tool
 ## Documentation and resources
 
 * Official app website: https://www.limesurvey.org
+* Official user documentation: https://help.limesurvey.org
 * Official admin documentation: https://manual.limesurvey.org/LimeSurvey_Manual/fr
 * Upstream app code repository: https://github.com/LimeSurvey/LimeSurvey
 * YunoHost documentation for this app: https://yunohost.org/app_limesurvey
