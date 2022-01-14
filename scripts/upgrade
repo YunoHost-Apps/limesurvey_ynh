@@ -145,6 +145,13 @@ ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=1
 ynh_add_fpm_config
 
 #=================================================
+# CONFIGURE
+#=================================================
+ynh_script_progression --message="Configuring Limesurvey..." --weight=1
+
+ynh_add_config --template="../conf/config.php" --destination="$final_path/application/config/config.php"
+
+#=================================================
 # UPGRADE DB
 #=================================================
 
