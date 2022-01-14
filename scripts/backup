@@ -29,6 +29,7 @@ ynh_print_info --message="Loading installation settings..."
 app=$YNH_APP_INSTANCE_NAME
 
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
@@ -62,6 +63,13 @@ ynh_backup --src_path="/etc/php/$phpversion/fpm/pool.d/$app.conf"
 ynh_print_info --message="Backing up the MySQL database..."
 
 ynh_mysql_dump_db --database="$db_name" > db.sql
+
+#=================================================
+# BACKUP THE DATA DIRECTORY
+#=================================================
+ynh_print_info --message="Backing up data directory..."
+
+ynh_backup --src_path="$datadir" --is_big
 
 #=================================================
 # END OF SCRIPT

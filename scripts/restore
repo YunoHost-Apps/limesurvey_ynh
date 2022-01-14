@@ -72,7 +72,6 @@ chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
 chmod 755 "$final_path/tmp"
-chmod 755 "$final_path/upload"
 chmod 755 "$final_path/application/config/"
 
 #=================================================
@@ -100,6 +99,18 @@ ynh_script_progression --message="Restoring the MySQL database..." --weight=1
 db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
 ynh_mysql_setup_db --db_user=$db_user --db_name=$db_name --db_pwd=$db_pwd
 ynh_mysql_connect_as --user=$db_user --password=$db_pwd --database=$db_name < ./db.sql
+
+#=================================================
+# RESTORE THE DATA DIRECTORY
+#=================================================
+ynh_script_progression --message="Restoring data directory..." --weight=2
+
+# Use --not_mandatory for the data directory, because if the backup has been made with BACKUP_CORE_ONLY, there's no data into the backup.
+ynh_restore_file --origin_path="$datadir" --not_mandatory
+
+mkdir -p "$datadir"
+chown -R $app:www-data "$datadir"
+chmod -R o-rwx "$datadir"
 
 #=================================================
 # GENERIC FINALIZATION

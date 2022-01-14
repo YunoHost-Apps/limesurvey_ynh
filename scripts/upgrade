@@ -20,6 +20,7 @@ domain=$(ynh_app_setting_get --app=$app --key=domain)
 path_url=$(ynh_app_setting_get --app=$app --key=path)
 admin=$(ynh_app_setting_get --app=$app --key=admin)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 db_name=$(ynh_app_setting_get --app=$app --key=db_name)
 db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
 phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
@@ -61,6 +62,16 @@ fi
 if [ -z "$final_path" ]; then
    final_path=/var/www/$app
    ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+fi
+
+# If datadir doesn't exist, create it
+if [ -z "$datadir" ]; then
+   datadir=/home/yunohost.app/$app
+   ynh_app_setting_set --app=$app --key=datadir --value=$datadir/upload
+   mkdir -p $datadir
+   mv "$final_path/upload" $datadir/upload
+   chown -R $app:www-data "$datadir"
+   chmod -R o-rwx "$datadir"
 fi
 
 # Cleaning legacy permissions
@@ -105,9 +116,10 @@ fi
 chmod 750 "$final_path"
 chmod -R o-rwx "$final_path"
 chown -R $app:www-data "$final_path"
-chmod 755 "$final_path/tmp"
-chmod 755 "$final_path/upload"
-chmod 755 "$final_path/application/config/"
+chmod 750 "$final_path/tmp"
+chmod 750 "$final_path/application/config/"
+chown -R $app:www-data "$datadir"
+chmod 750 $datadir
 
 #=================================================
 # NGINX CONFIGURATION
