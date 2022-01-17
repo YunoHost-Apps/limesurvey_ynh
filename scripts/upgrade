@@ -70,7 +70,7 @@ if [ -z "$datadir" ]; then
    ynh_app_setting_set --app=$app --key=datadir --value=$datadir
    mkdir -p $datadir
     # Remove upload if empty
-    rmdir $datadir && mv "$final_path/upload" $datadir || true
+    rmdir $datadir 2> /dev/null && mv "$final_path/upload" $datadir || true
    chown -R $app:www-data "$datadir"
    chmod -R o-rwx "$datadir"
     ln -s $datadir $final_path/upload
