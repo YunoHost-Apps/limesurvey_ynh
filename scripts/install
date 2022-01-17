@@ -166,8 +166,6 @@ ynh_secure_remove --file=./data.sql
 #=================================================
 # SETUP FAIL2BAN
 #=================================================
-#ynh_script_progression --message="Configuring fail2ban..." --weight=1
-
 # No message in logs and the apps contains already a 10 minutes ban policy
 
 #=================================================
