@@ -15,7 +15,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 ## Overview
 
-Creation and distribution survey tool
+Create and distribute surveys
 
 **Shipped version:** 5.2.6~ynh1
 
@@ -29,8 +29,7 @@ Creation and distribution survey tool
 
 ## YunoHost specific features
 
-* SSO and LDAP are configured.
-* Login secured by fail2ban
+* LDAP are configured.
 ## Documentation and resources
 
 * Official app website: https://www.limesurvey.org

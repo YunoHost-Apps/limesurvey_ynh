@@ -25,8 +25,7 @@ Outil de création et diffusion de sondage
 
 ## YunoHost specific features
 
-* SSO and LDAP are configured.
-* Login secured by fail2ban
+* LDAP are configured.
 ## Documentations et ressources
 
 * Site officiel de l'app : https://www.limesurvey.org
