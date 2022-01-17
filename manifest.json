@@ -3,7 +3,7 @@
     "id": "limesurvey",
     "packaging_format": 1,
     "description": {
-        "en": "Creation and distribution survey tool",
+        "en": "Create and distribute surveys",
         "fr": "Outil de création et diffusion de sondage"
     },
     "version": "5.2.6~ynh1",
