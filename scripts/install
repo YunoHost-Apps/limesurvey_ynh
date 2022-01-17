@@ -123,6 +123,7 @@ mkdir -p $datadir
 rmdir $datadir && mv "$final_path/upload" $datadir || true
 chown -R $app:www-data "$datadir"
 chmod -R o-rwx "$datadir"
+ln -s $datadir $final_path/upload 2> /dev/null || true
 
 #=================================================
 # CONFIGURE

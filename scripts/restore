@@ -111,6 +111,7 @@ ynh_restore_file --origin_path="$datadir" --not_mandatory
 mkdir -p "$datadir"
 chown -R $app:www-data "$datadir"
 chmod -R o-rwx "$datadir"
+ln -s $datadir $final_path/upload 2> /dev/null || true
 
 #=================================================
 # GENERIC FINALIZATION
