@@ -169,11 +169,11 @@
                 "default": "en"
             },
             {
-                "name": "is_public",
+                "name": "is_admin_public",
                 "type": "boolean",
                 "help": {
                     "en": "In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. ",
-                    "fr": "En mode privé, seuls les utilisateurs YunoHost autorisés peuvent créer un sondage. En mode public, il est possible de créer un sondage sans compte YunoHost."
+                    "fr": "En mode privé, seuls les utilisateurs YunoHost autorisés peuvent créer un sondage. En mode public, il est possible de créer un sondage avec un compte Limesurvey mais sans compte YunoHost."
                 },
                 "default": true
             },
