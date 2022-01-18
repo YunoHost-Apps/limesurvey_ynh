@@ -23,7 +23,7 @@ ynh_abort_if_errors
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
-is_admin_public=$YNH_APP_ARG_is_admin_public
+is_admin_public=$YNH_APP_ARG_IS_ADMIN_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
 password=$YNH_APP_ARG_PASSWORD
 
@@ -173,7 +173,7 @@ ynh_secure_remove --file=./data.sql
 #=================================================
 ynh_script_progression --message="Configuring permissions..." --weight=1
 
-if [ $is__public -eq 1 ]
+if [ $is_admin_public -eq 1 ]
 then
     allowed_groups="visitors $admin"
 else
