@@ -29,7 +29,7 @@ Create and distribute surveys
 
 ## YunoHost specific features
 
-* LDAP are configured.
+* The application is integrated with YunoHost accounts (LDAP database)
 ## Documentation and resources
 
 * Official app website: https://www.limesurvey.org

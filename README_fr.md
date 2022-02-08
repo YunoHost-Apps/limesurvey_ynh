@@ -25,7 +25,7 @@ Outil de création et diffusion de sondage
 
 ## YunoHost specific features
 
-* LDAP are configured.
+* The application is integrated with YunoHost accounts (LDAP database)
 ## Documentations et ressources
 
 * Site officiel de l'app : https://www.limesurvey.org
