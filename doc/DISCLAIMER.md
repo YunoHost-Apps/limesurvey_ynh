@@ -1,3 +1,3 @@
 ## YunoHost specific features
 
-* LDAP are configured.
+* The application is integrated with YunoHost accounts (LDAP database)
