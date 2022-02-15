@@ -2,10 +2,18 @@
     "name": "LimeSurvey",
     "id": "limesurvey",
     "packaging_format": 1,
-    "version": "3.17.1~ynh1",
     "description": {
-        "en": "LimeSurvey is used to create advanced poll.",
-        "fr": "LimeSurvey est un outil de création et diffusion de sondage en ligne."
+        "en": "Create and distribute surveys",
+        "fr": "Outil de création et diffusion de sondage"
+    },
+    "version": "5.2.6~ynh2",
+    "url": "https://www.limesurvey.org/",
+    "upstream": {
+        "license": "GPL-2.0+",
+        "website": "https://www.limesurvey.org",
+        "admindoc": "https://manual.limesurvey.org/LimeSurvey_Manual/fr",
+        "userdoc": "https://help.limesurvey.org",
+        "code": "https://github.com/LimeSurvey/LimeSurvey"
     },
     "license": "GPL-2.0+",
     "maintainer": {
@@ -13,45 +21,30 @@
         "email": "ljf+limesurvey_ynh@reflexlibre.net",
         "url": "https://reflexlibre.net"
     },
-    "url": "https://www.limesurvey.org/",
     "requirements": {
-        "yunohost": ">= 3.5.2"
+        "yunohost": ">= 4.3.0"
     },
     "multi_instance": true,
     "services": [
         "nginx",
-        "php5-fpm",
+        "php7.3-fpm",
         "mysql"
     ],
     "arguments": {
-        "install" : [
+        "install": [
             {
                 "name": "domain",
-                "type": "domain",
-                "ask": {
-                    "en": "Choose a domain for LimeSurvey",
-                    "fr": "Choisissez un nom de domaine pour LimeSurvey"
-                },
-                "example": "domain.org"
+                "type": "domain"
             },
             {
                 "name": "path",
                 "type": "path",
-                "ask": {
-                    "en": "Choose a path for LimeSurvey",
-                    "fr": "Choisissez l'adresse pour LimeSurvey"
-                },
                 "example": "/poll",
                 "default": "/poll"
             },
             {
                 "name": "admin",
-                "type": "user",
-                "ask": {
-                    "en": "Choose the LimeSurvey administrator (must be an existing YunoHost user)",
-                    "fr": "Choisissez l'administrateur de LimeSurvey (doit être un utilisateur YunoHost)"
-                },
-                "example": "john"
+                "type": "user"
             },
             {
                 "name": "language",
@@ -60,17 +53,133 @@
                     "en": "Choose the default language of this LimeSurvey",
                     "fr": "Choisissez la langue par défault de LimeSurvey"
                 },
-                "choices": ["en", "fr","es", "de"],
+                "choices": [
+                    "af",
+                    "am",
+                    "ar",
+                    "az",
+                    "be",
+                    "bg",
+                    "bn",
+                    "bs",
+                    "ca",
+                    "ca-valencia",
+                    "ceb",
+                    "ckb",
+                    "cnr",
+                    "cs",
+                    "cs-informal",
+                    "cy",
+                    "da",
+                    "de",
+                    "de-easy",
+                    "de-informal",
+                    "el",
+                    "en",
+                    "eo",
+                    "es",
+                    "es-AR",
+                    "es-AR-informal",
+                    "es-CL",
+                    "es-CO",
+                    "es-MX",
+                    "et",
+                    "eu",
+                    "fa",
+                    "fi",
+                    "fil",
+                    "fr",
+                    "ful",
+                    "ga",
+                    "gl",
+                    "gu",
+                    "he",
+                    "hi",
+                    "hil",
+                    "hr",
+                    "hu",
+                    "hy",
+                    "id",
+                    "ilo",
+                    "is",
+                    "it",
+                    "it-informal",
+                    "ja",
+                    "ka",
+                    "kal",
+                    "kk",
+                    "kmr",
+                    "ko",
+                    "ky",
+                    "lb",
+                    "lt",
+                    "lv",
+                    "mk",
+                    "ml",
+                    "mn",
+                    "mr",
+                    "ms",
+                    "mt",
+                    "mya",
+                    "nb",
+                    "nl",
+                    "nl-informal",
+                    "nn",
+                    "ny",
+                    "oc",
+                    "pa",
+                    "pap-CW",
+                    "pl",
+                    "pl-informal",
+                    "prs",
+                    "ps",
+                    "pt",
+                    "pt-BR",
+                    "ro",
+                    "roh",
+                    "ru",
+                    "run",
+                    "rw",
+                    "sah",
+                    "si",
+                    "sk",
+                    "sl",
+                    "smi",
+                    "so",
+                    "sq",
+                    "sr",
+                    "sr-Latn",
+                    "sv",
+                    "swh",
+                    "ta",
+                    "tg",
+                    "th",
+                    "ti",
+                    "tl",
+                    "tr",
+                    "uk",
+                    "ur",
+                    "vi",
+                    "xho",
+                    "zh-Hans",
+                    "zh-Hant-HK",
+                    "zh-Hant-TW",
+                    "zu"
+                ],
                 "default": "en"
             },
             {
-                "name": "is_public",
+                "name": "is_admin_public",
                 "type": "boolean",
-                "ask": {
-                    "en": "Will people without YunoHost account have LimeSurvey account to be able to create polls ?",
-                    "fr": "Est-ce que des personnes sans compte YunoHost aurront un compte LimeSurvey pour créer des questionnaires ?"
+                "help": {
+                    "en": "In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. ",
+                    "fr": "En mode privé, seuls les utilisateurs YunoHost autorisés peuvent créer un sondage. En mode public, il est possible de créer un sondage avec un compte Limesurvey mais sans compte YunoHost."
                 },
-                "default": 1
+                "default": true
+            },
+            {
+                "name": "password",
+                "type": "password"
             }
         ]
     }
