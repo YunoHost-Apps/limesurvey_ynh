@@ -20,16 +20,18 @@ domain=$(ynh_app_setting_get --app=$app --key=domain)
 path_url=$(ynh_app_setting_get --app=$app --key=path)
 admin=$(ynh_app_setting_get --app=$app --key=admin)
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 db_name=$(ynh_app_setting_get --app=$app --key=db_name)
+db_user=$db_name
 db_pwd=$(ynh_app_setting_get --app=$app --key=mysqlpwd)
+datadir=$(ynh_app_setting_get --app=$app --key=datadir)
 phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
-
-prefix=$(ynh_app_setting_get $app prefix)
+prefix=$(ynh_app_setting_get --app=$app --key=prefix)
+is_admin_public=$(ynh_app_setting_get --app=$app --key=is_admin_public)
 
 #=================================================
 # CHECK VERSION
 #=================================================
+ynh_script_progression --message="Checking version..."
 
 upgrade_type=$(ynh_check_app_version_changed)
 
@@ -41,12 +43,14 @@ ynh_script_progression --message="Backing up $app before upgrading (may take a w
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
-    # restore it if the upgrade fails
-    ynh_restore_upgradebackup
+	# Restore it if the upgrade fails
+	ynh_restore_upgradebackup
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
+#=================================================
+# STANDARD UPGRADE STEPS
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
@@ -54,43 +58,50 @@ ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
 
 # If db_name doesn't exist, create it
 if [ -z "$db_name" ]; then
-   db_name=$(ynh_sanitize_dbid --db_name=$app)
-   ynh_app_setting_set --app=$app --key=db_name --value=$db_name
+	db_name=$(ynh_sanitize_dbid --db_name=$app)
+	ynh_app_setting_set --app=$app --key=db_name --value=$db_name
 fi
 
 # If final_path doesn't exist, create it
 if [ -z "$final_path" ]; then
-   final_path=/var/www/$app
-   ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+	final_path=/var/www/$app
+	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 fi
 
 # If datadir doesn't exist, create it
 if [ -z "$datadir" ]; then
-   datadir=/home/yunohost.app/$app/upload
-   ynh_app_setting_set --app=$app --key=datadir --value=$datadir
-   mkdir -p $datadir
-    # Remove upload if empty
-    rmdir $datadir 2> /dev/null && mv "$final_path/upload" $datadir || true
-   chown -R $app:www-data "$datadir"
-   chmod -R o-rwx "$datadir"
-    ln -s $datadir $final_path/upload
+	datadir=/home/yunohost.app/$app/upload
+	ynh_app_setting_set --app=$app --key=datadir --value=$datadir
+	mkdir -p $datadir
+	# Remove upload if empty
+	rmdir $datadir 2> /dev/null && mv "$final_path/upload" $datadir || true
+	chown -R $app:www-data "$datadir"
+	chmod -R o-rwx "$datadir"
+	ln -s $datadir $final_path/upload
 fi
 
 # Cleaning legacy permissions
 if ynh_legacy_permissions_exists; then
-    ynh_legacy_permissions_delete_all
+	ynh_legacy_permissions_delete_all
 
-    ynh_app_setting_delete --app=$app --key=is_admin_public
+	ynh_app_setting_delete --app=$app --key=is_public
 fi
 
 if ! ynh_permission_exists --permission="admin"; then
-    # Create the required permissions
-    ynh_permission_create --permission="admin" --url="/admin" --allowed=$admin
+	# Create the required permissions
+	if [ $is_admin_public -eq 1 ]
+	then
+		allowed_groups="visitors $admin"
+	else
+		allowed_groups="$admin"
+	fi
+	ynh_permission_create --permission="admin" --url="/admin" --allowed=$allowed_groups  --show_tile="true"
+
 fi
 
 # Create a permission if needed
 if ! ynh_permission_exists --permission="api"; then
-    ynh_permission_create --permission="api" --url="/api" --allowed="visitors" --show_tile="false" --protected="true"
+	ynh_permission_create --permission="api" --url="/api" --allowed="visitors" --show_tile="false" --protected="true"
 fi
 
 #=================================================
@@ -102,17 +113,15 @@ ynh_script_progression --message="Making sure dedicated system user exists..." -
 ynh_system_user_create --username=$app --home_dir="$final_path"
 
 #=================================================
-# STANDARD UPGRADE STEPS
-#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
-    ynh_script_progression --message="Upgrading source files..." --weight=1
+	ynh_script_progression --message="Upgrading source files..." --weight=1
 
-    # Download, check integrity, uncompress and patch the source from app.src
-    ynh_setup_source --dest_dir="$final_path" --keep="$(echo $final_path/plugins/*) $final_path/application/config/config.php $final_path/upload"
+	# Download, check integrity, uncompress and patch the source from app.src
+	ynh_setup_source --dest_dir="$final_path" --keep="$(echo $final_path/plugins/*) $final_path/application/config/config.php $final_path/upload"
 fi
 
 chmod 750 "$final_path"
@@ -123,14 +132,6 @@ chmod 750 "$final_path/application/config/"
 chown -R $app:www-data "$datadir"
 chmod 750 $datadir
 ln -s $datadir $final_path/upload 2> /dev/null || true
-
-#=================================================
-# NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Upgrading NGINX web server configuration..." --weight=1
-
-# Create a dedicated NGINX config
-ynh_add_nginx_config
 
 #=================================================
 # UPGRADE DEPENDENCIES
@@ -148,19 +149,35 @@ ynh_script_progression --message="Upgrading PHP-FPM configuration..." --weight=1
 ynh_add_fpm_config
 
 #=================================================
-# CONFIGURE
+# NGINX CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring Limesurvey..." --weight=1
+ynh_script_progression --message="Upgrading NGINX web server configuration..." --weight=1
+
+# Create a dedicated NGINX config
+ynh_add_nginx_config
+
+#=================================================
+# SPECIFIC UPGRADE
+#=================================================
+# UPDATE A CONFIG FILE
+#=================================================
+ynh_script_progression --message="Updating a configuration file..." --weight=1
 
 ynh_add_config --template="../conf/config.php" --destination="$final_path/application/config/config.php"
+
+chmod 400 "$final_path/application/config/config.php"
+chown $app:$app "$final_path/application/config/config.php"
 
 #=================================================
 # UPGRADE DB
 #=================================================
+ynh_script_progression --message="Upgrading DB..."
 
 # Migrate DB
 ynh_exec_as "$app" php $final_path/application/commands/console.php updatedb 
 
+#=================================================
+# GENERIC FINALIZATION
 #=================================================
 # RELOAD NGINX
 #=================================================

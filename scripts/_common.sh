@@ -8,6 +8,7 @@ PKG_DIR=$(cd ../; pwd)
 
 YNH_PHP_VERSION="7.3"
 
+# dependencies used by the app
 pkg_dependencies="php${YNH_PHP_VERSION}-cli php${YNH_PHP_VERSION}-mysql php${YNH_PHP_VERSION}-imap python3-pip php${YNH_PHP_VERSION}-gd php${YNH_PHP_VERSION}-ldap php${YNH_PHP_VERSION}-zip php${YNH_PHP_VERSION}-mbstring"
 
 #=================================================

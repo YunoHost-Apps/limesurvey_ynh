@@ -13,6 +13,9 @@ source /usr/share/yunohost/helpers
 # MANAGE SCRIPT FAILURE
 #=================================================
 
+ynh_clean_setup () {
+	true
+}
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
@@ -22,10 +25,10 @@ ynh_abort_if_errors
 
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
-admin=$YNH_APP_ARG_ADMIN
-is_admin_public=$YNH_APP_ARG_IS_ADMIN_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
+admin=$YNH_APP_ARG_ADMIN
 password=$YNH_APP_ARG_PASSWORD
+is_admin_public=$YNH_APP_ARG_IS_ADMIN_PUBLIC
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -47,8 +50,8 @@ ynh_script_progression --message="Storing installation settings..." --weight=1
 
 ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
-ynh_app_setting_set --app=$app --key=admin --value=$admin
 ynh_app_setting_set --app=$app --key=language --value=$language
+ynh_app_setting_set --app=$app --key=admin --value=$admin
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -94,6 +97,15 @@ chmod 750 "$final_path/upload"
 chmod 750 "$final_path/application/config/"
 
 #=================================================
+# PHP-FPM CONFIGURATION
+#=================================================
+ynh_script_progression --message="Configuring PHP-FPM..." --weight=1
+
+# Create a dedicated PHP-FPM config
+ynh_add_fpm_config
+phpversion=$(ynh_app_setting_get --app=$app --key=phpversion)
+
+#=================================================
 # NGINX CONFIGURATION
 #=================================================
 ynh_script_progression --message="Configuring NGINX web server..." --weight=1
@@ -102,22 +114,15 @@ ynh_script_progression --message="Configuring NGINX web server..." --weight=1
 ynh_add_nginx_config
 
 #=================================================
-# PHP-FPM CONFIGURATION
-#=================================================
-ynh_script_progression --message="Configuring PHP-FPM..." --weight=1
-
-# Create a dedicated PHP-FPM config
-ynh_add_fpm_config
-
-#=================================================
 # SPECIFIC SETUP
 #=================================================
-# CREATE THE DATA DIRECTORY
+# CREATE DATA DIRECTORY
 #=================================================
 ynh_script_progression --message="Creating a data directory..." --weight=1
 
 datadir=/home/yunohost.app/limesurvey/upload
 ynh_app_setting_set --app=$app --key=datadir --value=$datadir
+
 mkdir -p $datadir
 # Remove upload if empty
 rmdir $datadir 2> /dev/null && mv "$final_path/upload" $datadir || true
@@ -126,23 +131,27 @@ chmod -R o-rwx "$datadir"
 ln -s $datadir $final_path/upload 2> /dev/null || true
 
 #=================================================
-# CONFIGURE
+# ADD A CONFIGURATION
 #=================================================
-ynh_script_progression --message="Configuring Limesurvey..." --weight=1
+ynh_script_progression --message="Adding a configuration file..." --weight=1
 
 ynh_add_config --template="../conf/config.php" --destination="$final_path/application/config/config.php"
 
+chmod 400 "$final_path/application/config/config.php"
+chown $app:$app "$final_path/application/config/config.php"
+
 #=================================================
-# INSTALL
+# INSTALL APP
 #=================================================
+ynh_script_progression --message="Installing app..."
 
 ls_cli=$final_path/application/commands/console.php
 
-fullname=$(ynh_user_get_info "$admin" "fullname")
-mail=$(ynh_user_get_info "$admin" "mail")
+fullname=$(ynh_user_get_info --username="$admin" --key="fullname")
+mail=$(ynh_user_get_info --username="$admin" --key="mail")
 
 # Permission should be correctly set before to do this
-ynh_exec_as "$app" php $ls_cli install "$admin" "$password" "$fullname" "$mail"
+ynh_exec_as "$app" php$phpversion $ls_cli install "$admin" "$password" "$fullname" "$mail"
 
 # Permission should be correctly set before to do this
 #ynh_exec_as "$app" php $ls_cli install "$admin" "$(ynh_string_random 24)" "$fullname" "$mail"
@@ -150,6 +159,8 @@ ynh_exec_as "$app" php $ls_cli install "$admin" "$password" "$fullname" "$mail"
 #=================================================
 # LOAD SQL SPECIFIC CONFIG
 #=================================================
+ynh_script_progression --message="Loading SQL specific config..."
+
 ynh_add_config --template="../conf/data.sql" --destination="./data.sql"
 
 ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name" < ./data.sql
@@ -157,30 +168,30 @@ ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name
 ynh_secure_remove --file=./data.sql
 
 #=================================================
-# Add nice themes
+# ADD NICE THEMES
 #=================================================
+#ynh_script_progression --message="Adding nice themes..."
 
 #ynh_setup_source "$datadir/upload/templates/libreform" libreform
 #ynh_setup_source "$final_path/upload/templates/librepoll" librepoll
 
 #=================================================
-# SETUP FAIL2BAN
-#=================================================
-# No message in logs and the apps contains already a 10 minutes ban policy
-
+# GENERIC FINALIZATION
 #=================================================
 # SETUP SSOWAT
 #=================================================
 ynh_script_progression --message="Configuring permissions..." --weight=1
 
+# Everyone can access the app.
+# The "main" permission is automatically created before the install script.
+ynh_permission_update --permission="main" --add="visitors"
+
 if [ $is_admin_public -eq 1 ]
 then
-    allowed_groups="visitors $admin"
+	allowed_groups="visitors $admin"
 else
-    allowed_groups="$admin"
+	allowed_groups="$admin"
 fi
-ynh_permission_update --permission="main" --show_tile="false" --add="visitors"
-
 ynh_permission_create --permission="admin" --url="/admin" --allowed=$allowed_groups  --show_tile="true"
 
 
