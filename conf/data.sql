@@ -1,12 +1,12 @@
 
-UPDATE lime_plugins SET active=1 WHERE name="AuthLDAP";
+UPDATE __PREFIX__plugins SET active=1 WHERE name="AuthLDAP";
 
-INSERT INTO `lime_permissions` (`id`, `entity`, `entity_id`, `uid`, `permission`, `create_p`, `read_p`, `update_p`, `delete_p`, `import_p`, `export_p`) VALUES 
+INSERT INTO `__PREFIX__permissions` (`id`, `entity`, `entity_id`, `uid`, `permission`, `create_p`, `read_p`, `update_p`, `delete_p`, `import_p`, `export_p`) VALUES 
 (2,'global',0,2,'auth_ldap',0,1,0,0,0,0),
 (3,'global',0,2,'surveys',1,0,0,0,0,0);
 
 
-INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key`, `value`) VALUES
+INSERT INTO `__PREFIX__plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key`, `value`) VALUES
 (2, 5, NULL, NULL, 'server', '\"ldap:\\/\\/localhost\"'),
 (3, 5, NULL, NULL, 'ldapport', '\"\"'),
 (4, 5, NULL, NULL, 'ldapversion', '\"3\"'),
@@ -35,6 +35,6 @@ INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key
 #(24, 7, NULL, NULL, 'serverkey', '"REMOTE_USER"'),
 #(25, 7,NULL,NULL,'is_default','\"1\"');
 
-INSERT INTO `lime_settings_global` VALUES
+INSERT INTO `__PREFIX__settings_global` VALUES
 ('defaultlang','__LANGUAGE__'),
 ('AssetsVersion','30214');

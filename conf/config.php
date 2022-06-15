@@ -28,10 +28,10 @@ return array(
         'db' => array(
             'connectionString' => 'mysql:host=localhost;port=3306;dbname=__DB_NAME__;',
             'emulatePrepare' => true,
-            'username' => '__DB_NAME__',
+            'username' => '__DB_USER__',
             'password' => '__DB_PWD__',
             'charset' => 'utf8mb4',
-            'tablePrefix' => 'lime_',
+            'tablePrefix' => '__PREFIX__',
         ),
 
         'emcache' => array('class' => 'CFileCache'),
@@ -65,7 +65,7 @@ return array(
         // 'use_asset_manager'=>true, // Uncomment if you want to use debug mode and asset manager at the same time
         'enableLdap' => true,
         'force_ssl' => true,
-        'uploaddir' => '__DATADIR__'
+        'uploaddir' => '__DATADIR__/upload'
     )
 );
 /* End of file config.php */

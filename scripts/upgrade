@@ -68,6 +68,12 @@ if [ -z "$final_path" ]; then
 	ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 fi
 
+# If prefix doesn't exist, create it
+if [ -z "$prefix" ]; then
+	prefix="lime_"
+	ynh_app_setting_set --app=$app --key=prefix --value=$prefix
+fi
+
 # If datadir doesn't exist, create it
 if [ -z "$datadir" ]; then
 	datadir=/home/yunohost.app/$app/upload
@@ -77,7 +83,7 @@ if [ -z "$datadir" ]; then
 	rmdir $datadir 2> /dev/null && mv "$final_path/upload" $datadir || true
 	chown -R $app:www-data "$datadir"
 	chmod -R o-rwx "$datadir"
-	ln -s $datadir $final_path/upload
+	ln -s $datadir/upload $final_path/upload
 fi
 
 # Cleaning legacy permissions
@@ -131,7 +137,7 @@ chmod 750 "$final_path/tmp"
 chmod 750 "$final_path/application/config/"
 chown -R $app:www-data "$datadir"
 chmod 750 $datadir
-ln -s $datadir $final_path/upload 2> /dev/null || true
+ln -s $datadir/upload $final_path/upload 2> /dev/null || true
 
 #=================================================
 # UPGRADE DEPENDENCIES
@@ -174,7 +180,7 @@ chown $app:$app "$final_path/application/config/config.php"
 ynh_script_progression --message="Upgrading DB..."
 
 # Migrate DB
-ynh_exec_as "$app" php $final_path/application/commands/console.php updatedb 
+ynh_exec_as "$app" php$phpversion $final_path/application/commands/console.php updatedb 
 
 #=================================================
 # GENERIC FINALIZATION
