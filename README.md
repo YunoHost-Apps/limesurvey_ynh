@@ -5,7 +5,7 @@ It shall NOT be edited by hand.
 
 # LimeSurvey for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)  
+[![Integration level](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![Working status](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)  
 [![Install LimeSurvey with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 
 *[Lire ce readme en français.](./README_fr.md)*
@@ -17,13 +17,11 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 Create and distribute surveys
 
-**Shipped version:** 5.2.6~ynh2
-
-
+**Shipped version:** 5.2.6~ynh3
 
 ## Screenshots
 
-![](./doc/screenshots/create_html_statistic_screen.png)
+![Screenshot of LimeSurvey](./doc/screenshots/create_html_statistic_screen.png)
 
 ## Disclaimers / important information
 
@@ -32,22 +30,23 @@ Create and distribute surveys
 * The application is integrated with YunoHost accounts (LDAP database)
 ## Documentation and resources
 
-* Official app website: https://www.limesurvey.org
-* Official user documentation: https://help.limesurvey.org
-* Official admin documentation: https://manual.limesurvey.org/LimeSurvey_Manual/fr
-* Upstream app code repository: https://github.com/LimeSurvey/LimeSurvey
-* YunoHost documentation for this app: https://yunohost.org/app_limesurvey
-* Report a bug: https://github.com/YunoHost-Apps/limesurvey_ynh/issues
+* Official app website: <https://www.limesurvey.org>
+* Official user documentation: <https://help.limesurvey.org>
+* Official admin documentation: <https://manual.limesurvey.org/LimeSurvey_Manual/fr>
+* Upstream app code repository: <https://github.com/LimeSurvey/LimeSurvey>
+* YunoHost documentation for this app: <https://yunohost.org/app_limesurvey>
+* Report a bug: <https://github.com/YunoHost-Apps/limesurvey_ynh/issues>
 
 ## Developer info
 
 Please send your pull request to the [testing branch](https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing).
 
 To try the testing branch, please proceed like that.
-```
+
+``` bash
 sudo yunohost app install https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --debug
 or
 sudo yunohost app upgrade limesurvey -u https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --debug
 ```
 
-**More info regarding app packaging:** https://yunohost.org/packaging_apps
+**More info regarding app packaging:** <https://yunohost.org/packaging_apps>
