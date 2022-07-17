@@ -6,7 +6,7 @@
         "en": "Create and distribute surveys",
         "fr": "Outil de création et diffusion de sondage"
     },
-    "version": "5.2.6~ynh3",
+    "version": "5.2.6~ynh4",
     "url": "https://www.limesurvey.org/",
     "upstream": {
         "license": "GPL-2.0+",
@@ -175,7 +175,7 @@
             {
                 "name": "is_admin_public",
                 "type": "boolean",
-                "help": {
+                "ask": {
                     "en": "In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. ",
                     "fr": "En mode privé, seuls les utilisateurs YunoHost autorisés peuvent créer un sondage. En mode public, il est possible de créer un sondage avec un compte Limesurvey mais sans compte YunoHost."
                 },
