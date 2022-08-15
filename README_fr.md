@@ -18,7 +18,8 @@ Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour
 Outil de création et diffusion de sondage
 
 
-**Version incluse :** 5.2.6~ynh4
+**Version incluse :** 5.2.6~ynh4
+
 
 ## Captures d'écran
 
