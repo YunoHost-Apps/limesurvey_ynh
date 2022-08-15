@@ -1,3 +1,5 @@
 ## YunoHost specific features
 
-* The application is integrated with YunoHost accounts (LDAP database)
+* In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. 
+* SSO and LDAP are configured.
+* Login secured by fail2ban

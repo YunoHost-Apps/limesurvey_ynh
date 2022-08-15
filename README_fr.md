@@ -17,7 +17,8 @@ Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour
 
 Outil de création et diffusion de sondage
 
-**Version incluse :** 5.2.6~ynh3
+
+**Version incluse :** 5.2.6~ynh4
 
 ## Captures d'écran
 
@@ -25,9 +26,12 @@ Outil de création et diffusion de sondage
 
 ## Avertissements / informations importantes
 
-## YunoHost specific features
+## Caractéristiques spécifiques de YunoHost
 
-* The application is integrated with YunoHost accounts (LDAP database)
+* En mode privé, seuls les membres autorisés de YunoHost peuvent créer des sondages, en mode public, il est possible de créer des comptes pour les personnes n'ayant pas de compte YunoHost.
+* SSO et LDAP sont configurés.
+* Login sécurisé par fail2ban
+
 ## Documentations et ressources
 
 * Site officiel de l'app : <https://www.limesurvey.org>
