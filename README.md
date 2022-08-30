@@ -15,9 +15,11 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 ## Overview
 
-Create and distribute surveys
+LimeSurvey is used to create advanced poll.
 
-**Shipped version:** 5.2.6~ynh3
+
+**Shipped version:** 5.2.6~ynh4
+
 
 ## Screenshots
 
@@ -27,7 +29,10 @@ Create and distribute surveys
 
 ## YunoHost specific features
 
-* The application is integrated with YunoHost accounts (LDAP database)
+* In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. 
+* SSO and LDAP are configured.
+* Login secured by fail2ban
+
 ## Documentation and resources
 
 * Official app website: <https://www.limesurvey.org>
