@@ -75,19 +75,13 @@ checksum=$(sha256sum "$tempdir/$filename" | head -c 64)
 # Delete temporary directory
 rm -rf $tempdir
 
-# Get extension
-if [[ $filename == *.tar.gz ]]; then
-  extension=tar.gz
-else
-  extension=${filename##*.}
-fi
 
 # Rewrite source file
 cat <<EOT > conf/$src.src
 SOURCE_URL=$asset_url
 SOURCE_SUM=$checksum
 SOURCE_SUM_PRG=sha256sum
-SOURCE_FORMAT=$extension
+SOURCE_FORMAT=tar.gz
 SOURCE_IN_SUBDIR=true
 SOURCE_FILENAME=limesurvey.tar.gz
 SOURCE_EXTRACT=true
