@@ -20,7 +20,6 @@ LimeSurvey is used to create advanced poll.
 
 **Shipped version:** 5.2.6~ynh4
 
-
 ## Screenshots
 
 ![Screenshot of LimeSurvey](./doc/screenshots/create_html_statistic_screen.png)
