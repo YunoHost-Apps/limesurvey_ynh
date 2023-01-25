@@ -18,7 +18,7 @@ Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) po
 Outil de création et diffusion de sondage
 
 
-**Version incluse :** 5.6.1+230123~ynh1
+**Version incluse :** 5.6.1~ynh1
 
 ## Captures d’écran
 
@@ -26,7 +26,7 @@ Outil de création et diffusion de sondage
 
 ## Avertissements / informations importantes
 
-## Caractéristiques spécifiques de YunoHost
+### Caractéristiques spécifiques de YunoHost
 
 * En mode privé, seuls les membres autorisés de YunoHost peuvent créer des sondages, en mode public, il est possible de créer des comptes pour les personnes n'ayant pas de compte YunoHost.
 * SSO et LDAP sont configurés.
