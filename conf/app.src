@@ -1,5 +1,5 @@
-SOURCE_URL=https://api.github.com/repos/LimeSurvey/LimeSurvey/tarball/refs/tags/5.6.1+230123
-SOURCE_SUM=7956d0b93028572ab4e35964561591663ab7f4fe2aca2cc7cb2adb331eff7ce6
+SOURCE_URL=https://api.github.com/repos/LimeSurvey/LimeSurvey/tarball/refs/tags/5.6.4+230206
+SOURCE_SUM=82a2759ffbfae483291329d8a9e1aeb2ddcb0abc32b9975e871197332203179b
 SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=tar.gz
 SOURCE_IN_SUBDIR=true
