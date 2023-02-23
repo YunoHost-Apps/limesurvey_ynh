@@ -6,6 +6,7 @@ It shall NOT be edited by hand.
 # LimeSurvey for YunoHost
 
 [![Integration level](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![Working status](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
+
 [![Install LimeSurvey with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 
 *[Lire ce readme en français.](./README_fr.md)*
