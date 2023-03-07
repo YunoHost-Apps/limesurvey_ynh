@@ -6,7 +6,7 @@
         "en": "Create and distribute surveys",
         "fr": "Outil de création et diffusion de sondage"
     },
-    "version": "5.6.1~ynh1",
+    "version": "5.6.8+230227~ynh1",
     "url": "https://www.limesurvey.org/",
     "upstream": {
         "license": "GPL-2.0+",
