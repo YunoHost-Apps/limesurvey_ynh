@@ -5,7 +5,8 @@ It shall NOT be edited by hand.
 
 # LimeSurvey for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![Working status](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)  
+[![Integration level](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![Working status](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
+
 [![Install LimeSurvey with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 
 *[Lire ce readme en français.](./README_fr.md)*
@@ -18,7 +19,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 LimeSurvey is used to create advanced poll.
 
 
-**Shipped version:** 5.2.6~ynh4
+**Shipped version:** 5.6.8+230227~ynh1
 
 ## Screenshots
 
@@ -26,7 +27,7 @@ LimeSurvey is used to create advanced poll.
 
 ## Disclaimers / important information
 
-## YunoHost specific features
+### YunoHost specific features
 
 * In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. 
 * SSO and LDAP are configured.

@@ -5,28 +5,29 @@ It shall NOT be edited by hand.
 
 # LimeSurvey pour YunoHost
 
-[![Niveau d'intégration](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)  
+[![Niveau d’intégration](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
+
 [![Installer LimeSurvey avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 
 *[Read this readme in english.](./README.md)*
 
-> *Ce package vous permet d'installer LimeSurvey rapidement et simplement sur un serveur YunoHost.
-Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l'installer et en profiter.*
+> *Ce package vous permet d’installer LimeSurvey rapidement et simplement sur un serveur YunoHost.
+Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l’installer et en profiter.*
 
-## Vue d'ensemble
+## Vue d’ensemble
 
 Outil de création et diffusion de sondage
 
 
-**Version incluse :** 5.2.6~ynh4
+**Version incluse :** 5.6.8+230227~ynh1
 
-## Captures d'écran
+## Captures d’écran
 
-![Capture d'écran de LimeSurvey](./doc/screenshots/create_html_statistic_screen.png)
+![Capture d’écran de LimeSurvey](./doc/screenshots/create_html_statistic_screen.png)
 
 ## Avertissements / informations importantes
 
-## Caractéristiques spécifiques de YunoHost
+### Caractéristiques spécifiques de YunoHost
 
 * En mode privé, seuls les membres autorisés de YunoHost peuvent créer des sondages, en mode public, il est possible de créer des comptes pour les personnes n'ayant pas de compte YunoHost.
 * SSO et LDAP sont configurés.
@@ -34,10 +35,10 @@ Outil de création et diffusion de sondage
 
 ## Documentations et ressources
 
-* Site officiel de l'app : <https://www.limesurvey.org>
+* Site officiel de l’app : <https://www.limesurvey.org>
 * Documentation officielle utilisateur : <https://help.limesurvey.org>
-* Documentation officielle de l'admin : <https://manual.limesurvey.org/LimeSurvey_Manual/fr>
-* Dépôt de code officiel de l'app : <https://github.com/LimeSurvey/LimeSurvey>
+* Documentation officielle de l’admin : <https://manual.limesurvey.org/LimeSurvey_Manual/fr>
+* Dépôt de code officiel de l’app : <https://github.com/LimeSurvey/LimeSurvey>
 * Documentation YunoHost pour cette app : <https://yunohost.org/app_limesurvey>
 * Signaler un bug : <https://github.com/YunoHost-Apps/limesurvey_ynh/issues>
 
@@ -53,4 +54,4 @@ ou
 sudo yunohost app upgrade limesurvey -u https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --debug
 ```
 
-**Plus d'infos sur le packaging d'applications :** <https://yunohost.org/packaging_apps>
+**Plus d’infos sur le packaging d’applications :** <https://yunohost.org/packaging_apps>

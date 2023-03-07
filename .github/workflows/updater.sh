@@ -4,6 +4,13 @@
 # PACKAGE UPDATING HELPER
 #=================================================
 
+# This script is meant to be run by GitHub Actions
+# The YunoHost-Apps organisation offers a template Action to run this script periodically
+# Since each app is different, maintainers can adapt its contents so as to perform
+# automatic actions when a new upstream release is detected.
+
+# Remove this exit command when you are ready to run this Action
+exit 1
 
 #=================================================
 # FETCHING LATEST RELEASE AND ITS ASSETS
@@ -75,13 +82,19 @@ checksum=$(sha256sum "$tempdir/$filename" | head -c 64)
 # Delete temporary directory
 rm -rf $tempdir
 
+# Get extension
+if [[ $filename == *.tar.gz ]]; then
+  extension=tar.gz
+else
+  extension=${filename##*.}
+fi
 
 # Rewrite source file
 cat <<EOT > conf/$src.src
 SOURCE_URL=$asset_url
 SOURCE_SUM=$checksum
 SOURCE_SUM_PRG=sha256sum
-SOURCE_FORMAT=tar.gz
+SOURCE_FORMAT=$extension
 SOURCE_IN_SUBDIR=true
 SOURCE_FILENAME=limesurvey.tar.gz
 SOURCE_EXTRACT=true
