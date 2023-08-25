@@ -1,0 +1,18 @@
+test_format = 1.0
+
+[default]
+
+    # -------------------------------
+    # Default args to use for install
+    # -------------------------------
+    
+#    args.admin = "john"
+#    args.password = "1Strong-Password"
+#    args.is_admin_public
+
+    # -------------------------------
+    # Commits to test upgrade from
+    # -------------------------------
+
+    test_upgrade_from.58cac7dfc0d0b835898d56238e550c775be7255b.name = "Upgrade from 5.2.6~ynh2"
+    test_upgrade_from.73fa31321aa056102c8a1c79efc3946753190c9c.name = "Upgrade from 5.2.6~ynh3"

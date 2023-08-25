@@ -1,0 +1,87 @@
+packaging_format = 2
+
+id = "limesurvey"
+name = "LimeSurvey"
+description.en = "Create and distribute surveys"
+description.fr = "Outil de création et diffusion de sondage"
+
+version = "5.6.8+230227~ynh1"
+
+maintainers = ["ljf"]
+
+[upstream]
+license = "GPL-2.0+"
+website = "https://www.limesurvey.org"
+admindoc = "https://manual.limesurvey.org/LimeSurvey_Manual/fr"
+userdoc = "https://help.limesurvey.org"
+code = "https://github.com/LimeSurvey/LimeSurvey"
+cpe = "cpe:2.3:a:limesurvey:limesurvey"
+
+[integration]
+yunohost = ">= 11.0.9"
+architectures = "all"
+multi_instance = true
+ldap = true
+sso = true
+disk = "50M" # FIXME: replace with an **estimate** minimum disk requirement. e.g. 20M, 400M, 1G, ...
+ram.build = "50M" # FIXME: replace with an **estimate** minimum ram requirement. e.g. 50M, 400M, 1G, ...
+ram.runtime = "50M" # FIXME: replace with an **estimate** minimum ram requirement. e.g. 50M, 400M, 1G, ...
+
+[install]
+    [install.domain]
+    type = "domain"
+
+    [install.path]
+    type = "path"
+    default = "/poll"
+
+    [install.language]
+    ask.en = "Choose the default language of this LimeSurvey"
+    ask.fr = "Choisissez la langue par défault de LimeSurvey"
+    type = "string"
+    choices = ["af", "am", "ar", "az", "be", "bg", "bn", "bs", "ca", "ca-valencia", "ceb", "ckb", "cnr", "cs", "cs-informal", "cy", "da", "de", "de-easy", "de-informal", "el", "en", "eo", "es", "es-AR", "es-AR-informal", "es-CL", "es-CO", "es-MX", "et", "eu", "fa", "fi", "fil", "fr", "ful", "ga", "gl", "gu", "he", "hi", "hil", "hr", "hu", "hy", "id", "ilo", "is", "it", "it-informal", "ja", "ka", "kal", "kk", "kmr", "ko", "ky", "lb", "lt", "lv", "mk", "ml", "mn", "mr", "ms", "mt", "mya", "nb", "nl", "nl-informal", "nn", "ny", "oc", "pa", "pap-CW", "pl", "pl-informal", "prs", "ps", "pt", "pt-BR", "ro", "roh", "ru", "run", "rw", "sah", "si", "sk", "sl", "smi", "so", "sq", "sr", "sr-Latn", "sv", "swh", "ta", "tg", "th", "ti", "tl", "tr", "uk", "ur", "vi", "xho", "zh-Hans", "zh-Hant-HK", "zh-Hant-TW", "zu"]
+    default = "en"
+
+    [install.admin]
+    type = "user"
+
+    [install.password]
+    type = "password"
+
+    [install.init_admin_permission]
+    ask.en = "If you select Visitors here, they will be able to create surveys with a Limesurvey account and without YunoHost account."
+    ask.fr = "Si vous sélectionnez Visiteurs ici, il sera possible de créer un sondage avec un compte Limesurvey mais sans compte YunoHost."
+    type = "group"
+
+[resources]
+    [resources.sources]
+        [resources.sources.libreform]
+        url = "https://github.com/zamentur/libreform/archive/40fad776c33271ecc028b9260fb7f9e300998e5f.tar.gz"
+        sha256 = "4c0a96d610c6740ff7467cf1916a923949bf4c00e99a3cd33509335f884e138b"
+
+        [resources.sources.main]
+        url = "https://api.github.com/repos/LimeSurvey/LimeSurvey/tarball/refs/tags/5.6.8+230227"
+        sha256 = "eedad74060c71673b4ff0dbc466957d317add672d0e32984c83141b8b0ff3757"
+
+        autoupdate.strategy = "latest_github_tag"
+        format = "tar.gz"
+		in_subdir = true
+		
+    [resources.system_user]
+
+    [resources.install_dir]
+
+    [resources.data_dir]
+    subdirs = ["upload"]
+    
+    [resources.permissions]
+    main.url = "/"
+    main.allowed = "visitors"
+
+    admin.url = "/admin"
+
+    [resources.apt]
+    packages = "php7.3-cli, php7.3-mysql, php7.3-imap, python3-pip, php7.3-gd, php7.3-ldap, php7.3-zip, php7.3-mbstring"
+
+    [resources.database]
+    type = "mysql"
