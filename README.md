@@ -25,14 +25,6 @@ LimeSurvey is used to create advanced poll.
 
 ![Screenshot of LimeSurvey](./doc/screenshots/create_html_statistic_screen.png)
 
-## Disclaimers / important information
-
-### YunoHost specific features
-
-* In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. 
-* SSO and LDAP are configured.
-* Login secured by fail2ban
-
 ## Documentation and resources
 
 * Official app website: <https://www.limesurvey.org>
