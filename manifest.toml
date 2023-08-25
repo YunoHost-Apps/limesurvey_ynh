@@ -38,7 +38,7 @@ ram.runtime = "50M"
     [install.language]
     ask.en = "Choose the default language of this LimeSurvey"
     ask.fr = "Choisissez la langue par défault de LimeSurvey"
-    type = "string"
+    type = "select"
     choices = ["af", "am", "ar", "az", "be", "bg", "bn", "bs", "ca", "ca-valencia", "ceb", "ckb", "cnr", "cs", "cs-informal", "cy", "da", "de", "de-easy", "de-informal", "el", "en", "eo", "es", "es-AR", "es-AR-informal", "es-CL", "es-CO", "es-MX", "et", "eu", "fa", "fi", "fil", "fr", "ful", "ga", "gl", "gu", "he", "hi", "hil", "hr", "hu", "hy", "id", "ilo", "is", "it", "it-informal", "ja", "ka", "kal", "kk", "kmr", "ko", "ky", "lb", "lt", "lv", "mk", "ml", "mn", "mr", "ms", "mt", "mya", "nb", "nl", "nl-informal", "nn", "ny", "oc", "pa", "pap-CW", "pl", "pl-informal", "prs", "ps", "pt", "pt-BR", "ro", "roh", "ru", "run", "rw", "sah", "si", "sk", "sl", "smi", "so", "sq", "sr", "sr-Latn", "sv", "swh", "ta", "tg", "th", "ti", "tl", "tr", "uk", "ur", "vi", "xho", "zh-Hans", "zh-Hant-HK", "zh-Hant-TW", "zu"]
     default = "en"
 
