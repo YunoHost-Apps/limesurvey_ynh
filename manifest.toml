@@ -23,9 +23,9 @@ architectures = "all"
 multi_instance = true
 ldap = true
 sso = true
-disk = "50M" # FIXME: replace with an **estimate** minimum disk requirement. e.g. 20M, 400M, 1G, ...
-ram.build = "50M" # FIXME: replace with an **estimate** minimum ram requirement. e.g. 50M, 400M, 1G, ...
-ram.runtime = "50M" # FIXME: replace with an **estimate** minimum ram requirement. e.g. 50M, 400M, 1G, ...
+disk = "50M"
+ram.build = "300M"
+ram.runtime = "50M"
 
 [install]
     [install.domain]
@@ -65,7 +65,7 @@ ram.runtime = "50M" # FIXME: replace with an **estimate** minimum ram requiremen
 
         autoupdate.strategy = "latest_github_tag"
         format = "tar.gz"
-		in_subdir = true
+        in_subdir = true
 		
     [resources.system_user]
 
@@ -81,7 +81,7 @@ ram.runtime = "50M" # FIXME: replace with an **estimate** minimum ram requiremen
     admin.url = "/admin"
 
     [resources.apt]
-    packages = "php7.3-cli, php7.3-mysql, php7.3-imap, python3-pip, php7.3-gd, php7.3-ldap, php7.3-zip, php7.3-mbstring"
+    packages = "mariadb-server, php7.3-cli, php7.3-mysql, php7.3-imap, python3-pip, php7.3-gd, php7.3-ldap, php7.3-zip, php7.3-mbstring"
 
     [resources.database]
     type = "mysql"

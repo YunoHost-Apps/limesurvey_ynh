@@ -96,15 +96,6 @@ ynh_secure_remove --file=./data.sql
 #ynh_setup_source "$install_dir/upload/templates/librepoll" librepoll
 
 #=================================================
-# GENERIC FINALIZATION
-#=================================================
-# SETUP SSOWAT
-#=================================================
-
-# Grant $admin access to /admin, whether or not Visitors has been selected in the installation form
-ynh_permission_update --permission="admin" --add="$admin"
-
-#=================================================
 # END OF SCRIPT
 #=================================================
 
