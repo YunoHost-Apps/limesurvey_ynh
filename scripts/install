@@ -129,7 +129,6 @@ mkdir -p $datadir/upload/surveys
 rmdir $datadir 2> /dev/null && mv "$final_path/upload" $datadir || true
 chmod -R o-rwx "$datadir"
 chown -R $app:www-data "$datadir"
-chown -h $app:www-data upload
 ln -s $datadir/upload $final_path/upload 2> /dev/null || true
 
 #=================================================
