@@ -123,7 +123,7 @@ ynh_script_progression --message="Creating a data directory..." --weight=1
 datadir=/home/yunohost.app/$app
 ynh_app_setting_set --app=$app --key=datadir --value=$datadir
 
-mkdir -p $datadir/upload
+mkdir -p $datadir/upload/surveys
 
 # Remove upload if empty
 rmdir $datadir 2> /dev/null && mv "$final_path/upload" $datadir || true
