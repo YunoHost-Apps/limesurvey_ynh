@@ -39,7 +39,7 @@ LimeSurvey is used to create advanced poll.
 * Official user documentation: <https://help.limesurvey.org>
 * Official admin documentation: <https://manual.limesurvey.org/LimeSurvey_Manual/fr>
 * Upstream app code repository: <https://github.com/LimeSurvey/LimeSurvey>
-* YunoHost documentation for this app: <https://yunohost.org/app_limesurvey>
+* YunoHost Store: <https://apps.yunohost.org/app/limesurvey>
 * Report a bug: <https://github.com/YunoHost-Apps/limesurvey_ynh/issues>
 
 ## Developer info
