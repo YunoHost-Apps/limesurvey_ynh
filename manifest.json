@@ -44,7 +44,7 @@
             },
             {
                 "name": "language",
-                "type": "string",
+                "type": "select",
                 "ask": {
                     "en": "Choose the default language of this LimeSurvey",
                     "fr": "Choisissez la langue par défault de LimeSurvey"
