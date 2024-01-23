@@ -19,19 +19,11 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 LimeSurvey is used to create advanced poll.
 
 
-**Shipped version:** 5.6.8+230227~ynh1
+**Shipped version:** 5.6.8+230227~ynh2
 
 ## Screenshots
 
 ![Screenshot of LimeSurvey](./doc/screenshots/create_html_statistic_screen.png)
-
-## Disclaimers / important information
-
-### YunoHost specific features
-
-* In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. 
-* SSO and LDAP are configured.
-* Login secured by fail2ban
 
 ## Documentation and resources
 
