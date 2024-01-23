@@ -85,6 +85,7 @@ ram.runtime = "50M" # FIXME: replace with an **estimate** minimum ram requiremen
     packages = [
         "python3-pip",
         "php7.4-cli",
+        "php7.4-fpm",
         "php7.4-mysql",
         "php7.4-imap",
         "php7.4-gd",
