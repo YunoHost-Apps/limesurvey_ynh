@@ -81,7 +81,7 @@ ram.runtime = "50M"
     [resources.permissions]
     main.url = "/"
     admin.url = "/admin"
-    admin.allowed = "admin"
+    admin.allowed = "admins"
 
     [resources.apt]
     packages = [
