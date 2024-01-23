@@ -33,13 +33,24 @@ if [ ! -L "$install_dir/upload" ]; then
     mv "$install_dir/upload" "$data_dir/upload"
 fi
 
+# Legacy permission setting
+if [ -z "${is_admin_public:-}" ]; then
+    if [ "$is_admin_public" -eq 1 ]; then
+        ynh_permission_update --permission="admin" --add="visitors"
+    fi
+    ynh_app_setting_delete --app="$app" --key=is_admin_public
+fi
+
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression --message="Upgrading source files..." --weight=1
 
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep="plugins/ application/config/config.php upload"
+ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep="plugins/ application/config/config.php"
+
+ynh_secure_remove --file="$install_dir/upload"
+ln -s "$data_dir/upload" "$install_dir/upload"
 
 chmod 750 "$install_dir"
 chmod -R o-rwx "$install_dir"

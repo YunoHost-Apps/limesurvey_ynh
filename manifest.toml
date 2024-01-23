@@ -37,6 +37,12 @@ ram.runtime = "50M"
     type = "path"
     default = "/poll"
 
+    [install.init_main_permission]
+    # this is a generic question - ask strings are automatically handled by YunoHost's core
+    # This won't be saved as setting and will instead be used to initialize the SSOwat permission
+    type = "group"
+    default = "visitors"
+
     [install.language]
     ask.en = "Choose the default language of this LimeSurvey"
     ask.fr = "Choisissez la langue par défault de LimeSurvey"
@@ -49,12 +55,6 @@ ram.runtime = "50M"
 
     [install.password]
     type = "password"
-
-    [install.is_admin_public]
-    ask.en = "In private mode, only authorized YunoHost members can create poll, with the public mode, it's possible to create account to people with no YunoHost account. "
-    ask.fr = "En mode privé, seuls les utilisateurs YunoHost autorisés peuvent créer un sondage. En mode public, il est possible de créer un sondage avec un compte Limesurvey mais sans compte YunoHost."
-    type = "boolean"
-    default = true
 
 [resources]
     [resources.sources]
@@ -80,6 +80,8 @@ ram.runtime = "50M"
 
     [resources.permissions]
     main.url = "/"
+    admin.url = "/admin"
+    admin.allowed = "admin"
 
     [resources.apt]
     packages = [
@@ -92,6 +94,7 @@ ram.runtime = "50M"
         "php7.4-ldap",
         "php7.4-zip",
         "php7.4-mbstring",
+        "mariadb-server",
     ]
 
     [resources.database]
