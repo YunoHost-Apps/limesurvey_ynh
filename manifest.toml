@@ -68,6 +68,7 @@ ram.runtime = "50M"
     sha256 = "4c0a96d610c6740ff7467cf1916a923949bf4c00e99a3cd33509335f884e138b"
     autoupdate.strategy = "latest_github_commit"
     autoupdate.upstream = "https://github.com/zamentur/libreform"
+    prefetch = false
 
     [resources.system_user]
 

@@ -26,7 +26,12 @@ ynh_script_progression --message="Setting up source files..." --weight=1
 ynh_setup_source --dest_dir="$install_dir"
 
 # Move upload directory to data_dir, with a symlink
-mv "$install_dir/upload" "$data_dir"
+if [ -d "$data_dir/upload" ]; then
+    ynh_warn "An upload directory already exist, reusing it."
+else
+    mv "$install_dir/upload" "$data_dir"
+fi
+
 ln -s "$data_dir/upload" "$install_dir/upload"
 
 chmod 750 "$install_dir"
