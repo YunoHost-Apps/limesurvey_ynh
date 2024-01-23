@@ -15,7 +15,7 @@ source /usr/share/yunohost/helpers
 
 # Database prefix
 prefix=lime_
-ynh_app_setting_set --app=$app --key=prefix --value=$prefix
+ynh_app_setting_set --app="$app" --key=prefix --value="$prefix"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -25,6 +25,8 @@ ynh_script_progression --message="Setting up source files..." --weight=1
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
 
+# Move upload directory to data_dir, with a symlink
+mv "$install_dir/upload" "$data_dir"
 ln -s "$data_dir/upload" "$install_dir/upload"
 
 chmod 750 "$install_dir"

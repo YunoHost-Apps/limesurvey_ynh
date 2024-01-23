@@ -39,16 +39,13 @@ fi
 ynh_script_progression --message="Upgrading source files..." --weight=1
 
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep="plugins/ application/config/config.php"
-
-ln -s "$data_dir/upload" "$install_dir/upload"
+ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep="plugins/ application/config/config.php upload"
 
 chmod 750 "$install_dir"
-chmod 750 "$install_dir/tmp"
-chmod 750 "$install_dir/application/config/"
 chmod -R o-rwx "$install_dir"
 chown -R "$app:www-data" "$install_dir"
 
+# Set permissions just in case
 chmod 750 "$data_dir"
 chown -R "$app:www-data" "$data_dir"
 

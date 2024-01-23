@@ -74,7 +74,6 @@ ram.runtime = "50M"
     [resources.install_dir]
 
     [resources.data_dir]
-    subdirs = ["upload"]
     owner = "__APP__:rwx"
     group = "www-data:rwx"
 
