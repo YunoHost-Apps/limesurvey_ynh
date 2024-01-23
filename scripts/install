@@ -27,7 +27,7 @@ ynh_setup_source --dest_dir="$install_dir"
 
 # Move upload directory to data_dir, with a symlink
 if [ -d "$data_dir/upload" ]; then
-    ynh_warn "An upload directory already exist, reusing it."
+    ynh_print_warn "An upload directory already exist, reusing it."
 else
     mv "$install_dir/upload" "$data_dir"
 fi
