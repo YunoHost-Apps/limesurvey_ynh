@@ -83,14 +83,14 @@ ram.runtime = "50M" # FIXME: replace with an **estimate** minimum ram requiremen
 
     [resources.apt]
     packages = [
-        "php7.3-cli",
-        "php7.3-mysql",
-        "php7.3-imap",
         "python3-pip",
-        "php7.3-gd",
-        "php7.3-ldap",
-        "php7.3-zip",
-        "php7.3-mbstring",
+        "php7.4-cli",
+        "php7.4-mysql",
+        "php7.4-imap",
+        "php7.4-gd",
+        "php7.4-ldap",
+        "php7.4-zip",
+        "php7.4-mbstring",
     ]
 
     [resources.database]
