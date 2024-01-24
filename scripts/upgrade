@@ -34,7 +34,7 @@ if [ ! -L "$install_dir/upload" ]; then
 fi
 
 # Legacy permission setting
-if [ -z "${is_admin_public:-}" ]; then
+if [ -n "${is_admin_public:-}" ]; then
     if [ "$is_admin_public" -eq 1 ]; then
         ynh_permission_update --permission="admin" --add="visitors"
     fi
