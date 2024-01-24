@@ -1,7 +1,0 @@
-SOURCE_URL=https://api.github.com/repos/LimeSurvey/LimeSurvey/tarball/refs/tags/5.6.8+230227
-SOURCE_SUM=eedad74060c71673b4ff0dbc466957d317add672d0e32984c83141b8b0ff3757
-SOURCE_SUM_PRG=sha256sum
-SOURCE_FORMAT=tar.gz
-SOURCE_IN_SUBDIR=true
-SOURCE_FILENAME=limesurvey.tar.gz
-SOURCE_EXTRACT=true

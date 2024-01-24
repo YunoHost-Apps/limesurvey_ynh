@@ -19,19 +19,11 @@ Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) po
 Outil de création et diffusion de sondage
 
 
-**Version incluse :** 5.6.8+230227~ynh1
+**Version incluse :** 5.6.8+230227~ynh2
 
 ## Captures d’écran
 
 ![Capture d’écran de LimeSurvey](./doc/screenshots/create_html_statistic_screen.png)
-
-## Avertissements / informations importantes
-
-### Caractéristiques spécifiques de YunoHost
-
-* En mode privé, seuls les membres autorisés de YunoHost peuvent créer des sondages, en mode public, il est possible de créer des comptes pour les personnes n'ayant pas de compte YunoHost.
-* SSO et LDAP sont configurés.
-* Login sécurisé par fail2ban
 
 ## Documentations et ressources
 

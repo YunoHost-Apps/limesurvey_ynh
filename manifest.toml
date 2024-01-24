@@ -1,0 +1,101 @@
+#:schema https://raw.githubusercontent.com/YunoHost/apps/master/schemas/manifest.v2.schema.json
+
+packaging_format = 2
+
+id = "limesurvey"
+name = "LimeSurvey"
+description.en = "Create and distribute surveys"
+description.fr = "Outil de création et diffusion de sondage"
+
+version = "5.6.8+230227~ynh2"
+
+maintainers = ["ljf"]
+
+[upstream]
+license = "GPL-2.0+"
+website = "https://www.limesurvey.org"
+admindoc = "https://manual.limesurvey.org/LimeSurvey_Manual/fr"
+userdoc = "https://help.limesurvey.org"
+code = "https://github.com/LimeSurvey/LimeSurvey"
+cpe = "cpe:2.3:a:limesurvey:limesurvey"
+
+[integration]
+yunohost = ">= 11.0.9"
+architectures = "all"
+multi_instance = true
+ldap = true
+sso = true
+disk = "50M"
+ram.build = "150M"
+ram.runtime = "50M"
+
+[install]
+    [install.domain]
+    type = "domain"
+
+    [install.path]
+    type = "path"
+    default = "/poll"
+
+    [install.init_main_permission]
+    # this is a generic question - ask strings are automatically handled by YunoHost's core
+    # This won't be saved as setting and will instead be used to initialize the SSOwat permission
+    type = "group"
+    default = "visitors"
+
+    [install.language]
+    ask.en = "Choose the default language of this LimeSurvey"
+    ask.fr = "Choisissez la langue par défault de LimeSurvey"
+    type = "select"
+    choices = ["af", "am", "ar", "az", "be", "bg", "bn", "bs", "ca", "ca-valencia", "ceb", "ckb", "cnr", "cs", "cs-informal", "cy", "da", "de", "de-easy", "de-informal", "el", "en", "eo", "es", "es-AR", "es-AR-informal", "es-CL", "es-CO", "es-MX", "et", "eu", "fa", "fi", "fil", "fr", "ful", "ga", "gl", "gu", "he", "hi", "hil", "hr", "hu", "hy", "id", "ilo", "is", "it", "it-informal", "ja", "ka", "kal", "kk", "kmr", "ko", "ky", "lb", "lt", "lv", "mk", "ml", "mn", "mr", "ms", "mt", "mya", "nb", "nl", "nl-informal", "nn", "ny", "oc", "pa", "pap-CW", "pl", "pl-informal", "prs", "ps", "pt", "pt-BR", "ro", "roh", "ru", "run", "rw", "sah", "si", "sk", "sl", "smi", "so", "sq", "sr", "sr-Latn", "sv", "swh", "ta", "tg", "th", "ti", "tl", "tr", "uk", "ur", "vi", "xho", "zh-Hans", "zh-Hant-HK", "zh-Hant-TW", "zu"]
+    default = "en"
+
+    [install.admin]
+    type = "user"
+
+    [install.password]
+    type = "password"
+
+[resources]
+    [resources.sources]
+    [resources.sources.main]
+    url = "https://api.github.com/repos/LimeSurvey/LimeSurvey/tarball/refs/tags/5.6.8+230227"
+    sha256 = "eedad74060c71673b4ff0dbc466957d317add672d0e32984c83141b8b0ff3757"
+    autoupdate.strategy = "latest_github_tag"
+
+    [resources.sources.libreform]
+    url = "https://github.com/zamentur/libreform/archive/40fad776c33271ecc028b9260fb7f9e300998e5f.tar.gz"
+    sha256 = "4c0a96d610c6740ff7467cf1916a923949bf4c00e99a3cd33509335f884e138b"
+    autoupdate.strategy = "latest_github_commit"
+    autoupdate.upstream = "https://github.com/zamentur/libreform"
+    prefetch = false
+
+    [resources.system_user]
+
+    [resources.install_dir]
+
+    [resources.data_dir]
+    owner = "__APP__:rwx"
+    group = "www-data:rwx"
+
+    [resources.permissions]
+    main.url = "/"
+    admin.url = "/admin"
+    admin.allowed = "admins"
+
+    [resources.apt]
+    packages = [
+        "python3-pip",
+        "php7.4-cli",
+        "php7.4-fpm",
+        "php7.4-mysql",
+        "php7.4-imap",
+        "php7.4-gd",
+        "php7.4-ldap",
+        "php7.4-zip",
+        "php7.4-mbstring",
+        "mariadb-server",
+    ]
+
+    [resources.database]
+    type = "mysql"

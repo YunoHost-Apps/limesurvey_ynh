@@ -65,7 +65,7 @@ return array(
         // 'use_asset_manager'=>true, // Uncomment if you want to use debug mode and asset manager at the same time
         'enableLdap' => true,
         'force_ssl' => true,
-        'uploaddir' => '__DATADIR__/upload'
+        'uploaddir' => '__DATA_DIR__/upload'
     )
 );
 /* End of file config.php */

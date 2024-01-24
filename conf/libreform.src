@@ -1,4 +1,0 @@
-SOURCE_URL=https://github.com/zamentur/libreform/archive/40fad776c33271ecc028b9260fb7f9e300998e5f.tar.gz
-SOURCE_SUM=4c0a96d610c6740ff7467cf1916a923949bf4c00e99a3cd33509335f884e138b
-SOURCE_SUM_PRG=sha256sum
-SOURCE_FILENAME=libreform-40fad776c33271ecc028b9260fb7f9e300998e5f.tar.gz
