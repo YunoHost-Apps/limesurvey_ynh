@@ -59,8 +59,8 @@ ram.runtime = "50M"
 [resources]
     [resources.sources]
     [resources.sources.main]
-    url = "https://api.github.com/repos/LimeSurvey/LimeSurvey/tarball/refs/tags/5.6.8+230227"
-    sha256 = "eedad74060c71673b4ff0dbc466957d317add672d0e32984c83141b8b0ff3757"
+    url = "https://github.com/LimeSurvey/LimeSurvey/archive/5.6.8+230227.tar.gz"
+    sha256 = "68e559068fa9043c4420f917f219b571d14a5567fb1c82c7c6fb2493bbdec681"
     autoupdate.strategy = "latest_github_tag"
 
     [resources.sources.libreform]
