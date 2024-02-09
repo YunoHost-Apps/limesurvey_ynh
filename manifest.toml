@@ -61,7 +61,6 @@ ram.runtime = "50M"
     [resources.sources.main]
     url = "https://github.com/LimeSurvey/LimeSurvey/archive/5.6.8+230227.tar.gz"
     sha256 = "68e559068fa9043c4420f917f219b571d14a5567fb1c82c7c6fb2493bbdec681"
-    autoupdate.strategy = "latest_github_tag"
 
     [resources.sources.libreform]
     url = "https://github.com/zamentur/libreform/archive/40fad776c33271ecc028b9260fb7f9e300998e5f.tar.gz"
