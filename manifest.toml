@@ -7,7 +7,7 @@ name = "LimeSurvey"
 description.en = "Create and distribute surveys"
 description.fr = "Outil de création et diffusion de sondage"
 
-version = "5.6.8+230227~ynh2"
+version = "6.4.5+240205~ynh2"
 
 maintainers = ["ljf"]
 
