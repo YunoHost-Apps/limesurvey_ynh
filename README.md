@@ -19,7 +19,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 LimeSurvey is used to create advanced poll.
 
 
-**Shipped version:** 6.4.5+240205~ynh2
+**Shipped version:** 6.4.6+240212~ynh1
 
 ## Screenshots
 
