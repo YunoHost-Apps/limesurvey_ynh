@@ -59,8 +59,8 @@ ram.runtime = "50M"
 [resources]
     [resources.sources]
     [resources.sources.main]
-    url = "https://github.com/LimeSurvey/LimeSurvey/archive/refs/tags/6.4.5+240205.tar.gz"
-    sha256 = "96318c85ddf2fd5b6af91f3eb67843ca74ff293f4ac79a016c26710a60b5bda1"
+    url = "https://github.com/LimeSurvey/LimeSurvey/archive/refs/tags/6.4.6+240212.tar.gz"
+    sha256 = "56bb08660f56b53e9157959de7cc1d975251df7af71a485c1755546181820f2f"
     autoupdate.strategy = "latest_github_tag"
     autoupdate.version_regex = "^(.*)\\+.*$"
 
