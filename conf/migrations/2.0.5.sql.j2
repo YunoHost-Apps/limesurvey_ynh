@@ -1,6 +1,0 @@
-INSERT INTO `{{ prefix }}plugin_settings` (`plugin_id`, `model`, `model_id`, `key`, `value`) VALUES ( (SELECT id FROM `{{ prefix }}plugins` WHERE name='Authwebserver'),NULL,NULL,'is_default','\"1\"')
-  ON DUPLICATE KEY UPDATE value='\"1\"';
-
-{% if is_public == "1" %}
-UPDATE `{{ prefix }}plugin_settings` ps, `lime_plugins` p SET ps.value='\"0\"' WHERE p.name='Authwebserver' AND p.id=ps.plugin_id AND ps.`key`='is_default';
-{% endif %} 
