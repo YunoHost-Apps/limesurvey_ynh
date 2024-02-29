@@ -19,7 +19,7 @@ Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) po
 Outil de création et diffusion de sondage
 
 
-**Version incluse :** 6.4.7+240219~ynh1
+**Version incluse :** 6.4.9+240226~ynh1
 
 ## Captures d’écran
 
