@@ -18,8 +18,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 LimeSurvey is used to create advanced poll.
 
-
-**Shipped version:** 6.4.9+240226~ynh1
+**Shipped version:** 6.4.12~ynh1
 
 ## Screenshots
 
@@ -27,12 +26,12 @@ LimeSurvey is used to create advanced poll.
 
 ## Documentation and resources
 
-* Official app website: <https://www.limesurvey.org>
-* Official user documentation: <https://help.limesurvey.org>
-* Official admin documentation: <https://manual.limesurvey.org/LimeSurvey_Manual/fr>
-* Upstream app code repository: <https://github.com/LimeSurvey/LimeSurvey>
-* YunoHost Store: <https://apps.yunohost.org/app/limesurvey>
-* Report a bug: <https://github.com/YunoHost-Apps/limesurvey_ynh/issues>
+- Official app website: <https://www.limesurvey.org>
+- Official user documentation: <https://help.limesurvey.org>
+- Official admin documentation: <https://manual.limesurvey.org/LimeSurvey_Manual/fr>
+- Upstream app code repository: <https://github.com/LimeSurvey/LimeSurvey>
+- YunoHost Store: <https://apps.yunohost.org/app/limesurvey>
+- Report a bug: <https://github.com/YunoHost-Apps/limesurvey_ynh/issues>
 
 ## Developer info
 
@@ -40,7 +39,7 @@ Please send your pull request to the [testing branch](https://github.com/YunoHos
 
 To try the testing branch, please proceed like that.
 
-``` bash
+```bash
 sudo yunohost app install https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --debug
 or
 sudo yunohost app upgrade limesurvey -u https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --debug

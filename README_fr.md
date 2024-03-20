@@ -18,8 +18,7 @@ Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) po
 
 Outil de création et diffusion de sondage
 
-
-**Version incluse :** 6.4.9+240226~ynh1
+**Version incluse :** 6.4.12~ynh1
 
 ## Captures d’écran
 
@@ -27,12 +26,12 @@ Outil de création et diffusion de sondage
 
 ## Documentations et ressources
 
-* Site officiel de l’app : <https://www.limesurvey.org>
-* Documentation officielle utilisateur : <https://help.limesurvey.org>
-* Documentation officielle de l’admin : <https://manual.limesurvey.org/LimeSurvey_Manual/fr>
-* Dépôt de code officiel de l’app : <https://github.com/LimeSurvey/LimeSurvey>
-* YunoHost Store: <https://apps.yunohost.org/app/limesurvey>
-* Signaler un bug : <https://github.com/YunoHost-Apps/limesurvey_ynh/issues>
+- Site officiel de l’app : <https://www.limesurvey.org>
+- Documentation officielle utilisateur : <https://help.limesurvey.org>
+- Documentation officielle de l’admin : <https://manual.limesurvey.org/LimeSurvey_Manual/fr>
+- Dépôt de code officiel de l’app : <https://github.com/LimeSurvey/LimeSurvey>
+- YunoHost Store : <https://apps.yunohost.org/app/limesurvey>
+- Signaler un bug : <https://github.com/YunoHost-Apps/limesurvey_ynh/issues>
 
 ## Informations pour les développeurs
 
@@ -40,7 +39,7 @@ Merci de faire vos pull request sur la [branche testing](https://github.com/Yuno
 
 Pour essayer la branche testing, procédez comme suit.
 
-``` bash
+```bash
 sudo yunohost app install https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --debug
 ou
 sudo yunohost app upgrade limesurvey -u https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --debug
