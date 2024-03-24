@@ -95,6 +95,7 @@ ram.runtime = "50M"
         "php8.2-ldap",
         "php8.2-zip",
         "php8.2-mbstring",
+        "php8.2-xml",
         "mariadb-server",
     ]
 
