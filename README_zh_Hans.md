@@ -3,7 +3,7 @@
 请勿手动编辑。
 -->
 
-# YunoHost 的 LimeSurvey
+# YunoHost 上的 LimeSurvey
 
 [![集成程度](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![工作状态](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
 
@@ -19,7 +19,7 @@
 LimeSurvey is used to create advanced poll.
 
 
-**分发版本：** 6.5.4~ynh1
+**分发版本：** 6.5.5~ynh1
 
 ## 截图
 
