@@ -19,7 +19,7 @@
 LimeSurvey is used to create advanced poll.
 
 
-**分发版本：** 6.5.6~ynh1
+**分发版本：** 6.5.7~ynh1
 
 ## 截图
 
