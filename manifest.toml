@@ -20,7 +20,7 @@ code = "https://github.com/LimeSurvey/LimeSurvey"
 cpe = "cpe:2.3:a:limesurvey:limesurvey"
 
 [integration]
-yunohost = ">= 11.0.9"
+yunohost = ">= 11.2"
 architectures = "all"
 multi_instance = true
 ldap = true
@@ -38,8 +38,6 @@ ram.runtime = "50M"
     default = "/poll"
 
     [install.init_main_permission]
-    # this is a generic question - ask strings are automatically handled by YunoHost's core
-    # This won't be saved as setting and will instead be used to initialize the SSOwat permission
     type = "group"
     default = "visitors"
 

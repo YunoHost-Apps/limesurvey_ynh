@@ -43,7 +43,7 @@ chown -R "$app:www-data" "$install_dir"
 #=================================================
 ynh_script_progression --message="Adding a configuration file..." --weight=1
 
-ynh_add_config --template="../conf/config.php" --destination="$install_dir/application/config/config.php"
+ynh_add_config --template="config.php" --destination="$install_dir/application/config/config.php"
 
 chmod 400 "$install_dir/application/config/config.php"
 chown "$app:$app" "$install_dir/application/config/config.php"
@@ -66,7 +66,7 @@ ynh_exec_as "$app" "php$phpversion" "$ls_cli" install "$admin" "$password" "$ful
 #=================================================
 ynh_script_progression --message="Loading SQL specific config..."
 
-ynh_add_config --template="../conf/data.sql" --destination="./data.sql"
+ynh_add_config --template="data.sql" --destination="./data.sql"
 
 ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name" < ./data.sql
 
