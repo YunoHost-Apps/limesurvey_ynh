@@ -7,7 +7,7 @@ name = "LimeSurvey"
 description.en = "Create and distribute surveys"
 description.fr = "Outil de création et diffusion de sondage"
 
-version = "6.5.7~ynh1"
+version = "6.5.8~ynh1"
 
 maintainers = ["ljf"]
 
@@ -20,7 +20,7 @@ code = "https://github.com/LimeSurvey/LimeSurvey"
 cpe = "cpe:2.3:a:limesurvey:limesurvey"
 
 [integration]
-yunohost = ">= 11.0.9"
+yunohost = ">= 11.2"
 architectures = "all"
 multi_instance = true
 ldap = true
@@ -38,8 +38,6 @@ ram.runtime = "50M"
     default = "/poll"
 
     [install.init_main_permission]
-    # this is a generic question - ask strings are automatically handled by YunoHost's core
-    # This won't be saved as setting and will instead be used to initialize the SSOwat permission
     type = "group"
     default = "visitors"
 
@@ -59,8 +57,8 @@ ram.runtime = "50M"
 [resources]
     [resources.sources]
     [resources.sources.main]
-    url = "https://github.com/LimeSurvey/LimeSurvey/archive/refs/tags/6.5.7+240515.tar.gz"
-    sha256 = "a9d8b31fddba18054a472b3bcd1fca185e901e978f675883a9b0e0ec92a01c0b"
+    url = "https://github.com/LimeSurvey/LimeSurvey/archive/refs/tags/6.5.8+240517.tar.gz"
+    sha256 = "f5b126c0f90d1ab2f9f5789e905e48bde4c5fd85da07e7d2df9c6f627db349b6"
     autoupdate.strategy = "latest_github_tag"
     autoupdate.version_regex = "^(.*)\\+.*$"
 
@@ -83,6 +81,7 @@ ram.runtime = "50M"
     main.url = "/"
     admin.url = "/admin"
     admin.allowed = "admins"
+    admin.show_tile = false
 
     [resources.apt]
     packages = [
