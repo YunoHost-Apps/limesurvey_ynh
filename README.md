@@ -19,7 +19,7 @@ It shall NOT be edited by hand.
 LimeSurvey is used to create advanced poll.
 
 
-**Shipped version:** 6.5.8~ynh1
+**Shipped version:** 6.5.9~ynh1
 
 ## Screenshots
 
