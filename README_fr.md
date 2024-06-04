@@ -19,7 +19,7 @@ Il NE doit PAS être modifié à la main.
 Outil de création et diffusion de sondage
 
 
-**Version incluse :** 6.5.8~ynh1
+**Version incluse :** 6.5.9~ynh1
 
 ## Captures d’écran
 
