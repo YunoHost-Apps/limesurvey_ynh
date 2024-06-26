@@ -5,7 +5,7 @@ EZ editatu eskuz.
 
 # LimeSurvey YunoHost-erako
 
-[![Integrazio maila](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
+[![Integrazio maila](https://dash.yunohost.org/integration/limesurvey.svg)](https://ci-apps.yunohost.org/ci/apps/limesurvey/) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
 
 [![Instalatu LimeSurvey YunoHost-ekin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 

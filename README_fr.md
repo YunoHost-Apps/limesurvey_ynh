@@ -5,7 +5,7 @@ Il NE doit PAS être modifié à la main.
 
 # LimeSurvey pour YunoHost
 
-[![Niveau d’intégration](https://dash.yunohost.org/integration/limesurvey.svg)](https://dash.yunohost.org/appci/app/limesurvey) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
+[![Niveau d’intégration](https://dash.yunohost.org/integration/limesurvey.svg)](https://ci-apps.yunohost.org/ci/apps/limesurvey/) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
 
 [![Installer LimeSurvey avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 
