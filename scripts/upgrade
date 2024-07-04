@@ -27,7 +27,7 @@ if [ ! -L "$install_dir/upload" ]; then
     if [ -z "$(ls -A "$data_dir/upload")" ]; then
         rmdir "$data_dir/upload"
     else
-        ynh_warn "$data_dir/upload is not empty, moving to $data_dir/upload_backup. You can decide to remove it or merge it with the new upload dir."
+        ynh_print_warn "$data_dir/upload is not empty, moving to $data_dir/upload_backup. You can decide to remove it or merge it with the new upload dir."
         mv "$data_dir/upload" "$data_dir/upload_backup"
     fi
     mv "$install_dir/upload" "$data_dir/upload"
