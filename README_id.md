@@ -19,7 +19,7 @@ Ini TIDAK boleh diedit dengan tangan.
 LimeSurvey is used to create advanced poll.
 
 
-**Versi terkirim:** 6.5.17~ynh1
+**Versi terkirim:** 6.5.18~ynh1
 
 ## Tangkapan Layar
 
@@ -30,7 +30,7 @@ LimeSurvey is used to create advanced poll.
 - Website aplikasi resmi: <https://www.limesurvey.org>
 - Dokumentasi pengguna resmi: <https://help.limesurvey.org>
 - Dokumentasi admin resmi: <https://manual.limesurvey.org/LimeSurvey_Manual/fr>
-- Repositori kode aplikasi hulu: <https://github.com/LimeSurvey/LimeSurvey>
+- Depot kode aplikasi hulu: <https://github.com/LimeSurvey/LimeSurvey>
 - Gudang YunoHost: <https://apps.yunohost.org/app/limesurvey>
 - Laporkan bug: <https://github.com/YunoHost-Apps/limesurvey_ynh/issues>
 

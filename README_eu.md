@@ -19,7 +19,7 @@ EZ editatu eskuz.
 LimeSurvey is used to create advanced poll.
 
 
-**Paketatutako bertsioa:** 6.5.17~ynh1
+**Paketatutako bertsioa:** 6.5.18~ynh1
 
 ## Pantaila-argazkiak
 
