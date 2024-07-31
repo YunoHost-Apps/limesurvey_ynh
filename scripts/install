@@ -37,6 +37,7 @@ ln -s "$data_dir/upload" "$install_dir/upload"
 chmod 750 "$install_dir"
 chmod -R o-rwx "$install_dir"
 chown -R "$app:www-data" "$install_dir"
+chown -R "$app:www-data" "$data_dir/upload"
 
 #=================================================
 # ADD A CONFIGURATION
