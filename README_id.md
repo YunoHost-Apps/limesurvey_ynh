@@ -19,7 +19,7 @@ Ini TIDAK boleh diedit dengan tangan.
 LimeSurvey is used to create advanced poll.
 
 
-**Versi terkirim:** 6.6.0~ynh1
+**Versi terkirim:** 6.6.1~ynh1
 
 ## Tangkapan Layar
 
