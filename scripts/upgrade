@@ -1,26 +1,15 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# STANDARD UPGRADE STEPS
-#=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..." --weight=1
+ynh_script_progression "Ensuring downward compatibility..."
 
 # If prefix doesn't exist, create it
-if [ -z "${prefix:-}" ]; then
-    prefix="lime_"
-    ynh_app_setting_set --app=$app --key=prefix --value=$prefix
-fi
+ynh_app_setting_set_default --key=prefix --value="lime_"
 
 # if install_dir/upload is not a symlink, moving data...
 if [ ! -L "$install_dir/upload" ]; then
@@ -39,61 +28,49 @@ if [ -n "${is_admin_public:-}" ]; then
         # Small trick to clear package linter...
         "ynh"_permission_update --permission="admin" --add="visitors"
     fi
-    ynh_app_setting_delete --app="$app" --key=is_admin_public
+    ynh_app_setting_delete --key=is_admin_public
 fi
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Upgrading source files..." --weight=1
+ynh_script_progression "Upgrading source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep="plugins/ application/config/config.php"
+ynh_setup_source --dest_dir="$install_dir" --full_replace --keep="plugins/ application/config/config.php"
 
-ynh_secure_remove --file="$install_dir/upload"
+ynh_safe_rm "$install_dir/upload"
 ln -s "$data_dir/upload" "$install_dir/upload"
-
-chmod 750 "$install_dir"
-chmod -R o-rwx "$install_dir"
-chown -R "$app:www-data" "$install_dir"
 
 # Set permissions just in case
 chmod 750 "$data_dir"
 chown -R "$app:www-data" "$data_dir"
 
 #=================================================
-# SPECIFIC UPGRADE
-#=================================================
 # UPDATE A CONFIG FILE
 #=================================================
-ynh_script_progression --message="Updating a configuration file..." --weight=1
+ynh_script_progression "Updating configuration..."
 
-ynh_add_config --template="../conf/config.php" --destination="$install_dir/application/config/config.php"
-
-chmod 400 "$install_dir/application/config/config.php"
-chown "$app:$app" "$install_dir/application/config/config.php"
+ynh_config_add --template="config.php" --destination="$install_dir/application/config/config.php"
 
 #=================================================
 # UPGRADE DB
 #=================================================
-ynh_script_progression --message="Running Database migrations..."
+ynh_script_progression "Running Database migrations..."
 
 # Migrate DB
-ynh_exec_as "$app" "php$phpversion" "$install_dir/application/commands/console.php" updatedb
+ynh_exec_as_app "php$php_version" "$install_dir/application/commands/console.php" updatedb
 
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Upgrading system configurations related to $app..." --weight=1
+ynh_script_progression "Upgrading system configurations related to $app..."
 
-# Create a dedicated PHP-FPM config
-ynh_add_fpm_config
+ynh_config_add_phpfpm
 
-# Create a dedicated NGINX config
-ynh_add_nginx_config
+ynh_config_add_nginx
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression "Upgrade of $app completed"

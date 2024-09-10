@@ -1,11 +1,5 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
@@ -15,14 +9,13 @@ source /usr/share/yunohost/helpers
 
 # Database prefix
 prefix=lime_
-ynh_app_setting_set --app="$app" --key=prefix --value="$prefix"
+ynh_app_setting_set --key=prefix --value="$prefix"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Setting up source files..." --weight=1
+ynh_script_progression "Setting up source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
 
 # Move upload directory to data_dir, with a symlink
@@ -34,25 +27,19 @@ fi
 
 ln -s "$data_dir/upload" "$install_dir/upload"
 
-chmod 750 "$install_dir"
-chmod -R o-rwx "$install_dir"
-chown -R "$app:www-data" "$install_dir"
 chown -R "$app:www-data" "$data_dir/upload"
 
 #=================================================
 # ADD A CONFIGURATION
 #=================================================
-ynh_script_progression --message="Adding a configuration file..." --weight=1
+ynh_script_progression "Adding $app's configuration..."
 
-ynh_add_config --template="config.php" --destination="$install_dir/application/config/config.php"
-
-chmod 400 "$install_dir/application/config/config.php"
-chown "$app:$app" "$install_dir/application/config/config.php"
+ynh_config_add --template="config.php" --destination="$install_dir/application/config/config.php"
 
 #=================================================
 # INSTALL APP
 #=================================================
-ynh_script_progression --message="Installing app..."
+ynh_script_progression "Installing app..."
 
 ls_cli="$install_dir/application/commands/console.php"
 
@@ -60,23 +47,23 @@ fullname=$(ynh_user_get_info --username="$admin" --key="fullname")
 mail=$(ynh_user_get_info --username="$admin" --key="mail")
 
 # Permission should be correctly set before to do this
-ynh_exec_as "$app" "php$phpversion" "$ls_cli" install "$admin" "$password" "$fullname" "$mail"
+ynh_exec_as_app "php$php_version" "$ls_cli" install "$admin" "$password" "$fullname" "$mail"
 
 #=================================================
 # LOAD SQL SPECIFIC CONFIG
 #=================================================
-ynh_script_progression --message="Loading SQL specific config..."
+ynh_script_progression "Loading SQL specific config..."
 
-ynh_add_config --template="data.sql" --destination="./data.sql"
+ynh_config_add --template="data.sql" --destination="./data.sql"
 
-ynh_mysql_connect_as --user="$db_user" --password="$db_pwd" --database="$db_name" < ./data.sql
+ynh_mysql_db_shell < ./data.sql
 
-ynh_secure_remove --file=./data.sql
+ynh_safe_rm ./data.sql
 
 #=================================================
 # ADD NICE THEMES
 #=================================================
-#ynh_script_progression --message="Adding nice themes..."
+#ynh_script_progression "Adding nice themes..."
 
 #ynh_setup_source "$data_dir/upload/templates/libreform" libreform
 #ynh_setup_source "$install_dir/upload/templates/librepoll" librepoll
@@ -84,16 +71,14 @@ ynh_secure_remove --file=./data.sql
 #=================================================
 # SYSTEM CONFIGURATION
 #=================================================
-ynh_script_progression --message="Adding system configurations related to $app..." --weight=1
+ynh_script_progression "Adding system configurations related to $app..."
 
-# Create a dedicated PHP-FPM config
-ynh_add_fpm_config
+ynh_config_add_phpfpm
 
-# Create a dedicated NGINX config
-ynh_add_nginx_config
+ynh_config_add_nginx
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Installation of $app completed" --last
+ynh_script_progression "Installation of $app completed"
