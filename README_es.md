@@ -19,7 +19,7 @@ No se debe editar a mano.
 LimeSurvey is used to create advanced poll.
 
 
-**Versión actual:** 6.6.1~ynh1
+**Versión actual:** 6.6.2~ynh1
 
 ## Capturas
 
@@ -36,7 +36,7 @@ LimeSurvey is used to create advanced poll.
 
 ## Información para desarrolladores
 
-Por favor enviar sus correcciones a la [`branch testing`](https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing
+Por favor enviar sus correcciones a la [rama `testing`](https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing).
 
 Para probar la rama `testing`, sigue asÍ:
 
