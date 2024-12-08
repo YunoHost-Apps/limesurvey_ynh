@@ -5,7 +5,9 @@ No se debe editar a mano.
 
 # LimeSurvey para Yunohost
 
-[![Nivel de integración](https://dash.yunohost.org/integration/limesurvey.svg)](https://ci-apps.yunohost.org/ci/apps/limesurvey/) ![Estado funcional](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Estado En Mantención](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
+[![Nivel de integración](https://apps.yunohost.org/badge/integration/limesurvey)](https://ci-apps.yunohost.org/ci/apps/limesurvey/)
+![Estado funcional](https://apps.yunohost.org/badge/state/limesurvey)
+![Estado En Mantención](https://apps.yunohost.org/badge/maintained/limesurvey)
 
 [![Instalar LimeSurvey con Yunhost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 
@@ -19,7 +21,7 @@ No se debe editar a mano.
 LimeSurvey is used to create advanced poll.
 
 
-**Versión actual:** 6.8.0~ynh1
+**Versión actual:** 6.8.1~ynh1
 
 ## Capturas
 
