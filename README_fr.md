@@ -5,7 +5,9 @@ Il NE doit PAS être modifié à la main.
 
 # LimeSurvey pour YunoHost
 
-[![Niveau d’intégration](https://dash.yunohost.org/integration/limesurvey.svg)](https://ci-apps.yunohost.org/ci/apps/limesurvey/) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
+[![Niveau d’intégration](https://apps.yunohost.org/badge/integration/limesurvey)](https://ci-apps.yunohost.org/ci/apps/limesurvey/)
+![Statut du fonctionnement](https://apps.yunohost.org/badge/state/limesurvey)
+![Statut de maintenance](https://apps.yunohost.org/badge/maintained/limesurvey)
 
 [![Installer LimeSurvey avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 
@@ -19,7 +21,7 @@ Il NE doit PAS être modifié à la main.
 Outil de création et diffusion de sondage
 
 
-**Version incluse :** 6.8.0~ynh1
+**Version incluse :** 6.8.1~ynh1
 
 ## Captures d’écran
 
