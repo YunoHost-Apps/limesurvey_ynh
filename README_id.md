@@ -5,7 +5,9 @@ Ini TIDAK boleh diedit dengan tangan.
 
 # LimeSurvey untuk YunoHost
 
-[![Tingkat integrasi](https://dash.yunohost.org/integration/limesurvey.svg)](https://ci-apps.yunohost.org/ci/apps/limesurvey/) ![Status kerja](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Status pemeliharaan](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
+[![Tingkat integrasi](https://apps.yunohost.org/badge/integration/limesurvey)](https://ci-apps.yunohost.org/ci/apps/limesurvey/)
+![Status kerja](https://apps.yunohost.org/badge/state/limesurvey)
+![Status pemeliharaan](https://apps.yunohost.org/badge/maintained/limesurvey)
 
 [![Pasang LimeSurvey dengan YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 
@@ -19,7 +21,7 @@ Ini TIDAK boleh diedit dengan tangan.
 LimeSurvey is used to create advanced poll.
 
 
-**Versi terkirim:** 6.8.0~ynh1
+**Versi terkirim:** 6.8.1~ynh1
 
 ## Tangkapan Layar
 

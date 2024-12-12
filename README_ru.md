@@ -5,7 +5,9 @@
 
 # LimeSurvey для YunoHost
 
-[![Уровень интеграции](https://dash.yunohost.org/integration/limesurvey.svg)](https://ci-apps.yunohost.org/ci/apps/limesurvey/) ![Состояние работы](https://ci-apps.yunohost.org/ci/badges/limesurvey.status.svg) ![Состояние сопровождения](https://ci-apps.yunohost.org/ci/badges/limesurvey.maintain.svg)
+[![Уровень интеграции](https://apps.yunohost.org/badge/integration/limesurvey)](https://ci-apps.yunohost.org/ci/apps/limesurvey/)
+![Состояние работы](https://apps.yunohost.org/badge/state/limesurvey)
+![Состояние сопровождения](https://apps.yunohost.org/badge/maintained/limesurvey)
 
 [![Установите LimeSurvey с YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=limesurvey)
 
@@ -19,7 +21,7 @@
 LimeSurvey is used to create advanced poll.
 
 
-**Поставляемая версия:** 6.8.0~ynh1
+**Поставляемая версия:** 6.8.1~ynh1
 
 ## Снимки экрана
 
