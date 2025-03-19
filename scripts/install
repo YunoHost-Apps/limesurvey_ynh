@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
 source _common.sh
 source /usr/share/yunohost/helpers
 
@@ -16,6 +20,7 @@ ynh_app_setting_set --key=prefix --value="$prefix"
 #=================================================
 ynh_script_progression "Setting up source files..."
 
+# Download, check integrity, uncompress and patch the source from manifest.toml
 ynh_setup_source --dest_dir="$install_dir"
 
 # Move upload directory to data_dir, with a symlink
@@ -30,11 +35,22 @@ ln -s "$data_dir/upload" "$install_dir/upload"
 chown -R "$app:www-data" "$data_dir/upload"
 
 #=================================================
-# ADD A CONFIGURATION
+# APP INITIAL CONFIGURATION
 #=================================================
-ynh_script_progression "Adding $app's configuration..."
+ynh_script_progression "Adding $app's configuration files..."
 
 ynh_config_add --template="config.php" --destination="$install_dir/application/config/config.php"
+
+#=================================================
+# SYSTEM CONFIGURATION
+#=================================================
+ynh_script_progression "Adding system configurations related to $app..."
+
+# Create a PHP-FPM config (with conf/extra_php-fpm.conf being appended to it)
+ynh_config_add_phpfpm
+
+# Create a dedicated NGINX config using the conf/nginx.conf template
+ynh_config_add_nginx
 
 #=================================================
 # INSTALL APP
@@ -67,15 +83,6 @@ ynh_safe_rm ./data.sql
 
 #ynh_setup_source "$data_dir/upload/templates/libreform" libreform
 #ynh_setup_source "$install_dir/upload/templates/librepoll" librepoll
-
-#=================================================
-# SYSTEM CONFIGURATION
-#=================================================
-ynh_script_progression "Adding system configurations related to $app..."
-
-ynh_config_add_phpfpm
-
-ynh_config_add_nginx
 
 #=================================================
 # END OF SCRIPT
