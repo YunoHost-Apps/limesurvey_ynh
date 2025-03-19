@@ -21,7 +21,7 @@ No se debe editar a mano.
 LimeSurvey is used to create advanced poll.
 
 
-**Versión actual:** 6.11.0~ynh1
+**Versión actual:** 6.12.0~ynh1
 
 ## Capturas
 

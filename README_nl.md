@@ -21,7 +21,7 @@ Hij mag NIET handmatig aangepast worden.
 LimeSurvey is used to create advanced poll.
 
 
-**Geleverde versie:** 6.11.0~ynh1
+**Geleverde versie:** 6.12.0~ynh1
 
 ## Schermafdrukken
 
