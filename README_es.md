@@ -3,7 +3,7 @@ Este archivo README esta generado automaticamente<https://github.com/YunoHost/ap
 No se debe editar a mano.
 -->
 
-# LimeSurvey para Yunohost
+# LimeSurvey para YunoHost
 
 [![Nivel de integración](https://apps.yunohost.org/badge/integration/limesurvey)](https://ci-apps.yunohost.org/ci/apps/limesurvey/)
 ![Estado funcional](https://apps.yunohost.org/badge/state/limesurvey)
@@ -21,7 +21,7 @@ No se debe editar a mano.
 LimeSurvey is used to create advanced poll.
 
 
-**Versión actual:** 6.12.0~ynh1
+**Versión actual:** 6.12.1~ynh1
 
 ## Capturas
 
