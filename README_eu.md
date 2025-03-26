@@ -21,7 +21,7 @@ EZ editatu eskuz.
 LimeSurvey is used to create advanced poll.
 
 
-**Paketatutako bertsioa:** 6.12.0~ynh1
+**Paketatutako bertsioa:** 6.12.1~ynh1
 
 ## Pantaila-argazkiak
 
@@ -40,7 +40,7 @@ LimeSurvey is used to create advanced poll.
 
 Bidali `pull request`a [`testing` abarrera](https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing).
 
-`testing` abarra probatzeko, ondorengoa egin:
+`testing` abarra probatzeko, honakoa egin:
 
 ```bash
 sudo yunohost app install https://github.com/YunoHost-Apps/limesurvey_ynh/tree/testing --debug
