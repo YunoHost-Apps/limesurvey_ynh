@@ -90,15 +90,15 @@ ram.runtime = "50M"
     [resources.apt]
     packages = [
         "python3-pip",
-        "php8.2-cli",
-        "php8.2-fpm",
-        "php8.2-mysql",
-        "php8.2-imap",
-        "php8.2-gd",
-        "php8.2-ldap",
-        "php8.2-zip",
-        "php8.2-mbstring",
-        "php8.2-xml",
+        "php8.4-cli",
+        "php8.4-fpm",
+        "php8.4-mysql",
+        "php8.4-imap",
+        "php8.4-gd",
+        "php8.4-ldap",
+        "php8.4-zip",
+        "php8.4-mbstring",
+        "php8.4-xml",
         "mariadb-server",
     ]
 
