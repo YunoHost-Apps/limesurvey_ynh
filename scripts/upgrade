@@ -40,7 +40,7 @@ fi
 ynh_script_progression "Upgrading source files..."
 
 # Download, check integrity, uncompress and patch the source from manifest.toml
-ynh_setup_source --dest_dir="$install_dir" --full_replace --keep="plugins/ application/config/config.php"
+ynh_setup_source --dest_dir="$install_dir" --full_replace --keep="plugins/ application/config/config.php application/config/security.php"
 
 ynh_safe_rm "$install_dir/upload"
 ln -s "$data_dir/upload" "$install_dir/upload"
