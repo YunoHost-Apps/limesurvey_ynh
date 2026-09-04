@@ -7,7 +7,7 @@ name = "LimeSurvey"
 description.en = "Create and distribute surveys"
 description.fr = "Outil de création et diffusion de sondage"
 
-version = "7.0.10~ynh1"
+version = "7.0.12~ynh1"
 
 maintainers = ["ljf"]
 
@@ -60,8 +60,8 @@ ram.runtime = "50M"
 [resources]
     [resources.sources]
     [resources.sources.main]
-    url = "https://github.com/LimeSurvey/LimeSurvey/archive/refs/tags/7.0.10+260813.tar.gz"
-    sha256 = "c25a2b64abcca28e783fb9740dd38fe03de747691cc705feb538e52beefa1299"
+    url = "https://github.com/LimeSurvey/LimeSurvey/archive/refs/tags/7.0.12+260833.tar.gz"
+    sha256 = "295101354fb40fd9cd1fdec15fdfd7dad4923cf35a0760c0f7b4679092ce608d"
     autoupdate.strategy = "latest_github_tag"
     autoupdate.version_regex = "^(.*)\\+.*$"
 
