@@ -30,11 +30,11 @@ INSERT INTO `__PREFIX__plugin_settings` (`id`, `plugin_id`, `model`, `model_id`,
 (22, 5, NULL, NULL, 'allowInitialUser', '\"1\"');
 
 
-#INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key`, `value`) VALUES
-#(23, 7, NULL, NULL, 'strip_domain', 'null'),
-#(24, 7, NULL, NULL, 'serverkey', '"REMOTE_USER"'),
-#(25, 7,NULL,NULL,'is_default','\"1\"');
+--INSERT INTO `lime_plugin_settings` (`id`, `plugin_id`, `model`, `model_id`, `key`, `value`) VALUES
+--(23, 7, NULL, NULL, 'strip_domain', 'null'),
+--(24, 7, NULL, NULL, 'serverkey', '"REMOTE_USER"'),
+--(25, 7,NULL,NULL,'is_default','\"1\"');
 
 INSERT INTO `__PREFIX__settings_global` VALUES
-('defaultlang','__LANGUAGE__'),
-('AssetsVersion','30214');
+('defaultlang','__LANGUAGE__');
+--('AssetsVersion','30214');
