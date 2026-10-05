@@ -37,4 +37,4 @@ INSERT INTO `__PREFIX__plugin_settings` (`id`, `plugin_id`, `model`, `model_id`,
 
 INSERT INTO `__PREFIX__settings_global` VALUES
 ('defaultlang','__LANGUAGE__'),
-('AssetsVersion','30214');
+#('AssetsVersion','30214');
