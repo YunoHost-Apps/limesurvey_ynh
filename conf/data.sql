@@ -35,6 +35,3 @@ INSERT INTO `__PREFIX__plugin_settings` (`id`, `plugin_id`, `model`, `model_id`,
 #(24, 7, NULL, NULL, 'serverkey', '"REMOTE_USER"'),
 #(25, 7,NULL,NULL,'is_default','\"1\"');
 
-INSERT INTO `__PREFIX__settings_global` VALUES
-('defaultlang','__LANGUAGE__'),
-('AssetsVersion','30214');
