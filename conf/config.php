@@ -65,7 +65,8 @@ return array(
         // 'use_asset_manager'=>true, // Uncomment if you want to use debug mode and asset manager at the same time
         'enableLdap' => true,
         'force_ssl' => true,
-        'uploaddir' => '__DATA_DIR__/upload'
+        'uploaddir' => '__DATA_DIR__/upload',
+        'publicurl' => 'https://__DOMAIN____PATH__/',
     )
 );
 /* End of file config.php */
