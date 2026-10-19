@@ -86,6 +86,12 @@ ram.runtime = "50M"
     admin.url = "/admin"
     admin.allowed = "admins"
     admin.show_tile = false
+    
+    api.url = "/rest/v1"
+    api.auth_header = false
+    api.allowed = "visitors"
+    api.show_tile = false
+    api.protected = true
 
     [resources.apt]
     packages = [
